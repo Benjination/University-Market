@@ -1,0 +1,17 @@
+{
+  "client_id" : "6b35c16d-f188-4c6e-81a2-25af3f8d3bd1",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://com.example.universitymarket/gYfucgrOlZ3FLWgYctqk1bCxZbo%3D",
+  "broker_redirect_uri_registered": false,
+  "minimum_required_broker_protocol_version" : "4.0",
+  "account_mode" : "SINGLE",
+  "authorities" : [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "AzureADMultipleOrgs",
+        "tenant_id": "organizations"
+      }
+    }
+  ]
+}
