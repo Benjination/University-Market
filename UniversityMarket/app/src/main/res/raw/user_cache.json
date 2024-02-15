@@ -1,0 +1,24 @@
+{
+  "email" : "",
+  "access_token": "",
+  "info" : [
+    {
+      "first_name": "",
+      "middle_name": "",
+      "last_name": "",
+      "domain": "",
+      "tenant_id": "",
+      "date_registered": ""
+    }
+  ],
+  "posts": [
+    {
+      "count": "",
+      "sample_item": {
+        "name": "",
+        "price": "",
+        "image_url": ""
+      }
+    }
+  ]
+}

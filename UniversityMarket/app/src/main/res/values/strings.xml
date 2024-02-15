@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">University Market</string>
+
+    <string name="main_sample_button0_txt">Nav to Sample Page</string>
+    <string name="main_sample_button1_txt">Print to Console</string>
+    <string name="sample_sample_label0_txt">This is a sample string stored in \'res/values/strings.xml\', this is good practice!</string>
+    <string name="sample_sample_spinner0_txt0">This is a preset sample option</string>
+    <string name="sample_sample_spinner0_txt1">This is another preset sample option</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
