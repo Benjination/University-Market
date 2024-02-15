@@ -30,31 +30,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_sample_button0" />
 
-    <TextView
-        android:id="@+id/main_login_label0"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="135dp"
-        android:layout_marginEnd="135dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/main_login_label0_txt"
-        app:layout_constraintBottom_toTopOf="@+id/main_login_label1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/main_login_label1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="138dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="138dp"
-        android:layout_marginBottom="68dp"
-        android:text="@string/main_login_label1_txt"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_login_label0" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
