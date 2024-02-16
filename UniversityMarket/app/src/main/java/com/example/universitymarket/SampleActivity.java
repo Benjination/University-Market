@@ -1,7 +1,6 @@
 package com.example.universitymarket;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
 public class SampleActivity extends AppCompatActivity {
