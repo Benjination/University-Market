@@ -1,0 +1,29 @@
+{
+  "id": "",
+  "about": {
+      "item_title": "",
+      "item_description": "",
+      "author_email": "",
+      "list_price": "",
+      "image_urls": [
+        "test",
+        "tests"
+      ],
+      "date_created": ""
+  },
+  "genres": [
+    "sample",
+    "this",
+    "that"
+  ],
+  "descriptors": [
+    {
+      "sample": "this",
+      "tsa": "that"
+    },
+    {
+      "sample": "this",
+      "tsa": "that"
+    }
+  ]
+}

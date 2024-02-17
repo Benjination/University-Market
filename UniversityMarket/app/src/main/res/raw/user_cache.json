@@ -1,24 +1,17 @@
 {
-  "email" : "",
-  "access_token": "",
-  "info" : [
-    {
-      "first_name": "",
-      "middle_name": "",
-      "last_name": "",
-      "domain": "",
-      "tenant_id": "",
-      "date_registered": ""
-    }
-  ],
-  "posts": [
-    {
-      "count": "",
-      "sample_item": {
-        "name": "",
-        "price": "",
-        "image_url": ""
-      }
-    }
+  "email": "das",
+  "access_token": "asdlkfdsa",
+  "info": {
+      "username": "dasd",
+      "first_name": "Hi",
+      "middle_name": "There",
+      "last_name": "Firebase",
+      "domain": "sdfsafd",
+      "tenant_id": "3r234234",
+      "date_registered": "2/16/2024"
+  },
+  "user_posts": [
+    "3424",
+    "34234"
   ]
 }
