@@ -30,4 +30,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_sample_button0" />
 
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="261dp"
+        android:layout_height="469dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/logo" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="241dp"
+        android:layout_height="248dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/maverick" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
