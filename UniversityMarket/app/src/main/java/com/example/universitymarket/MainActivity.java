@@ -12,27 +12,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         configureButtons();
     }
 
     private void configureButtons() {
         Button sampleButton0 = findViewById(R.id.main_sample_button0);
         Button sampleButton1 = findViewById(R.id.main_sample_button1);
-
         sampleButton0.setOnClickListener(this);
         sampleButton1.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        Intent btn_i;
         switch (v.getId()) {
             case R.id.main_sample_button0:
-                Intent btn_i = new Intent(this, SampleActivity.class);
+                btn_i = new Intent(this, SampleActivity.class);
                 startActivity(btn_i);
                 break;
             case R.id.main_sample_button1:
-                Log.i("Console msg", "Hello there, from console button!");
+                btn_i = new Intent(this, DashboardActivity.class);
+                startActivity(btn_i);
                 break;
             default:
                 Log.i("Console msg", "Non-event triggering press");

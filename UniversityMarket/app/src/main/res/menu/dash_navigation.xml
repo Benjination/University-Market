@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/dash_records_button"
+        android:icon="@drawable/record_icon"
+        android:title="@string/dash_records_button_txt" />
+    <item
+        android:id="@+id/dash_cart_button"
+        android:icon="@drawable/cart_icon"
+        android:title="@string/dash_cart_button_txt" />
+    <item
+        android:id="@+id/dash_home_button"
+        android:checked="true"
+        android:icon="@drawable/home_icon"
+        android:title="@string/dash_home_button_txt" />
+    <item
+        android:id="@+id/dash_test_button"
+        android:icon="@drawable/test_icon"
+        android:title="@string/dash_test_button_txt" />
+    <item
+        android:id="@+id/dash_profile_button"
+        android:icon="@drawable/user_icon"
+        android:title="@string/dash_profile_button_txt" />
+</menu>

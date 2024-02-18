@@ -37,7 +37,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/logo" />
+        android:src="@drawable/image_placeholder" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -46,6 +46,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/maverick" />
+        android:src="@drawable/image_placeholder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

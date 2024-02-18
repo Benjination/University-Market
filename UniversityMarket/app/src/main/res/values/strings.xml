@@ -2,10 +2,28 @@
     <string name="app_name">University Market</string>
 
     <string name="main_sample_button0_txt">Nav to Sample Page</string>
-    <string name="main_sample_button1_txt">Print to Console</string>
+    <string name="main_sample_button1_txt">Nav to Dashboard</string>
     <string name="sample_sample_label0_txt">This is a sample string stored in \'res/values/strings.xml\', this is good practice!</string>
     <string name="sample_sample_spinner0_txt0">This is a preset sample option</string>
     <string name="sample_sample_spinner0_txt1">This is another preset sample option</string>
+
+    <string name="dash_records_button_txt">Records</string>
+    <string name="dash_cart_button_txt">Cart</string>
+    <string name="dash_home_button_txt">Home</string>
+    <string name="dash_test_button_txt">Test</string>
+    <string name="dash_profile_button_txt">Profile</string>
+
+    <string name="actionbar_search_button_txt">Search</string>
+    <string name="actionbar_filter_button_txt">Filter</string>
+    <string name="actionbar_filter_option0_txt">All</string>
+    <string name="actionbar_filter_option1_txt">Textbooks</string>
+    <string name="actionbar_filter_option2_txt">Technology</string>
+    <string name="actionbar_filter_option3_txt">Supplies</string>
+
+    <string name="home_events_tab_txt">Events</string>
+    <string name="home_market_tab_txt">Market</string>
+    <string name="home_post_tab_txt">Post</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

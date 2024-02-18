@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.HomepageFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/home_actionbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:menu="@menu/actionbar_navigation" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/home_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/home_actionbar"
+        android:background="@color/design_default_color_primary"
+        app:tabIndicatorColor="@color/design_default_color_on_primary"
+        app:tabMode="fixed"
+        app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:tabTextColor="@color/design_default_color_on_primary">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/home_events_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_events_tab_txt" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/home_market_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_market_tab_txt" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/home_post_tab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/home_post_tab_txt" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/home_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/home_tabs">
+
+    </androidx.viewpager2.widget.ViewPager2>
+</RelativeLayout>
