@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/actionbar_filter_button"
+        android:icon="@drawable/filter_outline_icon"
+        android:title="@string/actionbar_filter_button_txt">
+        <menu>
+            <group
+                android:id="@+id/actionbar_switch_group"
+                android:menuCategory="container">
+
+                <item
+                    android:id="@+id/actionbar_switch0"
+                    android:title="@string/actionbar_filter_option0_txt"
+                    app:actionLayout="@layout/switch_item"
+                    app:showAsAction="ifRoom" />
+                <item
+                    android:id="@+id/actionbar_switch1"
+                    android:title="@string/actionbar_filter_option1_txt"
+                    app:actionLayout="@layout/switch_item"
+                    app:showAsAction="ifRoom" />
+                <item
+                    android:id="@+id/actionbar_switch2"
+                    android:title="@string/actionbar_filter_option2_txt"
+                    app:actionLayout="@layout/switch_item"
+                    app:showAsAction="ifRoom" />
+                <item
+                    android:id="@+id/actionbar_switch3"
+                    android:title="@string/actionbar_filter_option3_txt"
+                    app:actionLayout="@layout/switch_item"
+                    app:showAsAction="ifRoom" />
+            </group>
+        </menu>
+    </item>
+</menu>
