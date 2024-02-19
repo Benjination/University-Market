@@ -20,7 +20,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button sampleButton1 = findViewById(R.id.main_sample_button1);
         sampleButton0.setOnClickListener(this);
         sampleButton1.setOnClickListener(this);
+
+        //Ben
+        Button login = findViewById(R.id.login);
+        login.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
+        });
+        //
     }
+
 
     @Override
     public void onClick(View v) {
