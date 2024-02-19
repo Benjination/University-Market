@@ -4,16 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.CartFragment">
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
+    tools:context=".fragments.WatchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/design_default_color_primary"
         android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <TextView
             android:id="@+id/textView5"
@@ -21,8 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingHorizontal="20dp"
-            android:text="Shopping Cart"
+            android:text="@string/dash_watch_view_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/design_default_color_on_primary"
             android:textSize="34sp" />
 
         <Space

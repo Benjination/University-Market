@@ -19,13 +19,11 @@ public class HomepageAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch(position){
             case 0:
-                return new EventsFragment();
-            case 2:
                 return new PostFragment();
             default :
                 return new MarketFragment();
         }
     }
 
-    @Override public int getItemCount() { return 3; }
+    @Override public int getItemCount() { return 2; }
 }

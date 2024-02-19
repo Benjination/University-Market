@@ -36,7 +36,6 @@ public class HomepageFragment extends Fragment {
         ViewPager2 pager = view.findViewById(R.id.home_pager);
 
         Drawable market_icon = ContextCompat.getDrawable(view.getContext(), R.drawable.market_icon);
-        Drawable events_icon = ContextCompat.getDrawable(view.getContext(), R.drawable.event_icon);
         Drawable post_icon = ContextCompat.getDrawable(view.getContext(), R.drawable.post_icon);
 
         HomepageAdapter adapter = new HomepageAdapter((FragmentActivity) getContext());
@@ -45,15 +44,11 @@ public class HomepageFragment extends Fragment {
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setText("EVENTS");
-                    tab.setIcon(events_icon);
-                    break;
-                case 1:
-                    tab.setText("MARKET");
+                    tab.setText("Market");
                     tab.setIcon(market_icon);
                     break;
-                case 2:
-                    tab.setText("POST");
+                case 1:
+                    tab.setText("Post");
                     tab.setIcon(post_icon);
             }
         }
