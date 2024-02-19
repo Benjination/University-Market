@@ -91,19 +91,19 @@
             android:id="@+id/button657"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="My Posts" />
 
         <Button
             android:id="@+id/button55"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="My impressions" />
 
         <Button
             android:id="@+id/button44"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Sign out" />
     </LinearLayout>
 
     <Space
