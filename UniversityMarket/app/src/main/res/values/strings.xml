@@ -28,5 +28,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login_demo">Login Demo</string>
+    <string name="enter_your_email">Enter Your Email</string>
+    <string name="enter_your_password">Enter Your Password</string>
+    <string name="log_in">Log In</string>
+    <string name="mavlogo">MavLogo</string>
+    <string name="back_to_main">Back To Main</string>
+    <string name="invalid_email">That\'s an Invalid password or email address. University Marketplace is exclusively for students, So you will have to login with your student email address.</string>
+    <string name="got_it">Got It</string>
+    <string name="emailsentstudent">An email has been sent to your student address. Please verify your account.</string>
+    <string name="emailsentmod">An email has been sent to your faculty/staff account. Please verify your email.</string>
 
 </resources>
