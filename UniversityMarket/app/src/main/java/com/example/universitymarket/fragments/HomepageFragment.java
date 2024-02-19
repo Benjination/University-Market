@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.HomepageAdapter;
 import com.google.android.material.tabs.TabLayout;
