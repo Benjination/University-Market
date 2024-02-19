@@ -50,25 +50,36 @@ public class MarketFragment extends Fragment {
 
         // Create an ArrayList of PostModel objects
         ArrayList<PostModel> postModelArrayList = new ArrayList<PostModel>();
-        postModelArrayList.add(new PostModel("$50 - Post Title 1", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 2", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 3", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 4", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 5", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 6", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 7", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 8", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 9", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 10", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 11", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 12", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 13", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 14", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 15", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 16", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 17", R.drawable.image_placeholder));
-        postModelArrayList.add(new PostModel("$50 - Post Title 18", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$15 - Code Complete Textbook", R.drawable.code_complete_thumbnail));
+        postModelArrayList.add(new PostModel("$5 - Raspberry Pi Charger", R.drawable.raspberry_pi_charger_thumbnail));
+        postModelArrayList.add(new PostModel("$10 - Object Oriented Software Engineering Textbook", R.drawable.ooswe_thumbnail));
+        postModelArrayList.add(new PostModel("$18 - Fundamentals of Software Engineering Textbook", R.drawable.fswe_thumbnail));
+        postModelArrayList.add(new PostModel("$20 - MacBook Charger", R.drawable.macbook_charger_thumbnail));
+        postModelArrayList.add(new PostModel("$10 - Program Development in Java Textbook", R.drawable.java_programming_thumbnail));
+        postModelArrayList.add(new PostModel("$30 - Mini Fridge", R.drawable.mini_fridge_thumbnail));
+        postModelArrayList.add(new PostModel("$40 - Raspberry Pi", R.drawable.raspberry_pi_thumbnail));
+        postModelArrayList.add(new PostModel("$5 - Software Engineering Textbook", R.drawable.software_eng_thumbnail));
+        postModelArrayList.add(new PostModel("$25 - Applying UML and Patterns Textbook", R.drawable.uml_thumbnail));
+        postModelArrayList.add(new PostModel("$45 - TI-84", R.drawable.ti84_thumbnail));
+        postModelArrayList.add(new PostModel("$10 - TI-30", R.drawable.ti30_thumbnail));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 13", R.drawable.image_placeholder));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 14", R.drawable.image_placeholder));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 15", R.drawable.image_placeholder));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 16", R.drawable.image_placeholder));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 17", R.drawable.image_placeholder));
+//        postModelArrayList.add(new PostModel("$50 - Post Title 18", R.drawable.image_placeholder));
 
+        // Set maximum length for post name
+        int maxLength = 20; // Change this value as needed
+
+        for (PostModel postModel : postModelArrayList) {
+            String originalTitle = postModel.getPost_name();
+            if (originalTitle.length() > maxLength) {
+                // Truncate the post name if it's too long
+                String truncatedTitle = originalTitle.substring(0, maxLength) + "...";
+                postModel.setPost_name(truncatedTitle);
+            }
+        }
         // Create the adapter and set it to the GridView
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
         postsGV.setAdapter(adapter1);
