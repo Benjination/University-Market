@@ -16,11 +16,6 @@ import com.example.universitymarket.utilities.PostModel;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link MarketFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 //public class MarketFragment extends Fragment {
 //
 //    // TODO: Rename parameter arguments, choose names that match
@@ -50,18 +45,18 @@ public class MarketFragment extends Fragment {
 
         // Create an ArrayList of PostModel objects
         ArrayList<PostModel> postModelArrayList = new ArrayList<PostModel>();
-        postModelArrayList.add(new PostModel("$15 - Code Complete Textbook", R.drawable.code_complete_thumbnail));
-        postModelArrayList.add(new PostModel("$5 - Raspberry Pi Charger", R.drawable.raspberry_pi_charger_thumbnail));
-        postModelArrayList.add(new PostModel("$10 - Object Oriented Software Engineering Textbook", R.drawable.ooswe_thumbnail));
-        postModelArrayList.add(new PostModel("$18 - Fundamentals of Software Engineering Textbook", R.drawable.fswe_thumbnail));
-        postModelArrayList.add(new PostModel("$20 - MacBook Charger", R.drawable.macbook_charger_thumbnail));
-        postModelArrayList.add(new PostModel("$10 - Program Development in Java Textbook", R.drawable.java_programming_thumbnail));
-        postModelArrayList.add(new PostModel("$30 - Mini Fridge", R.drawable.mini_fridge_thumbnail));
-        postModelArrayList.add(new PostModel("$40 - Raspberry Pi", R.drawable.raspberry_pi_thumbnail));
-        postModelArrayList.add(new PostModel("$5 - Software Engineering Textbook", R.drawable.software_eng_thumbnail));
-        postModelArrayList.add(new PostModel("$25 - Applying UML and Patterns Textbook", R.drawable.uml_thumbnail));
-        postModelArrayList.add(new PostModel("$45 - TI-84", R.drawable.ti84_thumbnail));
-        postModelArrayList.add(new PostModel("$10 - TI-30", R.drawable.ti30_thumbnail));
+        postModelArrayList.add(new PostModel("$15 - Code Complete Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$5 - Raspberry Pi Charger", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$10 - Object Oriented Software Engineering Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$18 - Fundamentals of Software Engineering Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$20 - MacBook Charger", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$10 - Program Development in Java Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$30 - Mini Fridge", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$40 - Raspberry Pi", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$5 - Software Engineering Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$25 - Applying UML and Patterns Textbook", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$45 - TI-84", R.drawable.image_placeholder));
+        postModelArrayList.add(new PostModel("$10 - TI-30", R.drawable.image_placeholder));
 //        postModelArrayList.add(new PostModel("$50 - Post Title 13", R.drawable.image_placeholder));
 //        postModelArrayList.add(new PostModel("$50 - Post Title 14", R.drawable.image_placeholder));
 //        postModelArrayList.add(new PostModel("$50 - Post Title 15", R.drawable.image_placeholder));
