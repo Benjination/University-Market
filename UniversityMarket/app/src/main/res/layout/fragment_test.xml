@@ -7,14 +7,16 @@
     tools:context=".fragments.TestFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/design_default_color_primary"
         android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <TextView
             android:id="@+id/textView5"
@@ -22,8 +24,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:paddingHorizontal="20dp"
-            android:text="Test page"
+            android:text="@string/dash_test_view_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/design_default_color_on_primary"
             android:textSize="34sp" />
 
         <Space

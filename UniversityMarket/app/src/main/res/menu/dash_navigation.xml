@@ -6,9 +6,10 @@
         android:icon="@drawable/record_icon"
         android:title="@string/dash_records_button_txt" />
     <item
-        android:id="@+id/dash_cart_button"
-        android:icon="@drawable/cart_icon"
-        android:title="@string/dash_cart_button_txt" />
+        android:id="@+id/dash_watch_button"
+        android:icon="@drawable/watch_icon"
+        android:title="@string/dash_watch_button_txt"
+        android:visible="false" />
     <item
         android:id="@+id/dash_home_button"
         android:checked="true"

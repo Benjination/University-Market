@@ -3,7 +3,7 @@ package com.example.universitymarket;
 import android.os.Bundle;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.universitymarket.fragments.CartFragment;
+import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.HomepageFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.RecordsFragment;
@@ -13,7 +13,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class DashboardActivity extends AppCompatActivity {
 
     RecordsFragment records = new RecordsFragment();
-    CartFragment cart = new CartFragment();
+    WatchFragment cart = new WatchFragment();
     HomepageFragment home = new HomepageFragment();
     TestFragment test = new TestFragment();
     ProfileFragment profile = new ProfileFragment();
@@ -39,7 +39,7 @@ public class DashboardActivity extends AppCompatActivity {
                 case R.id.dash_records_button:
                     getSupportFragmentManager().beginTransaction().replace(R.id.dash_fragment_buffer, records).commit();
                     break;
-                case R.id.dash_cart_button:
+                case R.id.dash_watch_button:
                     getSupportFragmentManager().beginTransaction().replace(R.id.dash_fragment_buffer, cart).commit();
                     break;
                 case R.id.dash_home_button:

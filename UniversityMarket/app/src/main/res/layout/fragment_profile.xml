@@ -7,14 +7,15 @@
     android:orientation="vertical"
     tools:context=".fragments.ProfileFragment">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="50dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/design_default_color_primary"
         android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,6 +37,7 @@
                     android:layout_weight="1"
                     android:text="Mary Beth"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:textColor="@color/design_default_color_on_primary"
                     android:textSize="34sp"
                     android:theme="@style/Theme.UniversityMarket" />
 
@@ -44,14 +46,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="abc1234@mavs.uta.edu" />
+                    android:text="abc1234@mavs.uta.edu"
+                    android:textColor="@color/design_default_color_on_primary" />
 
                 <TextView
                     android:id="@+id/textView13"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="5 Posts" />
+                    android:text="5 Posts"
+                    android:textColor="@color/design_default_color_on_primary" />
             </LinearLayout>
 
             <ImageView
@@ -59,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="20dp"
-                android:src="@drawable/image_placeholder"/>
+                android:src="@drawable/image_placeholder" />
         </LinearLayout>
 
         <Space
