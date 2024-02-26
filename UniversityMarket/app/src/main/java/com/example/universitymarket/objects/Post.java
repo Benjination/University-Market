@@ -1,49 +1,43 @@
 package com.example.universitymarket.objects;
 
-import androidx.annotation.Nullable;
-import com.example.universitymarket.globals.Policy;
-import com.example.universitymarket.utilities.Network;
-import java.util.ArrayList;
-import java.util.Arrays;
+import com.example.universitymarket.utilities.Data;
 import java.util.HashMap;
 import java.util.List;
 
 public class Post extends HashMap<String, Object> {
-    @Nullable private String id = null;
-    @Nullable private HashMap<String, Object> about = null;
-    @Nullable private List<String> genres = null;
-    @Nullable private List<HashMap<String, Object>> descriptors = null;
-    private List<String> image_urls = new ArrayList<>();
-    private HashMap<String, Object> descriptor_map = new HashMap<>();
+    private String id;
+    private HashMap<String, Object> about;
+    private List<Object> descriptors;
+    private List<String> image_urls;
+    private List<String> transact_ids;
+    private HashMap<String, Object> descriptorMap = new HashMap<>();
 
-    public void lateConstructor() {
-        if(id == null) {
-            id = (String) super.get("id");
-            about = (HashMap<String, Object>) super.get("info");
-            genres = (List<String>) super.get("genres");
-            descriptors = (List<HashMap<String, Object>>) super.get("descriptors");
-            initImageUrls();
-            initDescriptors();
-        }
-    }
+    public Post(HashMap<String, Object> rawdata) {
+        super.put("id", rawdata.get("id"));
+        super.put("about", rawdata.get("about"));
+        super.put("descriptors", rawdata.get("descriptors"));
+        id = (String) super.get("id");
+        about = (HashMap<String, Object>) super.get("about");
+        descriptors = (List<Object>) super.get("descriptors");
+        image_urls = (List<String>) about.get("image_urls");
+        transact_ids = (List<String>) about.get("transact_ids");
 
-    private void initImageUrls() {
-        List<?> indefinite = (ArrayList<?>) Arrays.asList(((HashMap<String, ?>) about.get("image_urls")).keySet().toArray());
-        for(int i=0; i<Policy.max_images_per_post && i<indefinite.size(); i++) {
-            image_urls.add((String) indefinite.get(i));
-        }
-    }
-
-    private void initDescriptors() {
-        for(int i=0; i<Policy.max_genres_per_item * Policy.max_descriptors_per_genre && i<descriptors.size(); i++) {
-            descriptors.get(i).forEach((key, value) -> descriptor_map.merge(key, value, (oldValue, newValue) -> {
-                if (oldValue.toString().equals(newValue)) { return oldValue; }
-                else { return newValue; }
-            }));
+        for(Object o : descriptors) {
+            Data.mergeHash(descriptorMap, (HashMap<String, Object>) descriptors);
         }
     }
 
     public String getId() { return id; }
+
+    public HashMap<String, Object> getAbout() { return about; }
+
+    public List<Object> getDescriptors() { return descriptors; }
+
+    public List<String> getImageUrls() { return image_urls; }
+
+    public List<String> getTransactIds() { return transact_ids; }
+
+    public HashMap<String, Object> getDescriptorMap() { return descriptorMap; }
 
     public String getTitle() { return (String) about.get("item_title"); }
 
@@ -51,22 +45,14 @@ public class Post extends HashMap<String, Object> {
 
     public String getAuthorEmail() { return (String) about.get("author_email"); }
 
-    public List<String> getAuthorName() {
-        User author = Network.getUser(getAuthorEmail());
-        assert author != null;
-        List<String> names = new ArrayList<>(author.getName());
-        return names;
-    }
-
-    public float getPrice() { return Float.parseFloat((String) about.get("list_price")); }
-
-    public List<String> getImages() { return image_urls; }
+    public String getPrice() { return (String) about.get("list_price"); }
 
     public String getDateCreated() { return (String) about.get("date_created"); }
 
-    public List<String> getGenres() { return genres; }
+    public String getGenre() { return (String) about.get("genre"); }
 
-    public HashMap<String, Object> getDescriptors() { return descriptor_map; }
-
-    public List<HashMap<String, Object>> getSeparatedDescriptors() { return descriptors; }
+    public HashMap<String, Object> getSuper() {
+        HashMap<String, Object> parent = this;
+        return parent;
+    }
 }

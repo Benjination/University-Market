@@ -1,74 +1,44 @@
 package com.example.universitymarket.objects;
 
-import android.util.Log;
-import androidx.annotation.Nullable;
-import com.example.universitymarket.utilities.Network;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 public class User extends HashMap<String, Object> {
-    @Nullable private String email = null;
-    @Nullable private HashMap<String, Object> info = null;
-    @Nullable private List<String> post_ids = null;
-    @Nullable private List<String> shopping_cart = null;
+    private String id;
+    private HashMap<String, Object> about;
+    private HashMap<String, Object> interactions;
+    private List<String> post_ids;
+    private List<String> watch_ids;
+    private List<String> transact_ids;
 
-    public void lateConstructor() {
-        if(email == null) {
-            email = (String) super.get("email");
-            info = (HashMap<String, Object>) super.get("info");
-            post_ids = (List<String>) super.get("post_ids");
-            shopping_cart = (List<String>) super.get("shopping_cart");
-        }
+    public User(HashMap<String, Object> rawdata) {
+        super.put("id", rawdata.get("id"));
+        super.put("about", rawdata.get("about"));
+        super.put("interactions", rawdata.get("interactions"));
+        id = (String) super.get("id");
+        about = (HashMap<String, Object>) super.get("about");
+        interactions = (HashMap<String, Object>) super.get("interactions");
+        post_ids = (List<String>) interactions.get("post_ids");
+        watch_ids = (List<String>) interactions.get("watch_ids");
+        transact_ids = (List<String>) interactions.get("transact_ids");
     }
 
-    public List<String> getName() {
-        List<String> name = new ArrayList<>();
-        name.add((String) info.get("first_name"));
-        name.add((String) info.get("middle_name"));
-        name.add((String) info.get("last_name"));
-        return name;
-    }
+    public String getId() { return id; }
 
-    public long getEpochRegistered() {
-        String raw = (String) info.get("date_registered");
-        Date date;
-        try {
-            date = DateFormat.getDateInstance().parse(raw);
-            date.getTime();
-        } catch(Exception e) {
-            Log.e("Date parsing error", e.getMessage());
-            return -1;
-        }
-        return date.getTime();
-    }
+    public String getEmail() { return id; }
 
-    public List<Post> getPosts() {
-        List<Post> buffer = new ArrayList<>();
-        for(String id : post_ids)
-            buffer.add(Network.getPost(id));
-        return buffer;
-    }
+    public HashMap<String, Object> getAbout() { return about; }
 
-    public String getEmail() { return email; }
-
-    public String getUsername() {
-        return (String) info.get("username");
-    }
-
-    public String getDomain() { return (String) info.get("domain"); }
-
-    public int getTenantID() {
-        return Integer.parseInt((String) info.get("tenant_id"));
-    }
-
-    public String getDateRegistered() { return (String) info.get("date_registered"); }
-
-    public HashMap<String, Object> getInfo() { return info; }
+    public HashMap<String, Object> getInteractions() { return interactions; }
 
     public List<String> getPostIds() { return post_ids; }
 
-    public List<String> getShoppingCart() { return shopping_cart; }
+    public List<String> getWatchIds() { return watch_ids; }
+
+    public List<String> getTransactIds() { return transact_ids; }
+
+    public HashMap<String, Object> getSuper() {
+        HashMap<String, Object> parent = this;
+        return parent;
+    }
 }

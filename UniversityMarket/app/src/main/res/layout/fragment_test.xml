@@ -49,16 +49,22 @@
         android:paddingVertical="20dp">
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/test_upload_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/test_upload_button_txt" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/test_clear_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/test_clear_button_txt" />
+
+        <Button
+            android:id="@+id/test_download_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/test_download_button_txt" />
 
     </LinearLayout>
 

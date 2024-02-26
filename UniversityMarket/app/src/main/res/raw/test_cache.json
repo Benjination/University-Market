@@ -1,0 +1,12 @@
+{
+  "field_lvl1": "This is a lvl1 field",
+  "coll_lvl1": {
+    "field_lvl2": "This is a lvl2 field",
+    "list_lvl2": ["This is element 1 of a lvl2 list"]
+  },
+  "list_lvl1": [
+    {
+      "field_lvl3": "This is a lvl3 field inside of a list collection"
+    }
+  ]
+}
