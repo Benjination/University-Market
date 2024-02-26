@@ -1,15 +1,18 @@
 {
-  "email": "",
+  "id": "",
   "access_token": "",
-  "info": {
-      "username": "",
-      "first_name": "",
-      "middle_name": "",
-      "last_name": "",
-      "domain": "",
-      "tenant_id": "",
-      "date_registered": ""
+  "about": {
+    "username": "",
+    "first_name": "",
+    "middle_name": "",
+    "last_name": "",
+    "domain": "",
+    "tenant_id": "",
+    "date_created": ""
   },
-  "post_ids": [],
-  "shopping_cart": []
+  "interactions": {
+    "post_ids": [],
+    "watch_ids": [],
+    "transact_ids": []
+  }
 }

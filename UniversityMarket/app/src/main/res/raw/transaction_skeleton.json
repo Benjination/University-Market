@@ -1,0 +1,12 @@
+{
+  "id": "",
+  "about": {
+    "item_id": "",
+    "total_amount": "",
+    "buyer_email": "",
+    "seller_email": "",
+    "closing_date": "",
+    "status": ""
+  },
+  "payments": []
+}

@@ -1,13 +1,22 @@
 package com.example.universitymarket.utilities;
 
 import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
-import androidx.annotation.Nullable;
+import android.util.Pair;
+import androidx.annotation.NonNull;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.ActiveUser;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.objects.Test;
+import com.example.universitymarket.objects.Transaction;
 import com.example.universitymarket.objects.User;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.microsoft.identity.client.AcquireTokenSilentParameters;
 import com.microsoft.identity.client.AuthenticationCallback;
@@ -19,13 +28,19 @@ import com.microsoft.identity.client.PublicClientApplication;
 import com.microsoft.identity.client.SignInParameters;
 import com.microsoft.identity.client.SilentAuthenticationCallback;
 import com.microsoft.identity.client.exception.MsalException;
+import com.microsoft.identity.common.java.exception.ArgumentException;
+import org.json.JSONException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
-public abstract class Network {
+public abstract class Network extends AsyncTask {
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public boolean signIn(Activity cur_act){
@@ -64,19 +79,19 @@ public abstract class Network {
                                     boolean dne = false; //check with firebase against email
                                     if(!dne) {
                                         if (needs_resync[0]) {
-                                            clearCache(cur_act);
-                                            syncCache(cur_act, "download");
+                                            //clearCache(cur_act);
+                                            //syncCache(cur_act, "download");
                                             access_token[0] = res.getAccessToken();
                                             account[0] = res.getAccount();
                                         }
                                         //updateCache(cur_act, "access_token", access_token[0]);
-                                        syncCache(cur_act, "upload");
+                                        //syncCache(cur_act, "upload");
                                     } else {
                                         /*TODO:  String[][] data = createAccount(); //graph API
                                         for (String[] dat : data) {
                                             updateCache(cur_act, dat[0], dat[1]);
                                         }*/
-                                        syncCache(cur_act, "upload");
+                                        //syncCache(cur_act, "upload");
                                     }
                                 }
                                 @Override public void onError(MsalException e) {
@@ -112,117 +127,315 @@ public abstract class Network {
         return msalApp[0];
     }
 
-    public void uploadCache(Activity cur_act) {
-        db.collection("users").document(ActiveUser.email).set(Data.mapCache(cur_act))
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d("uploadCache", "Data uploaded successfully");
-                    } else {
-                        Log.e("uploadCache", "Error sending data: ", task.getException());
-                    }
+    @NonNull
+    @SafeVarargs
+    private static Task<HashMap<String, Object>> setDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID, boolean clear, HashMap<String, Object>... obj) {
+        final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
+        HashMap<String, Object> pojoObj = new HashMap<>();
+        HashMap<String, Object> pojo;
+        String illCollID = "Must be 'users', 'posts', 'transactions', or 'test'";
+        String illNumObj = "Must contain either zero or one argument";
+        String illReqObj = "Must contain an argument for 'posts' or 'transactions'";
+        String illNullData = "POJO data could not be found";
+
+        if(obj.length > 1) {
+            if(!source.getTask().isComplete())
+                source.setException(new ArgumentException("setDoc", "obj", illNumObj));
+            return source.getTask();
+        } else if(obj.length == 1) {
+            HashMap<String, Object> buffer = obj[0];
+            Data.mergeHash(pojoObj, buffer);
+        }
+
+        String filename = "test_cache.json";
+        DocumentReference reference = db.collection(collID).document(docID);
+
+        switch(collID) {
+            case "users":
+                filename = "user_cache.json";
+            case "test":
+                try {
+                    InputStream inp = new FileInputStream(
+                            cur_act.getCacheDir().getAbsolutePath() + "/um_cache/" + filename
+                    );
+                    pojo = Data.jsonToPOJO(inp);
+                } catch(FileNotFoundException e) {
+                    source.setException(e);
+                    return source.getTask();
+                }
+                break;
+            case "transactions":
+            case "posts":
+                if(obj.length == 0 && !clear) {
+                    if (!source.getTask().isComplete())
+                        source.setException(new ArgumentException("setDoc", "obj", illReqObj));
+                    return source.getTask();
+                } else {
+                    pojo = pojoObj;
+                }
+                break;
+            default:
+                if(!source.getTask().isComplete())
+                    source.setException(new ArgumentException("setDoc", "collID", illCollID));
+                return source.getTask();
+        }
+
+        if(clear || pojo == null) {
+            if (!source.getTask().isComplete()) {
+                if (clear) {
+                    reference.delete();
+                    source.setResult(new HashMap<>());
+                } else {
+                    source.setException(new NullPointerException(illNullData));
+                }
+            }
+            return source.getTask();
+        }
+
+        reference.set(pojo)
+                .addOnSuccessListener(task -> {
+                    if(!source.getTask().isComplete())
+                        source.setResult(pojo);
+                })
+                .addOnFailureListener(e -> {
+                    if(!source.getTask().isComplete())
+                        source.setException(e);
                 });
+        return source.getTask();
     }
 
-    public void downloadCache(Activity cur_act) {
+    @NonNull
+    private static Task<HashMap<String, Object>> getDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID) {
+        final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
+        String illCollID = "Must be 'users', 'posts', 'transactions', or 'test'";
+        String illNullData = "Collection '" + collID + "' or document '" + docID + "' does not exist";
+        String illFormat = "'" + docID + "' from '" + collID + "' is not in skeleton format!";
+        new Handler().postDelayed(() -> {
+            if (!source.getTask().isComplete())
+                source.setException(new TimeoutException());
+        }, Policy.max_seconds_before_timeout * 1000);
 
-    }
+        int resID;
+        HashMap<String, Object> pojo;
+        Task<DocumentSnapshot> reference = db.collection(collID).document(docID).get();
 
-
-
-    private void syncCache(Activity cur_act, String direction) {
-        if(direction.equals("upload")){
-
-        } else if (direction.equals("download")) {
-
+        switch(collID) {
+            case "users":
+                resID = R.raw.user_skeleton;
+                break;
+            case "posts":
+                resID = R.raw.post_skeleton;
+                break;
+            case "transactions":
+                resID = R.raw.transaction_skeleton;
+                break;
+            case "test":
+                resID = R.raw.test_skeleton;
+                break;
+            default:
+                if(!source.getTask().isComplete())
+                    source.setException(new ArgumentException("getDoc", "collID", illCollID));
+                return source.getTask();
         }
-    }
 
-    private void clearCache(Activity cur_act) {
+        InputStream inp = cur_act.getResources().openRawResource(resID);
+        pojo = Data.jsonToPOJO(inp);
 
-    }
-
-    public static @Nullable Post getPost(String postID) {
-        final Map<String, Object>[] rawdata = (Map<String, Object>[]) new HashMap<?,?>[1];
-
-        List<String> genres = new ArrayList<>();
-        List<HashMap<String, Object>> descriptors = new ArrayList<>();
-
-        db.collection("posts").document(postID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        rawdata[0] = (Map<String, Object>) task.getResult().getData();
-                    } else {
-                        Log.e("getPost", "Error getting data: ", task.getException());
+        reference
+                .addOnSuccessListener(task -> {
+                    if(!source.getTask().isComplete() && !reference.getResult().exists()) {
+                        source.setException(new NullPointerException(illNullData));
+                        return;
                     }
-                })
-        ;
-        timeOut(rawdata);
-        if(rawdata[0].isEmpty())
-            return null;
 
-        List<?> indefinite_genre = (ArrayList<?>) Arrays.asList(((HashMap<String, ?>) rawdata[0].get("genres")).keySet().toArray());
-        List<?> indefinite_desc = (ArrayList<?>) Arrays.asList(((HashMap<String, ?>) rawdata[0].get("descriptors")).keySet().toArray());
-        for(int i=0; i<Policy.max_genres_per_item && i<indefinite_genre.size() && i<indefinite_desc.size(); i++) {
-            genres.add((String) indefinite_genre.get(i));
-            descriptors.add((HashMap<String, Object>) indefinite_desc.get(i));
-        }
-
-        Post data = new Post();
-        data.put("id", (String) rawdata[0].get("item_id"));
-        data.put("about", (HashMap<String, Object>) rawdata[0].get("about"));
-        data.put("genres", genres);
-        data.put("descriptors", descriptors);
-        data.lateConstructor();
-
-        return data;
-    }
-
-    public static @Nullable User getUser(String email) {
-        final Map<String, Object>[] rawdata = (Map<String, Object>[]) new HashMap<?,?>[1];
-
-        List<String> post_ids = new ArrayList<>();
-        List<String> shopping_cart = new ArrayList<>();
-
-        db.collection("users").document(email)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        rawdata[0] = (Map<String, Object>) task.getResult().getData();
-                    } else {
-                        Log.e("getUser", "Error getting data: ", task.getException());
+                    Map<String, Object> rawdata = task.getData();
+                    List<Object> members = new ArrayList<>();
+                    for(String s : pojo.keySet()) {
+                        if(s.equals("access_token"))
+                            continue;
+                        members.add(rawdata.get(s));
                     }
+
+                    if(!source.getTask().isComplete() && isAnyObjectNull(members)) {
+                        source.setException(new JSONException(illFormat));
+                        return;
+                    }
+
+                    Data.mergeHash(pojo, rawdata);
+                    source.setResult((HashMap<String, Object>) rawdata);
                 })
-        ;
-        timeOut(rawdata);
-        if(rawdata[0].isEmpty())
-            return null;
+                .addOnFailureListener(e -> {
+                    if(!source.getTask().isComplete())
+                        source.setException(e);
+                });
 
-        List<?> indefinite_post = (ArrayList<?>) Arrays.asList(((HashMap<String, ?>) rawdata[0].get("post_ids")).keySet().toArray());
-        for(int i=0; i<Policy.max_posts_per_user && i<indefinite_post.size(); i++) {
-            post_ids.add((String) indefinite_post.get(i));
-        }
-
-        List<?> indefinite_cart = (ArrayList<?>) Arrays.asList(((HashMap<String, ?>) rawdata[0].get("shopping_cart")).keySet().toArray());
-        for(Object o : indefinite_cart) {
-            shopping_cart.add((String) o);
-        }
-
-        User data = new User();
-        data.put("email", (String) rawdata[0].get("email"));
-        data.put("info", (HashMap<String, Object>) rawdata[0].get("info"));
-        data.put("post_ids", post_ids);
-        data.put("shopping_cart", shopping_cart);
-        data.lateConstructor();
-
-        return data;
+        return source.getTask();
     }
 
-    public static void timeOut(@Nullable Object[] mutex) {
-        long startTime = System.currentTimeMillis();
-        while(mutex[0] == null && startTime <= startTime + 1000 * Policy.max_seconds_before_timeout);
-        if(mutex[0] == null) {
-            Log.e("Network", "Connection timeout");
+    @NonNull
+    public static Task<HashMap<String, Object>> setTest(@NonNull Activity cur_act, @NonNull String docID, boolean clear) {
+        return setDoc(cur_act, "test", docID, clear);
+    }
+
+    @NonNull
+    public static Task<Test> getTest(@NonNull Activity cur_act, @NonNull String docID) {
+        TaskCompletionSource<Test> source = new TaskCompletionSource<>();
+        getDoc(cur_act, "test", docID)
+                .addOnSuccessListener(task -> {
+                    Test result = new Test(task);
+                    source.setResult(result);
+                })
+                .addOnFailureListener(source::setException);
+        return source.getTask();
+    }
+
+    @NonNull
+    public static Task<HashMap<String, Object>> uploadActiveUser(@NonNull Activity cur_act, boolean clear) {
+        if(!ActiveUser.email.equals("unknown"))
+            return setDoc(cur_act, "users", ActiveUser.email, clear);
+        return setDoc(cur_act, "unknown", "", false);
+    }
+
+    @NonNull
+    public static Task<User> downloadActiveUser(@NonNull Activity cur_act) {
+        TaskCompletionSource<User> source = new TaskCompletionSource<>();
+        getDoc(cur_act, "users", ActiveUser.email)
+                .addOnSuccessListener(task -> {
+                    User result = new User(task);
+                    source.setResult(result);
+
+                    Pair<String, HashMap<String, Object>> pair = new Pair<>(
+                            "user_cache.json",
+                            result.getSuper()
+                    );
+                    List<Pair<String, HashMap<String, Object>>> list = new ArrayList<>();
+                    list.add(pair);
+                    Data.setCache(cur_act, list);
+                })
+                .addOnFailureListener(source::setException);
+        return source.getTask();
+    }
+
+    @NonNull
+    public static Task<User> getOtherUser(@NonNull Activity cur_act, @NonNull String docID) {
+        TaskCompletionSource<User> source = new TaskCompletionSource<>();
+        getDoc(cur_act, "users", docID)
+                .addOnSuccessListener(task -> {
+                    User result = new User(task);
+                    source.setResult(result);
+                })
+                .addOnFailureListener(source::setException);
+        return source.getTask();
+    }
+
+    @NonNull
+    public static List<Task<User>> getOtherUsers(@NonNull Activity cur_act, @NonNull String[] docID) {
+        List<Task<User>> responses = new ArrayList<>();
+        for(String s : docID) {
+            TaskCompletionSource<User> source = new TaskCompletionSource<>();
+            getDoc(cur_act, "users", s)
+                    .addOnSuccessListener(task -> {
+                        User result = new User(task);
+                        source.setResult(result);
+                    })
+                    .addOnFailureListener(source::setException);
+            responses.add(source.getTask());
         }
+        return responses;
+    }
+
+    @NonNull
+    public static Task<HashMap<String, Object>> setPost(@NonNull Activity cur_act, boolean clear, @NonNull Post postOBJ) {
+        if(postOBJ.getId() != null)
+            return setDoc(cur_act, "posts", postOBJ.getId(), clear, postOBJ);
+        return setDoc(cur_act, "unknown", "", false);
+    }
+
+    @NonNull
+    public static List<Task<HashMap<String, Object>>> setPosts(@NonNull Activity cur_act, boolean clear, @NonNull Post[] postOBJ) {
+        List<Task<HashMap<String, Object>>> responses = new ArrayList<>();
+        for(Post post : postOBJ) {
+            if(post.getId() != null)
+                responses.add(setDoc(cur_act, "posts", post.getId(), clear, post));
+        }
+        return responses;
+    }
+
+    @NonNull
+    public static Task<Post> getPost(@NonNull Activity cur_act, @NonNull String docID) {
+        TaskCompletionSource<Post> source = new TaskCompletionSource<>();
+        getDoc(cur_act, "posts", docID)
+                .addOnSuccessListener(task -> {
+                    Post result = new Post(task);
+                    source.setResult(result);
+                })
+                .addOnFailureListener(source::setException);
+        return source.getTask();
+    }
+
+    @NonNull
+    public static List<Task<Post>> getPosts(@NonNull Activity cur_act, @NonNull String[] docID) {
+        List<Task<Post>> responses = new ArrayList<>();
+        for(String s : docID) {
+            TaskCompletionSource<Post> source = new TaskCompletionSource<>();
+            getDoc(cur_act, "posts", s)
+                    .addOnSuccessListener(task -> {
+                        Post result = new Post(task);
+                        source.setResult(result);
+                    })
+                    .addOnFailureListener(source::setException);
+            responses.add(source.getTask());
+        }
+        return responses;
+    }
+
+    @NonNull
+    public static Task<HashMap<String, Object>> setTransaction(@NonNull Activity cur_act, boolean clear, @NonNull Transaction tsctOBJ) {
+        if(tsctOBJ.getId() != null)
+            return setDoc(cur_act, "transactions", tsctOBJ.getId(), clear, tsctOBJ);
+        return setDoc(cur_act, "unknown", "", false);
+    }
+
+    @NonNull
+    public static List<Task<HashMap<String, Object>>> setTransactions(@NonNull Activity cur_act, boolean clear, @NonNull Transaction[] tsctOBJ) {
+        List<Task<HashMap<String, Object>>> responses = new ArrayList<>();
+        for(Transaction tsct : tsctOBJ) {
+            if(tsct.getId() != null)
+                responses.add(setDoc(cur_act, "transactions", tsct.getId(), clear, tsct));
+        }
+        return responses;
+    }
+
+    @NonNull
+    public static Task<Transaction> getTransaction(@NonNull Activity cur_act, @NonNull String docID) {
+        TaskCompletionSource<Transaction> source = new TaskCompletionSource<>();
+        getDoc(cur_act, "transactions", docID)
+                .addOnSuccessListener(task -> {
+                    Transaction result = new Transaction(task);
+                    source.setResult(result);
+                })
+                .addOnFailureListener(source::setException);
+        return source.getTask();
+    }
+
+    @NonNull
+    public static List<Task<Transaction>> getTransactions(@NonNull Activity cur_act, @NonNull String[] docID) {
+        List<Task<Transaction>> responses = new ArrayList<>();
+        for(String s : docID) {
+            TaskCompletionSource<Transaction> source = new TaskCompletionSource<>();
+            getDoc(cur_act, "transactions", s)
+                    .addOnSuccessListener(task -> {
+                        Transaction result = new Transaction(task);
+                        source.setResult(result);
+                    })
+                    .addOnFailureListener(source::setException);
+            responses.add(source.getTask());
+        }
+        return responses;
+    }
+
+    public static boolean isAnyObjectNull(Object... objects) {
+        for (Object o : objects) { return o == null; }
+        return false;
     }
 }

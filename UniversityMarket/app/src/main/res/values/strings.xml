@@ -21,10 +21,16 @@
 
     <string name="actionbar_search_button_txt">Search</string>
     <string name="actionbar_filter_button_txt">Filter</string>
-    <string name="actionbar_filter_option0_txt">All</string>
-    <string name="actionbar_filter_option1_txt">Textbooks</string>
-    <string name="actionbar_filter_option2_txt">Technology</string>
-    <string name="actionbar_filter_option3_txt">Supplies</string>
+    <string name="actionbar_filter_option0_txt">Textbooks</string>
+    <string name="actionbar_filter_option1_txt">Technology</string>
+    <string name="actionbar_filter_option2_txt">Supplies</string>
+    <string name="actionbar_filter_option3_txt">Events</string>
+    <string name="actionbar_filter_option4_txt">Tutoring</string>
+    <string name="actionbar_filter_option5_txt">Miscellaneous</string>
+
+    <string name="test_upload_button_txt">Upload Test</string>
+    <string name="test_clear_button_txt">Clear Test Collection</string>
+    <string name="test_download_button_txt">Download Test</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

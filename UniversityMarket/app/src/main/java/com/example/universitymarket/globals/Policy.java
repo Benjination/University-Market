@@ -22,5 +22,4 @@ public interface Policy {
     int max_images_per_post = 5;
     int max_descriptors_per_genre = 10;
     int max_chars_per_description = 300;
-
 }
