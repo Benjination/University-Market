@@ -1,10 +1,8 @@
 package com.example.universitymarket.globals;
 
-import android.app.Activity;
 import android.app.Application;
-import com.example.universitymarket.objects.Post;
-import com.example.universitymarket.utilities.Network;
-import com.google.android.gms.tasks.Task;
+import android.content.Context;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +13,7 @@ public class ActiveUser extends Application {
     public static String id = "unknown";
     public static String access_token = "unknown";
     public static Map<String, Object> about = new HashMap<>();
+    public static Map<String, Object> interactions = new HashMap<>();
     public static List<String> post_ids = new ArrayList<>();
     public static List<String> watch_ids = new ArrayList<>();
     public static List<String> transact_ids = new ArrayList<>();
@@ -30,11 +29,14 @@ public class ActiveUser extends Application {
         super.onCreate();
     }
 
+    /*
     public static List<Task<Post>> getPosts(Activity cur_act){
         return Network.getPosts(cur_act, (String[]) post_ids.toArray());
     }
 
     public static List<Task<Post>> getWatches(Activity cur_act) {
         return Network.getPosts(cur_act, (String[]) watch_ids.toArray());
-    }
+    }*/
+
+
 }

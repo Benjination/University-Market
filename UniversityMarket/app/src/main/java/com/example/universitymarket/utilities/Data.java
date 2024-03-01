@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Data {
-
     public static void mergeHash(Map<String, Object> from, Map<String, Object> to) {
         from.forEach((key, value) -> to.merge(key, value, (oldValue, newValue) ->
                 !oldValue.equals(newValue) ? oldValue : newValue));
@@ -35,16 +34,17 @@ public abstract class Data {
         ActiveUser.email = (String) pojo.get("email");
         ActiveUser.id = (String) pojo.get("email");
         ActiveUser.about = (HashMap<String, Object>) pojo.get("about");
-        ActiveUser.post_ids = (List<String>) pojo.get("post_ids");
-        ActiveUser.watch_ids = (List<String>) pojo.get("watch_ids");
-        ActiveUser.transact_ids = (List<String>) pojo.get("transact_ids");
-        ActiveUser.username = (String) pojo.get("username");
-        ActiveUser.first_name = (String) pojo.get("first_name");
-        ActiveUser.middle_name = (String) pojo.get("middle_name");
-        ActiveUser.last_name = (String) pojo.get("last_name");
-        ActiveUser.domain = (String) pojo.get("domain");
-        ActiveUser.tenant_id = (String) pojo.get("tenant_id");
-        ActiveUser.date_created = (String) pojo.get("date_created");
+        ActiveUser.interactions = (HashMap<String, Object>) pojo.get("interactions");
+        ActiveUser.post_ids = (List<String>) ActiveUser.interactions.get("post_ids");
+        ActiveUser.watch_ids = (List<String>) ActiveUser.interactions.get("watch_ids");
+        ActiveUser.transact_ids = (List<String>) ActiveUser.interactions.get("transact_ids");
+        ActiveUser.username = (String) ActiveUser.about.get("username");
+        ActiveUser.first_name = (String) ActiveUser.about.get("first_name");
+        ActiveUser.middle_name = (String) ActiveUser.about.get("middle_name");
+        ActiveUser.last_name = (String) ActiveUser.about.get("last_name");
+        ActiveUser.domain = (String) ActiveUser.about.get("domain");
+        ActiveUser.tenant_id = (String) ActiveUser.about.get("tenant_id");
+        ActiveUser.date_created = (String) ActiveUser.about.get("date_created");
     }
 
     public static void setCache(@NonNull Activity cur_act, List<Pair<String, HashMap<String, Object>>> pojoPAIR) {
@@ -57,7 +57,7 @@ public abstract class Data {
         try {
             for (Pair<String, HashMap<String, Object>> p : pojoPAIR) {
                 String json = pojoToJSON(p.second);
-                FileWriter out = new FileWriter(path + "/" + p.first);
+                FileWriter out = new FileWriter(path + "/" + p.first + ".json");
                 out.write(json);
                 out.close();
             }
@@ -67,8 +67,8 @@ public abstract class Data {
     }
 
     @NonNull
-    public static HashMap<String, Object> getCache(@NonNull Activity cur_act, @NonNull String filename) {
-        File file = new File(cur_act.getCacheDir().getAbsolutePath() + "/um_cache/" + filename);
+    public static HashMap<String, Object> getCache(@NonNull Activity cur_act, @NonNull String item_name) {
+        File file = new File(cur_act.getCacheDir().getAbsolutePath() + "/um_cache/" + item_name + ".json");
         if(!file.exists()) {
             return new HashMap<>();
         }
@@ -95,7 +95,6 @@ public abstract class Data {
             }
 
             inp.close();
-            Log.e("jsonToPOJO", json.toString());
             HashMap<String, Object> result = (HashMap<String, Object>) new ObjectMapper().readValue(json.toString(), HashMap.class);
             return result != null ? result : new HashMap<>();
         } catch (Exception e) {

@@ -16,7 +16,7 @@ public interface Policy {
 
     int max_posts_per_user = 20;
     int max_post_lifetime_days = 30;
-    int max_posts_loaded = 50;
+    int max_docs_loaded = 30;
     int max_genres_per_item = 3;
     int max_seconds_before_timeout = 5;
     int max_images_per_post = 5;
