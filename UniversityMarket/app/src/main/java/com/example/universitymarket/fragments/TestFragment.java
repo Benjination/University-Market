@@ -2,13 +2,11 @@ package com.example.universitymarket.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
 import android.util.Log;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,15 +14,22 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.universitymarket.R;
 import com.example.universitymarket.objects.Test;
+import com.example.universitymarket.utilities.Data;
+import com.example.universitymarket.utilities.NetListener;
 import com.example.universitymarket.utilities.Network;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
 
 public class TestFragment extends Fragment implements View.OnClickListener {
 
     private View root;
     private LayoutInflater inflater;
+    private ViewGroup container;
     private static Test test;
 
     public TestFragment() {
@@ -40,8 +45,8 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         this.inflater = inflater;
+        this.container = container;
         root = inflater.inflate(R.layout.fragment_test, container, false);
         configureButtons(root);
         return root;
@@ -57,7 +62,7 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     }
 
     private void displayPopup(View v) {
-        View popupView = inflater.inflate(R.layout.test_popup, null);
+        View popupView = inflater.inflate(R.layout.test_popup, container, false);
         int width = LinearLayout.LayoutParams.WRAP_CONTENT;
         int height = LinearLayout.LayoutParams.WRAP_CONTENT;
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, true);
@@ -76,40 +81,45 @@ public class TestFragment extends Fragment implements View.OnClickListener {
         l1.setText(test.getListLvl1().toString());
         l2.setText(test.getListLvl2().toString());
 
-        popupView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                popupWindow.dismiss();
-                return true;
-            }
-        });
+        popupView.setOnTouchListener((view, event) -> {
+                    v.performClick();
+                    popupWindow.dismiss();
+                    return true;
+                }
+        );
     }
 
     @Override
     public void onClick(View v) {
-        Intent btn_i;
-        switch (v.getId()) {
-            case R.id.test_upload_button:
-                Network.setTest(getActivity(), "test", false);
-                break;
-            case R.id.test_clear_button:
-                Network.setTest(getActivity(), "test2", true);
-                break;
-            case R.id.test_download_button:
-                Network.getTest(getActivity(),"test")
-                        .addOnSuccessListener(task -> {
-                            test = task;
-                            displayPopup(v);
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e("getTest", e.getMessage());
-                            Toast.makeText(
-                                    getContext(),
-                                    e.getMessage(),
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        });
-                break;
+        int ID = v.getId();
+        if(ID == R.id.test_upload_button) {
+            Network.setTest(requireActivity(),"test2", false,null);
+        }
+        if(ID == R.id.test_clear_button) {
+            Network.setTest(requireActivity(),"test2", false,null);
+        }
+        if(ID == R.id.test_download_button) {
+            Network.getTest(requireActivity(),"test", new NetListener<Test>() {
+                @Override
+                public void onSuccess(Test result) {
+                    List<Pair<String, HashMap<String, Object>>> list = new ArrayList<>();
+                    Pair<String, HashMap<String, Object>> item = new Pair<>("test_cache", result);
+                    list.add(item);
+                    Data.setCache(requireActivity(), list);
+                    test = new Test(Data.getCache(requireActivity(), "test_cache"));
+                    displayPopup(v);
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("getTest", error.getMessage());
+                    Toast.makeText(
+                            getContext(),
+                            error.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
         }
     }
 }
