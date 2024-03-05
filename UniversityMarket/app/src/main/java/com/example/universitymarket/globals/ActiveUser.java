@@ -3,10 +3,15 @@ package com.example.universitymarket.globals;
 import android.app.Application;
 import android.content.Context;
 
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import dalvik.system.DexClassLoader;
+import dalvik.system.DexFile;
+import dalvik.system.PathClassLoader;
 
 public class ActiveUser extends Application {
     public static String email = "unknown";
@@ -25,9 +30,11 @@ public class ActiveUser extends Application {
     public static String tenant_id = "unknown";
     public static String date_created = "unknown";
 
-    @Override public void onCreate() {
+    @Override
+    public void onCreate() {
         super.onCreate();
     }
+
 
     /*
     public static List<Task<Post>> getPosts(Activity cur_act){

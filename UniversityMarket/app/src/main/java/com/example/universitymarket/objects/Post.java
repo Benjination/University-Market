@@ -51,8 +51,5 @@ public class Post extends HashMap<String, Object> {
 
     public String getGenre() { return (String) about.get("genre"); }
 
-    public HashMap<String, Object> getSuper() {
-        HashMap<String, Object> parent = this;
-        return parent;
-    }
+    public HashMap<String, Object> getSuper() { return this; }
 }

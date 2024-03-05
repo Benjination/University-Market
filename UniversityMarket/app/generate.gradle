@@ -1,0 +1,256 @@
+import groovy.json.*
+
+static Object typeString(String line) {
+    Object field
+    if(line.matches("([0-9]+\\.[0-9]+)")) {
+        if(line.length() <= 20)
+            field = Float.parseFloat(line)
+        else if(line.length() <= 40)
+            field = Double.parseDouble(line)
+        else
+            field = new BigDecimal(line)
+    } else if(line.matches("[0-9]+")) {
+        BigInteger val = new BigInteger(line)
+        if(val <= Integer.MAX_VALUE)
+            field = Integer.parseInt(line)
+        else if(val <= Long.MAX_VALUE)
+            field = Long.parseLong(line)
+        else
+            field = val
+    } else {
+        field = line
+    }
+    return field
+}
+
+static void checkGeneric(String type, def parent, List<Object> map, int index, Object data) {
+    if(index == -1)
+        return
+    def arr = ((String) parent.getClass()).split("\\.")
+    String ptype = arr[arr.length - 1]
+
+    int idx = -1, pidx = -1
+    boolean add_parent = false
+
+    for(int i = 0; i < map.get(index).size(); i++) {
+        if(map.get(index).get(i).toString().contains(parent.toString())) {
+            pidx = i
+            for(int z = 0; z < map.get(index).get(i).size(); z++) {
+                def elem = map.get(index).get(i).get(z)
+                if (elem == ptype + "<Object>")
+                    return
+                if (elem.toString().contains(ptype)) {
+                    ptype = map.get(index).get(i).get(z)
+                    idx = z
+                    if(z != 0)
+                        add_parent = true
+                    break
+                }
+            }
+            break
+        }
+    }
+/*
+    for(int i = 0; add_parent && i < map.get(index + 1).size(); i++) {
+        if(map.get(index + 1).get(i).toString().contains(data.toString())) {
+            pidx = i
+            for(int z = 0; z < map.get(index).get(i).size(); z++) {
+                def elem = map.get(index).get(i).get(z)
+                if (elem == ptype + "<Object>")
+                    return
+                if (elem.toString().contains(ptype)) {
+                    ptype = map.get(index).get(i).get(z)
+                    idx = z
+                    if(z != 0)
+                        add_parent = true
+                    break
+                }
+            }
+            break
+        }
+    }*/
+
+    if(idx < 0 || pidx < 0)
+        return
+
+    def pmap = map.get(index).get(pidx)
+    def temp = ptype.split("(>)+[^,]*")[0].split(".*[^a-zA-Z]+")
+    ptype = ptype.split("<")[0]
+    if(temp.length > 1) {
+        if (temp[1] != type) {
+            if (ptype.contains("Map"))
+                pmap.set(idx, ptype + "<String, Object>")
+            else
+                pmap.set(idx, ptype + "<Object>")
+        }
+    } else {
+        if(ptype.contains("Map"))
+            pmap.set(idx, ptype + "<String, " + type + ">")
+        else
+            pmap.set(idx, ptype + "<" + type + ">")
+    }
+}
+
+static void elemAdd(Object first, Object second, Object third, def list, def map, def index) {
+    list = new ArrayList<>()
+    String type = ""
+    if(first instanceof String)
+        list.add(first)
+    if(third instanceof String | third instanceof Number) {
+        third = typeString(third.toString())
+    } else if(third.size == 0) {
+        if(third instanceof Map)
+            type = "<String, Object>"
+        else
+            type = "<Object>"
+    }
+    String[] arr = ((String) third.getClass()).split("\\.")
+    String buffer = type
+    type = arr[arr.length - 1].concat(buffer)
+    Object parent = list.size() != 0 ? second : first
+    checkGeneric(type, parent, map, index - 1, third)
+    list.add(type)
+
+    if(second instanceof Number)
+        list.add(second)
+    list.add(third)
+    map.get(index).add(list)
+}
+
+static void mapAdd(Object data, ArrayList<Object> map, int index) {
+    List<Object> list = new ArrayList<>()
+    if(index + 1 > map.size()) {
+        map.add(list)
+    }
+    if(data instanceof Map) {
+        for(key in data.keySet()) {
+            elemAdd(key, data, data.get(key), list, map, index)
+        }
+    } else if(data instanceof List) {
+        for(int i = 0; i < ((ArrayList) data).size(); i++) {
+            elemAdd(data, i + "", data.get(i), list, map, index)
+        }
+    }
+}
+
+void expand(def val, def map, def depth) {
+    mapAdd(val, map, depth)
+    for(obj in val) {
+        if(obj instanceof Map) {
+            HashMap<String, Object> json = new JsonSlurperClassic().parseText(new JsonBuilder(obj).toString())
+            crawl(json, map, depth + 1)
+        }
+        if(obj instanceof List) {
+            expand(obj, map, depth + 1)
+        }
+    }
+}
+
+void crawl(def json, def map, def depth) {
+    mapAdd(json, map, depth)
+    for(val in json.values()) {
+        if(val instanceof Map) {
+            String temp = new JsonBuilder(val).toString()
+            json = new JsonSlurperClassic().parseText(temp)
+            crawl(json, map, depth + 1)
+        }
+        if(val instanceof List) {
+            expand(val, map, depth + 1)
+        }
+    }
+}
+
+String generate(def map, def class_name) {
+    String tab = "    "
+
+    String packag = "package com.example.universitymarket.objects;\n"
+    String imports = \
+            "\nimport com.example.universitymarket.utilities.Data;\n" +
+            "import java.util.HashMap;\n" +
+            "import java.util.List;\n"
+    String declarations = ""
+    String constructor = \
+            "\n" + tab + "public " + class_name + "(HashMap<String, Object> rawdata) {\n"
+    String methods = ""
+
+    for(int i=0; i<map.size(); i++) {
+        for(int z=0; z<map.get(i).size(); z++) {
+            def cmap = map.get(i).get(z)
+            String clazz, generic = null
+            int class_index = -1
+            for(int a=0; a<cmap.size(); a++) {
+                clazz = ((String) cmap.get(a).toString()).split("<")[0]
+                def temp = ((String) cmap.get(a).toString()).split("^[^<]+")
+                generic = temp.size() > 1 ? temp[1] : ""
+                try {
+                    Class.forName("java.util." + clazz)
+                    class_index = a
+                    break
+                } catch(ClassNotFoundException ignore) {}
+                try {
+                    Class.forName("java.lang." + clazz)
+                    class_index = a
+                    break
+                } catch(ClassNotFoundException ignore) {}
+            }
+            if(class_index < 1)
+                continue
+
+            String name = cmap.get(0), type = cmap.get(1), data = cmap.get(2)
+
+            println(cmap)
+            if(i == 0) {
+                constructor = constructor.concat(
+                        tab + tab + "super.put(\"" + name + "\", rawdata.get(\"" + name + "\"));\n"
+                )
+            }
+            constructor = constructor.concat(
+                    tab + tab + name + " = (" + type + ") super.get(\"" + name + "\");\n"
+            )
+            if(generic == "<HashMap>") {
+                constructor = constructor.concat(
+                        tab + tab + "for(Object o : " + name + ") {\n" +
+                        tab + tab + tab + "Data.mergeHash(" + name + "Map, (HashMap<String, Object) o);\n" +
+                        tab + tab + "}\n"
+                )
+            }
+        }
+        constructor = constructor.concat(tab + "}\n")
+        println()
+    }
+
+    String body = declarations + constructor + methods
+    String definition = \
+            "\npublic class " + class_name + " extends HashMap<String, Object> {" +
+            body + "\n}"
+    String file = packag + imports + definition
+
+    return file
+}
+
+task generateObjectFiles() {
+    doLast {
+        File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
+        Map<String, File> skeleton_map = new HashMap<>()
+        File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
+        List<String> object_names = object_path.listFiles().name
+        for(s in skeletons) {
+            String temp = s.getName().split("(_skeleton\\.json)")[0]
+            StringBuilder name = new StringBuilder()
+                    .append(temp.charAt(0).toUpperCase())
+                    .append(temp.substring(1, temp.length()))
+                    .append(".java")
+            skeleton_map.put(name.toString(), s)
+        }
+        for(sn in skeleton_map.keySet()) {
+            if(!object_names.contains(sn)) {
+                String name = sn.split("\\.")[0]
+                List<Object> map = new ArrayList<>()
+                HashMap<String, Object> json = new JsonSlurperClassic().parseText(skeleton_map.get(sn).text)
+                crawl(json, map, 0)
+
+                new File(object_path, sn).write(generate(map, name))
+            }
+        }
+    }
+}

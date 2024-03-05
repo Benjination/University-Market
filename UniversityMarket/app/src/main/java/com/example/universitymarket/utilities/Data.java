@@ -2,16 +2,14 @@ package com.example.universitymarket.utilities;
 
 import android.app.Activity;
 import android.util.Log;
-import android.util.Pair;
 import androidx.annotation.NonNull;
 import com.example.universitymarket.globals.ActiveUser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import org.checkerframework.checker.initialization.qual.Initialized;
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public abstract class Data {
     public static void mergeHash(Map<String, Object> from, Map<String, Object> to) {
@@ -29,7 +28,7 @@ public abstract class Data {
 
     public static void setActiveUser(Map<String, Object> pojo, String json) {
         if(json != null) {
-            pojo = jsonToPOJO(new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8)));
+            pojo = jsonToPOJO(json);
         }
         ActiveUser.email = (String) pojo.get("email");
         ActiveUser.id = (String) pojo.get("email");
@@ -47,69 +46,195 @@ public abstract class Data {
         ActiveUser.date_created = (String) ActiveUser.about.get("date_created");
     }
 
-    public static void setCache(@NonNull Activity cur_act, List<Pair<String, HashMap<String, Object>>> pojoPAIR) {
-        File cd = new File(cur_act.getCacheDir().getAbsolutePath() + "/um_cache");
-        String path = cd.getAbsolutePath();
-        if(!cd.mkdir()) {
-            Log.d("updateCache", "um_cache directory already exists");
+    private static String getID(@NonNull Object identifier) {
+        if(identifier instanceof String && ((String) identifier).contains(":\"")) {
+            try {
+                String[] split = ((String) identifier).split("(,\")[^\"]*(\":\")");
+                return alphaNumerify(split[split.length - 1].split("\"")[0]);
+            } catch(ArrayIndexOutOfBoundsException e) {
+                Log.e("getID", e.getMessage());
+            }
+        } else if(identifier instanceof String) {
+            return (String) identifier;
+        } else if(identifier instanceof HashMap) {
+            try {
+                return (String) getID(pojoToJSON((HashMap<String, Object>) identifier));
+            } catch(NullPointerException e) {
+                Log.e("getID", e.getMessage());
+            }
         }
+        return null;
+    }
 
+    public static String alphaNumerify(@Initialized String input) {
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i < input.length(); i++) {
+            if(!(input.charAt(i) + "").matches("[a-zA-Z0-9]")) {
+                result.append("_");
+            } else {
+                result.append(input.charAt(i));
+            }
+        }
+        return result.toString();
+    }
+
+    public static boolean setCache(@NonNull Activity cur_act, HashMap<String, Object> pojo, boolean clear) {
+        return setCache(cur_act, pojoToJSON(pojo), clear);
+    }
+
+    public static boolean setCache(@NonNull Activity cur_act, String json, boolean clear) {
+        String path = cachePath(cur_act), name = getID(json);
+
+        if(name == null)
+            return false;
         try {
-            for (Pair<String, HashMap<String, Object>> p : pojoPAIR) {
-                String json = pojoToJSON(p.second);
-                FileWriter out = new FileWriter(path + "/" + p.first + ".json");
+            if(clear) {
+                File f = getCachedFile(cur_act, json);
+                if(f != null) {
+                    return f.delete();
+                }
+            } else {
+                FileWriter out = new FileWriter(path + "/" + name + ".json");
                 out.write(json);
                 out.close();
             }
         } catch(IOException e) {
-            Log.e("updateCache", e.getMessage());
+            Log.e("setCache", e.getMessage());
+            return false;
         }
+        return true;
+    }
+
+    public static boolean clearAllCache(@NonNull Activity cur_act) {
+        boolean result = true;
+        File[] files = getCachedFiles(cur_act);
+        if(files == null)
+            return false;
+
+        for(File file : files) {
+            result = file.delete();
+        }
+        return result;
+    }
+
+    public static boolean clearSubCache(@NonNull Activity cur_act, String prefix) {
+        boolean result = true;
+        File[] files = (File[]) Stream.of(new File(cachePath(cur_act)).listFiles()).filter(e -> e.getName().startsWith(prefix)).toArray();
+        for(File file : files) {
+            result = file.delete();
+        }
+        return result;
+    }
+
+    public static File getCachedFile(@NonNull Activity cur_act, @NonNull Object identifier) {
+        String ID = getID(identifier);
+        if(ID == null)
+            return null;
+        return new File(cachePath(cur_act) + "/" + ID + ".json");
+    }
+
+    public static File[] getCachedFiles(@NonNull Activity cur_act) {
+        return new File(cachePath(cur_act)).listFiles();
     }
 
     @NonNull
-    public static HashMap<String, Object> getCache(@NonNull Activity cur_act, @NonNull String item_name) {
-        File file = new File(cur_act.getCacheDir().getAbsolutePath() + "/um_cache/" + item_name + ".json");
-        if(!file.exists()) {
-            return new HashMap<>();
+    public static File[] getCachedFiles(@NonNull Activity cur_act, String prefix) {
+        return (File[]) Stream.of(new File(cachePath(cur_act)).listFiles()).filter(e -> e.getName().startsWith(prefix)).toArray();
+    }
+
+    public static String getCachedToJSON(@NonNull Activity cur_act, @NonNull Object identifier) {
+        File file = getCachedFile(cur_act, identifier);
+        if(file == null)
+            return null;
+        return fileToJSON(file);
+    }
+
+    public static HashMap<String, Object> getCachedToPOJO(@NonNull Activity cur_act, @NonNull Object identifier) {
+        File file = getCachedFile(cur_act, identifier);
+        if(file == null)
+            return null;
+        return fileToPOJO(file);
+    }
+
+    @NonNull
+    public static String cachePath(Activity cur_act) {
+        File cache_dir = new File(cur_act.getCacheDir().getAbsolutePath() + "/um_cache");
+        if(cache_dir.mkdir())
+            Log.d("cachePath", "um_cache directory created");
+        return cache_dir.getAbsolutePath();
+    }
+
+    @NonNull
+    public static String readData(@Initialized InputStream inp) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8));
+        StringBuilder data = new StringBuilder();
+
+        String line = reader.readLine();
+
+        while(line != null) {
+            data.append(line).append("\n");
+            line = reader.readLine();
         }
 
+        inp.close();
+        return data.toString();
+    }
+
+    @NonNull
+    public static String resToJSON(@NonNull Activity cur_act, @NonNull int resourceID) {
+        String result = "";
+        try {
+            InputStream inp = cur_act.getResources().openRawResource(resourceID);
+            result = readData(inp);
+        } catch (IOException e) {
+            Log.e("resToJSON", e.getMessage());
+        }
+        return result;
+    }
+
+    @NonNull
+    public static String fileToJSON(@NonNull File file) {
+        String result = "";
         try {
             InputStream inp = new FileInputStream(file);
-            return jsonToPOJO(inp);
-        } catch(FileNotFoundException e) {
-            Log.e("getCache", e.getMessage());
-            return new HashMap<>();
+            result =  readData(inp);
+        } catch (IOException e) {
+            Log.e("fileToJSON", e.getMessage());
         }
+        return result;
     }
 
     @NonNull
-    public static HashMap<String, Object> jsonToPOJO(@NonNull InputStream inp) {
+    public static HashMap<String, Object> resToPOJO(@NonNull Activity cur_act, int resourceID) {
+        HashMap<String, Object> result = new HashMap<>();
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8));
-            StringBuilder json = new StringBuilder();
-            String line = reader.readLine();
-
-            while(line != null && !line.contains("access_token")) {
-                json.append(line);
-                line = reader.readLine();
-            }
-
-            inp.close();
-            HashMap<String, Object> result = (HashMap<String, Object>) new ObjectMapper().readValue(json.toString(), HashMap.class);
-            return result != null ? result : new HashMap<>();
-        } catch (Exception e) {
-            Log.e("JSON read error", e.getMessage());
+            InputStream inp = cur_act.getResources().openRawResource(resourceID);
+            result = jsonToPOJO(readData(inp));
+        } catch (IOException e) {
+            Log.e("resToPOJO", e.getMessage());
         }
-        return new HashMap<>();
+        return result;
+    }
+
+    @NonNull
+    public static HashMap<String, Object> fileToPOJO(@NonNull File file) {
+        HashMap<String, Object> result = new HashMap<>();
+        try {
+            InputStream inp = new FileInputStream(file);
+            result = jsonToPOJO(readData(inp));
+        } catch (IOException e) {
+            Log.e("fileToPOJO", e.getMessage());
+        }
+        return result;
+    }
+
+    @NonNull
+    public static HashMap<String, Object> jsonToPOJO(@NonNull String json) {
+        return (HashMap<String, Object>) new GsonBuilder().create().fromJson(json, HashMap.class);
     }
 
     @NonNull
     public static String pojoToJSON(@NonNull HashMap<String, Object> pojo) {
-        try {
-            return new ObjectMapper().writeValueAsString(pojo);
-        } catch(JsonProcessingException e) {
-            Log.e("POJO parsing error", e.getMessage());
-        }
-        return "";
+        return new Gson().toJson(pojo);
     }
 }
