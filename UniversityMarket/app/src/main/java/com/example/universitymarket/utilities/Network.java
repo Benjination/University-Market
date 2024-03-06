@@ -23,157 +23,60 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.microsoft.identity.client.AcquireTokenSilentParameters;
-import com.microsoft.identity.client.AuthenticationCallback;
-import com.microsoft.identity.client.IAccount;
-import com.microsoft.identity.client.IAuthenticationResult;
-import com.microsoft.identity.client.IPublicClientApplication;
-import com.microsoft.identity.client.ISingleAccountPublicClientApplication;
-import com.microsoft.identity.client.PublicClientApplication;
-import com.microsoft.identity.client.SignInParameters;
-import com.microsoft.identity.client.SilentAuthenticationCallback;
-import com.microsoft.identity.client.exception.MsalException;
-import com.microsoft.identity.common.java.exception.ArgumentException;
 import org.json.JSONException;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 public abstract class Network {
-    private static FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    public boolean signIn(Activity cur_act){
-        ISingleAccountPublicClientApplication msalApp = getMSALObj(cur_act);
-        final IAccount[] account = new IAccount[1];
-        final String[] access_token = new String[1];
-
-        //check for token
-        try {
-            final boolean[] needs_resync = new boolean[1];
-            msalApp.acquireTokenSilent(
-                    new AcquireTokenSilentParameters.Builder()
-                            .withScopes(Arrays.asList(Policy.scopes))
-                            .withCallback(new SilentAuthenticationCallback() {
-                                @Override public void onSuccess(IAuthenticationResult res) {
-                                    access_token[0] = res.getAccessToken();
-                                    account[0] = res.getAccount();
-                                }
-                                @Override public void onError(MsalException exception) {
-                                    //user is logged out
-                                    needs_resync[0] = true;
-                                }
-                            })
-                            .build()
-            );
-
-            msalApp.signIn(
-                    SignInParameters.builder()
-                            .withActivity(cur_act)
-                            .withScopes(Arrays.asList(Policy.scopes))
-                            .withCallback(new AuthenticationCallback() {
-                                @Override public void onCancel() { Log.d("Login", "User cancelled"); }
-                                @Override public void onSuccess(IAuthenticationResult res) {
-                                    Log.d("Login", "Signed on");
-
-                                    boolean dne = false; //check with firebase against email
-                                    if(!dne) {
-                                        if (needs_resync[0]) {
-                                            //clearCache(cur_act);
-                                            //syncCache(cur_act, "download");
-                                            access_token[0] = res.getAccessToken();
-                                            account[0] = res.getAccount();
-                                        }
-                                        //updateCache(cur_act, "access_token", access_token[0]);
-                                        //syncCache(cur_act, "upload");
-                                    } else {
-                                        /*TODO:  String[][] data = createAccount(); //graph API
-                                        for (String[] dat : data) {
-                                            updateCache(cur_act, dat[0], dat[1]);
-                                        }*/
-                                        //syncCache(cur_act, "upload");
-                                    }
-                                }
-                                @Override public void onError(MsalException e) {
-                                    Log.e(e.getErrorCode(), e.getMessage());
-                                }
-                            })
-                            .build()
-            );
-        } catch (Exception e) {
-            Log.e("Azure connection error", e.getMessage());
-        }
-//add return false for bad case
-        return true;
-    }
-
-    private ISingleAccountPublicClientApplication getMSALObj(Activity cur_act) {
-        final ISingleAccountPublicClientApplication[] msalApp = new ISingleAccountPublicClientApplication[1];
-        try {
-            PublicClientApplication.createSingleAccountPublicClientApplication(
-                    cur_act,
-                    R.raw.auth_config,
-                    new IPublicClientApplication.ISingleAccountApplicationCreatedListener() {
-                        @Override public void onError(MsalException e) { Log.e(e.getExceptionName(), e.getMessage()); }
-                        @Override public void onCreated(ISingleAccountPublicClientApplication app) {
-                            msalApp[0] = app;
-                        }
-                    }
-            );
-        } catch (Exception e) {
-            Log.e(e.toString(), e.getMessage());
-            return null;
-        }
-        return msalApp[0];
-    }
 
     @NonNull
     @SafeVarargs
     private static Task<HashMap<String, Object>> setDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID, boolean clear, HashMap<String, Object>... obj) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
         HashMap<String, Object> pojoObj = new HashMap<>();
         HashMap<String, Object> pojo;
         String illCollID = "Must be 'users', 'posts', 'transactions', or 'test'";
         String illNumObj = "Must contain either zero or one argument";
-        String illReqObj = "Must contain an argument for 'posts' or 'transactions'";
+        String illReqObj = "Cached data for '" + docID + "' not found";
         String illNullData = "POJO data could not be found";
 
         if(obj.length > 1) {
             if(!source.getTask().isComplete())
-                source.setException(new ArgumentException("setDoc", "obj", illNumObj));
+                source.setException(new IllegalArgumentException(illNumObj));
             return source.getTask();
         } else if(obj.length == 1) {
             HashMap<String, Object> buffer = obj[0];
             Data.mergeHash(pojoObj, buffer);
         }
 
-        String cache_name = "test_cache";
         DocumentReference reference = db.collection(collID).document(docID);
 
         switch(collID) {
             case "users":
-                cache_name = "user_cache";
             case "test":
-                pojo = Data.getCache(cur_act, cache_name);
-                break;
             case "transactions":
             case "posts":
                 if(obj.length == 0 && !clear) {
-                    if (!source.getTask().isComplete())
-                        source.setException(new ArgumentException("setDoc", "obj", illReqObj));
-                    return source.getTask();
+                    HashMap<String, Object> buffer = Data.getCachedToPOJO(cur_act, docID);
+                    if(buffer != null) {
+                        pojo = buffer;
+                    } else {
+                        if (!source.getTask().isComplete())
+                            source.setException(new IllegalArgumentException(illReqObj));
+                        return source.getTask();
+                    }
                 } else {
                     pojo = pojoObj;
                 }
                 break;
             default:
                 if(!source.getTask().isComplete())
-                    source.setException(new ArgumentException("setDoc", "collID", illCollID));
+                    source.setException(new IllegalArgumentException(illCollID));
                 return source.getTask();
         }
 
@@ -203,6 +106,7 @@ public abstract class Network {
 
     @NonNull
     private static Task<HashMap<String, Object>> getDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
         String illCollID = "Must be 'users', 'posts', 'transactions', or 'test'";
         String illNullData = "Collection '" + collID + "' or document '" + docID + "' does not exist";
@@ -231,12 +135,11 @@ public abstract class Network {
                 break;
             default:
                 if(!source.getTask().isComplete())
-                    source.setException(new ArgumentException("getDoc", "collID", illCollID));
+                    source.setException(new IllegalArgumentException(illCollID));
                 return source.getTask();
         }
 
-        InputStream inp = cur_act.getResources().openRawResource(resID);
-        pojo = Data.jsonToPOJO(inp);
+        pojo = Data.resToPOJO(cur_act, resID);
 
         reference
                 .addOnSuccessListener(task -> {
@@ -271,6 +174,7 @@ public abstract class Network {
 
     @NonNull
     private static Task<List<HashMap<String, Object>>> getColl(@NonNull Activity cur_act, @NonNull String collID, @Nullable Filter filter, int pageNo) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<List<HashMap<String, Object>>> source = new TaskCompletionSource<>();
         String illCollID = "Must be 'users', 'posts', 'transactions', or 'test'";
         String illNullData = "Collection '" + collID + "' does not exist";
@@ -295,7 +199,7 @@ public abstract class Network {
                 break;
             default:
                 if(!source.getTask().isComplete())
-                    source.setException(new ArgumentException("getColl", "collID", illCollID));
+                    source.setException(new IllegalArgumentException(illCollID));
                 return source.getTask();
         }
 
@@ -333,7 +237,7 @@ public abstract class Network {
         return source.getTask();
     }
 
-    public static void setTest(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<Test> response) {
+    public static void setTestFromCache(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<Test> response) {
         Task<HashMap<String, Object>> echo = setDoc(cur_act, "test", docID, clear);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
@@ -341,6 +245,74 @@ public abstract class Network {
                 response.onSuccess(result);
             });
             echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setTestsFromCache(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<List<Test>> response) {
+        File[] files = Data.getCachedFiles(cur_act, "test");
+        List<Test> responses = new ArrayList<>();
+        for(int i = 0; i < files.length; i++) {
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"test", files[i].getName().split("(.json)")[0], clear);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == files.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Test result = new Test(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Test result = new Test(task);
+                        responses.add(result);
+                    });
+                }
+            }
+        }
+    }
+
+    public static void setTest(@NonNull Activity cur_act, @NonNull Test testOBJ, boolean clear, @Nullable NetListener<Test> response) {
+        if(response == null && testOBJ.getFieldLvl1() == null)
+            return;
+        else if(response != null && testOBJ.getFieldLvl1() == null) {
+            response.onFailure(new NullPointerException("Test ID does not exist in test object " + testOBJ));
+            return;
+        }
+        Task<HashMap<String, Object>> echo = setDoc(cur_act,"test", testOBJ.getFieldLvl1(), clear, testOBJ);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                Test result = new Test(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setTests(@NonNull Activity cur_act, @NonNull Test[] testOBJ, boolean clear, @Nullable NetListener<List<Test>> response) {
+        List<Test> responses = new ArrayList<>();
+        for(int i = 0; i < testOBJ.length; i++) {
+            if(response == null && testOBJ[i].getFieldLvl1() == null)
+                continue;
+            else if(response != null && testOBJ[i].getFieldLvl1() == null) {
+                response.onFailure(new NullPointerException("Test ID does not exist in test object " + testOBJ[i]));
+                continue;
+            }
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"test", testOBJ[i].getFieldLvl1(), clear, testOBJ[i]);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == testOBJ.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Test result = new Test(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Test result = new Test(task);
+                        responses.add(result);
+                    });
+                }
+            }
         }
     }
 
@@ -425,7 +397,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void uploadActiveUser(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<User> response) {
+    public static void setUserFromCache(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<User> response) {
         Task<HashMap<String, Object>> echo = setDoc(cur_act,"users", ActiveUser.email, clear);
         if(response == null && ActiveUser.email.equals("unknown"))
             return;
@@ -442,7 +414,7 @@ public abstract class Network {
         }
     }
 
-    public static void downloadActiveUser(@NonNull Activity cur_act) {
+    public static void getUser(@NonNull Activity cur_act) {
         getDoc(cur_act, "users", ActiveUser.email)
                 .addOnSuccessListener(task -> {
                     User result = new User(task);
@@ -451,15 +423,30 @@ public abstract class Network {
                             "user_cache.json",
                             result.getSuper()
                     );
-                    List<Pair<String, HashMap<String, Object>>> list = new ArrayList<>();
-                    list.add(pair);
-                    Data.setCache(cur_act, list);
+                    Data.setCache(cur_act, task, false);
                 })
                 .addOnFailureListener(e -> Toast.makeText(
                         cur_act,
                         e.getMessage(),
                         Toast.LENGTH_SHORT
                 ).show());
+    }
+
+    public static void setOtherUser(@NonNull Activity cur_act, @NonNull User userOBJ, boolean clear, @Nullable NetListener<User> response) {
+        if(response == null && userOBJ.getId() == null)
+            return;
+        else if(response != null && userOBJ.getId() == null) {
+            response.onFailure(new NullPointerException("User ID does not exist in user object " + userOBJ));
+            return;
+        }
+        Task<HashMap<String, Object>> echo = setDoc(cur_act,"users", userOBJ.getId(), clear, userOBJ);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                User result = new User(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
     }
 
     public static void getOtherUser(@NonNull Activity cur_act, @NonNull String docID, @NonNull NetListener<User> response) {
@@ -515,6 +502,41 @@ public abstract class Network {
                     response.onSuccess(list);
                 })
                 .addOnFailureListener(response::onFailure);
+    }
+
+
+    public static void setPostFromCache(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<Post> response) {
+        Task<HashMap<String, Object>> echo = setDoc(cur_act, "posts", docID, clear);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                Post result = new Post(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setPostsFromCache(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<List<Post>> response) {
+        File[] files = Data.getCachedFiles(cur_act, "post");
+        List<Post> responses = new ArrayList<>();
+        for(int i = 0; i < files.length; i++) {
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"posts", files[i].getName().split("(.json)")[0], clear);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == files.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Post result = new Post(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Post result = new Post(task);
+                        responses.add(result);
+                    });
+                }
+            }
+        }
     }
 
     public static void setPost(@NonNull Activity cur_act, @NonNull Post postOBJ, boolean clear, @Nullable NetListener<Post> response) {
@@ -615,6 +637,40 @@ public abstract class Network {
                     response.onSuccess(list);
                 })
                 .addOnFailureListener(response::onFailure);
+    }
+
+    public static void setTransactionFromCache(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<Transaction> response) {
+        Task<HashMap<String, Object>> echo = setDoc(cur_act, "transactions", docID, clear);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                Transaction result = new Transaction(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setTransactionsFromCache(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<List<Transaction>> response) {
+        File[] files = Data.getCachedFiles(cur_act, "tsct");
+        List<Transaction> responses = new ArrayList<>();
+        for(int i = 0; i < files.length; i++) {
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"transactions", files[i].getName().split("(.json)")[0], clear);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == files.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Transaction result = new Transaction(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Transaction result = new Transaction(task);
+                        responses.add(result);
+                    });
+                }
+            }
+        }
     }
 
     public static void setTransaction(@NonNull Activity cur_act, @NonNull Transaction tsctOBJ, boolean clear, @Nullable NetListener<Transaction> response) {

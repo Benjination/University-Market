@@ -3,6 +3,8 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+apply from: './generate.gradle'
+
 allprojects {
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
@@ -28,6 +30,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -42,8 +45,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.7.3')
     implementation 'com.google.firebase:firebase-auth:16.0.4'
     implementation("com.google.firebase:firebase-firestore")
-    implementation 'com.microsoft.identity.client:msal:4.5.0'
-    implementation 'com.microsoft.graph:microsoft-graph:5.80.0'
     implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
     testImplementation 'junit:junit:4.13.2'

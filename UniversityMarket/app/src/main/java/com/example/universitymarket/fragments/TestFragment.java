@@ -1,10 +1,8 @@
 package com.example.universitymarket.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
-import android.util.Pair;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +18,7 @@ import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.NetListener;
 import com.example.universitymarket.utilities.Network;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 public class TestFragment extends Fragment implements View.OnClickListener {
 
@@ -77,7 +72,6 @@ public class TestFragment extends Fragment implements View.OnClickListener {
         c1.setText(test.getCollLvl1().toString());
         f1.setText(test.getFieldLvl1());
         f2.setText(test.getFieldLvl2());
-        f3.setText(test.getFieldLvl3());
         l1.setText(test.getListLvl1().toString());
         l2.setText(test.getListLvl2().toString());
 
@@ -93,21 +87,21 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == R.id.test_upload_button) {
-            Network.setTest(requireActivity(),"test2", false,null);
+            Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_clear_button) {
-            Network.setTest(requireActivity(),"test2", false,null);
+            Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_download_button) {
             Network.getTest(requireActivity(),"test", new NetListener<Test>() {
                 @Override
                 public void onSuccess(Test result) {
-                    List<Pair<String, HashMap<String, Object>>> list = new ArrayList<>();
-                    Pair<String, HashMap<String, Object>> item = new Pair<>("test_cache", result);
-                    list.add(item);
-                    Data.setCache(requireActivity(), list);
-                    test = new Test(Data.getCache(requireActivity(), "test_cache"));
-                    displayPopup(v);
+                    Data.setCache(requireActivity(), result, false);
+                    HashMap<String, Object> data = Data.getCachedToPOJO(requireActivity(), result);
+                    if(data != null) {
+                        test = new Test(data);
+                        displayPopup(v);
+                    }
                 }
 
                 @Override
