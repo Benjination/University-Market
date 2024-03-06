@@ -72,7 +72,6 @@ public class TestFragment extends Fragment implements View.OnClickListener {
         c1.setText(test.getCollLvl1().toString());
         f1.setText(test.getFieldLvl1());
         f2.setText(test.getFieldLvl2());
-        f3.setText(test.getFieldLvl3());
         l1.setText(test.getListLvl1().toString());
         l2.setText(test.getListLvl2().toString());
 
