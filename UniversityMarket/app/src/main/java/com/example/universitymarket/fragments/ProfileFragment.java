@@ -9,10 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.example.universitymarket.Login;
 import com.example.universitymarket.R;
-import com.example.universitymarket.SampleActivity;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
