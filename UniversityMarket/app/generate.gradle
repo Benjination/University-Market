@@ -481,7 +481,7 @@ String[] generate(def map, def class_name, def file) {
     return response
 }
 
-void update(String nString, String dString, def active_names, def obj_names, def utility_path) {
+static void update(String nString, String dString, def active_names, def obj_names, def utility_path) {
     String redc_comments_top = \
             "\n/**\n * <b>\n * ANY MODIFICATIONS ABOVE THESE JAVADOC BOUNDS WILL BE OVERWRITTEN ON BUILD \n" +
             " * <div>\n * DO NOT REMOVE THIS \n" +
@@ -510,23 +510,29 @@ void update(String nString, String dString, def active_names, def obj_names, def
 
     for(int i = 0; i < 2; i++) {
         if((i == 0 ? nString : dString).size() != 0) {
-            InputStream inp = new FileInputStream(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8));
-            StringBuilder data = new StringBuilder();
+            File cur_file = new File(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"))
+            InputStream inp = new FileInputStream(cur_file)
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8))
+            StringBuilder data = new StringBuilder()
 
-            String line = reader.readLine();
-
-            while(!line.contains("*\\/")) {
-                line = reader.readLine();
+            String line = reader.readLine()
+            while(line != null) {
+                if(line.contains("*/")) {
+                    line = reader.readLine()
+                    break
+                }
+                line = reader.readLine()
             }
-            while(!line.contains("/**")) {
-                data.append(line).append("\n");
-                line = reader.readLine();
+            while(line != null) {
+                if(line.contains("/**"))
+                    break
+                data.append(line).append("\n")
+                line = reader.readLine()
             }
-            inp.close()
             new File(utility_path, (i == 0 ? "Network.java" : "Data.java")).write(
                     (i == 0 ? header_obj : header_active) + redc_comments_top + data.toString() + redc_comments_bottom + (i == 0 ? nString : dString)  + "\n}"
             )
+            inp.close()
         }
     }
 }

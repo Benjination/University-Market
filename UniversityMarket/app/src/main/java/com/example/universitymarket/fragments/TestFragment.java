@@ -87,10 +87,10 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == R.id.test_upload_button) {
-            Network.setTestFromCache(requireActivity(),"test2", false,null);
+            //Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_clear_button) {
-            Network.setTestFromCache(requireActivity(),"test2", false,null);
+            //Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_download_button) {
             Network.getTest(requireActivity(),"test", new NetListener<Test>() {
