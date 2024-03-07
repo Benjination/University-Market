@@ -1,4 +1,5 @@
 import groovy.json.*
+import java.nio.charset.StandardCharsets
 import java.time.*
 import java.time.format.*
 
@@ -480,23 +481,7 @@ String[] generate(def map, def class_name, def file) {
     return response
 }
 
-task generateSupported {
-    File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
-    Map<String, File> skeleton_map = new HashMap<>()
-    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
-    File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals")
-    File utility_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/utilities")
-    List<String> active_names = new ArrayList<>()
-    List<String> obj_names = new ArrayList<>()
-    for (s in skeletons) {
-        String temp = s.getName().split("(_skeleton)(_cached)?(\\.json)")[0]
-        StringBuilder name = new StringBuilder()
-                .append(temp.charAt(0).toUpperCase())
-                .append(temp.substring(1, temp.length()))
-                .append(".java")
-        skeleton_map.put(name.toString(), s)
-    }
-    String nString = "", dString = ""
+void update(String nString, String dString, def active_names, def obj_names, def utility_path) {
     String redc_comments_top = \
             "\n/**\n * <b>\n * ANY MODIFICATIONS ABOVE THESE JAVADOC BOUNDS WILL BE OVERWRITTEN ON BUILD \n" +
             " * <div>\n * DO NOT REMOVE THIS \n" +
@@ -511,23 +496,6 @@ task generateSupported {
             DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
                     .format(LocalDateTime.now()) + "\n" +
             "*/\n"
-
-    for (sn in skeleton_map.keySet()) {
-        String name = sn.split("\\.")[0]
-        obj_names.add(name)
-        List<Object> map = new ArrayList<>()
-        HashMap<String, Object> json = new JsonSlurperClassic().parseText(skeleton_map.get(sn).text)
-        crawl(json, map, 0)
-
-        String[] generated = generate(map, name, skeleton_map.get(sn))
-        new File(object_path, sn).write(generated[0])
-        nString = nString.concat(generated[1])
-        if(skeleton_map.get(sn).name.matches(".*(_cached\\.json)")) {
-            active_names.add("Active" + name)
-            new File(global_path, "Active" + sn).write(generated[2])
-            dString = dString.concat(generated[3])
-        }
-    }
 
     String header_obj = "package com.example.universitymarket.utilities;\n\n"
     String header_active = "package com.example.universitymarket.utilities;\n\n"
@@ -561,4 +529,41 @@ task generateSupported {
             )
         }
     }
+}
+
+task generateSupported {
+    File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
+    Map<String, File> skeleton_map = new HashMap<>()
+    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
+    File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals")
+    File utility_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/utilities")
+    List<String> active_names = new ArrayList<>()
+    List<String> obj_names = new ArrayList<>()
+    for (s in skeletons) {
+        String temp = s.getName().split("(_skeleton)(_cached)?(\\.json)")[0]
+        StringBuilder name = new StringBuilder()
+                .append(temp.charAt(0).toUpperCase())
+                .append(temp.substring(1, temp.length()))
+                .append(".java")
+        skeleton_map.put(name.toString(), s)
+    }
+    String nString = "", dString = ""
+
+    for (sn in skeleton_map.keySet()) {
+        String name = sn.split("\\.")[0]
+        obj_names.add(name)
+        List<Object> map = new ArrayList<>()
+        HashMap<String, Object> json = new JsonSlurperClassic().parseText(skeleton_map.get(sn).text)
+        crawl(json, map, 0)
+
+        String[] generated = generate(map, name, skeleton_map.get(sn))
+        new File(object_path, sn).write(generated[0])
+        nString = nString.concat(generated[1])
+        if(skeleton_map.get(sn).name.matches(".*(_cached\\.json)")) {
+            active_names.add("Active" + name)
+            new File(global_path, "Active" + sn).write(generated[2])
+            dString = dString.concat(generated[3])
+        }
+    }
+    update(nString, dString, active_names, obj_names, utility_path)
 }
