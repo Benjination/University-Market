@@ -13,7 +13,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
-import com.example.universitymarket.objects.Test;
+import com.example.universitymarket.globals.actives.ActiveUser;
+import com.example.universitymarket.objects.*;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.NetListener;
 import com.example.universitymarket.utilities.Network;
@@ -87,9 +88,15 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == R.id.test_upload_button) {
+            ActiveUser.id = "test";
             //Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_clear_button) {
+            Toast.makeText(
+                    getContext(),
+                    ActiveUser.id,
+                    Toast.LENGTH_SHORT
+            ).show();
             //Network.setTestFromCache(requireActivity(),"test2", false,null);
         }
         if(ID == R.id.test_download_button) {

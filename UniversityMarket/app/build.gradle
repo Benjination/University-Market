@@ -5,6 +5,12 @@ plugins {
 
 apply from: './generate.gradle'
 
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+}
+
 android {
     compileSdk 34
 

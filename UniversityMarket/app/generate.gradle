@@ -444,15 +444,10 @@ String[] generate(def map, def class_name, def file) {
     )
     response[1] = setters + getters
 
-    packag = "package com.example.universitymarket.globals;\n"
+    packag = "package com.example.universitymarket.globals.actives;\n"
     imports = imports.concat("import android.app.Application;\n")
     declarations = declarations.replace("private", "public static")
-    methods = \
-            "\n" + tab + "@Override\n" +
-            tab + "public void onCreate() {\n" +
-            tab + tab + "super.onCreate();\n" +
-            tab + "}\n"
-    body = declarations + methods
+    body = declarations
     definition = \
             "public class Active" + class_name + " extends Application {\n" +
             body + "\n}"
@@ -504,8 +499,8 @@ static void update(String nString, String dString, def active_names, def obj_nam
     for(val in obj_names)
         header_obj = header_obj.concat("import com.example.universitymarket.objects." + val + ";\n")
     for(val in active_names) {
-        header_obj = header_obj.concat("import com.example.universitymarket.globals." + val + ";\n")
-        header_active = header_active.concat("import com.example.universitymarket.globals." + val + ";\n")
+        header_obj = header_obj.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
+        header_active = header_active.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
     }
 
     for(int i = 0; i < 2; i++) {
@@ -541,7 +536,7 @@ task generateSupported {
     File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
     Map<String, File> skeleton_map = new HashMap<>()
     File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
-    File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals")
+    File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals/actives")
     File utility_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/utilities")
     List<String> active_names = new ArrayList<>()
     List<String> obj_names = new ArrayList<>()
