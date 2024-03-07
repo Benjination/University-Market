@@ -496,7 +496,6 @@ task generateSupported {
                 .append(".java")
         skeleton_map.put(name.toString(), s)
     }
-    RandomAccessFile data = new RandomAccessFile(utility_path.getAbsolutePath() + "/Data.java", "rw")
     String nString = "", dString = ""
     String redc_comments_top = \
             "\n/**\n * <b>\n * ANY MODIFICATIONS ABOVE THESE JAVADOC BOUNDS WILL BE OVERWRITTEN ON BUILD \n" +
@@ -532,7 +531,6 @@ task generateSupported {
 
     String header_obj = "package com.example.universitymarket.utilities;\n\n"
     String header_active = "package com.example.universitymarket.utilities;\n\n"
-    String contents = ""
     if(active_names.size() > 0)
         header_obj = header_obj.concat("import android.widget.Toast;\n")
     for(val in obj_names)
@@ -544,29 +542,23 @@ task generateSupported {
 
     for(int i = 0; i < 2; i++) {
         if((i == 0 ? nString : dString).size() != 0) {
-            RandomAccessFile file = new RandomAccessFile(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"), "rw")
-            (i == 0 ? nString : dString).concat("\n")
-            file.seek(0)
-            while(!file.readLine().contains("/**")) {}
-            file.seek(file.getFilePointer() - 5)
-            file.write(redc_comments_top.getBytes())
-            contents = contents.concat(file.readLine() + "\n")
-            while(!contents.contains("/**")) {
-                contents = contents.concat(file.readLine() + "\n")
+            InputStream inp = new FileInputStream(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8));
+            StringBuilder data = new StringBuilder();
+
+            String line = reader.readLine();
+
+            while(!line.contains("*\\/")) {
+                line = reader.readLine();
             }
-            file.seek(file.getFilePointer() - 5)
-            file.close()
+            while(!line.contains("/**")) {
+                data.append(line).append("\n");
+                line = reader.readLine();
+            }
+            inp.close()
             new File(utility_path, (i == 0 ? "Network.java" : "Data.java")).write(
-                    (i == 0 ? header_obj : header_active) + redc_comments_top + contents
+                    (i == 0 ? header_obj : header_active) + redc_comments_top + data.toString() + redc_comments_bottom + (i == 0 ? nString : dString)  + "\n}"
             )
-            file = new RandomAccessFile(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"), "rw")
-            file.seek(0)
-            while(!file.readLine().contains("/**")) {}
-            while(!file.readLine().contains("/**")) {}
-            file.seek(file.getFilePointer() - 5)
-            file.write((redc_comments_bottom + (i == 0 ? nString : dString)  + "\n}").getBytes())
-            file.close()
-            contents = new String()
         }
     }
 }
