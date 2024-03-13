@@ -5,10 +5,10 @@
     "item_description": "",
     "author_email": "",
     "list_price": "",
-    "image_urls": [],
+    "image_urls": [""],
     "date_created": "",
     "genre": "",
-    "transact_ids": []
+    "transact_ids": [""]
   },
   "descriptors": [{}]
 }

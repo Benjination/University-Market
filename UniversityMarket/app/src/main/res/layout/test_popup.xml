@@ -9,12 +9,12 @@
         android:id="@+id/textView23"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="100dp"
         android:layout_below="@id/test_list_lvl1_txt"
+        android:layout_marginHorizontal="100dp"
         android:layout_marginTop="50dp"
         android:layout_marginBottom="5dp"
-        android:textColor="@color/design_default_color_on_primary"
-        android:text="Tap to dismiss" />
+        android:text="Tap off to dismiss"
+        android:textColor="@color/design_default_color_on_primary" />
 
     <TextView
         android:id="@+id/test_field_lvl1"

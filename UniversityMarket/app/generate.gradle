@@ -147,10 +147,48 @@ static void crawl(def json, def map, def depth) {
     }
 }
 
+static void provCrawl(String name, HashMap<String, List<String>> map, HashMap<String, List<Object>> valMap) {
+    List<Object> list = new ArrayList<>()
+    HashMap<String, Object> hashes = new HashMap<>()
+    String params = "", args = "", clean = ""
+    for(int a = 0; map.containsKey(name) && a < map.get(name).size(); a++) {
+        List<String> currentProv = map.get(name).get(a)
+        if(currentProv.get(0).contains("HashMap<")) {
+            provCrawl(currentProv.get(1), map, valMap)
+            List<Object> response = valMap.get(currentProv.get(1))
+            params = params.concat(response.get(0))
+            response.get(1).forEach((key, value) -> hashes.merge(key, value, (oldValue, newValue) ->
+                    oldValue != newValue ? oldValue : newValue))
+            if(a + 1 < map.get(name).size())
+                params = params.concat(", ")
+        } else {
+            params = params.concat(currentProv.get(0) + " " + currentProv.get(1))
+            args = args.concat(currentProv.get(1))
+            clean = clean.concat(currentProv.get(1))
+            if(a + 1 < map.get(name).size()) {
+                params = params.concat(", ")
+                args = args.concat(", ")
+                clean = clean.concat(",")
+            }
+        }
+    }
+    list.add(params)
+    hashes.put(name, args)
+    list.add(hashes)
+    list.add(clean)
+    if(!valMap.containsKey(name))
+        valMap.put(name, list)
+}
+
 String[] generate(def map, def class_name, def file) {
     String tab = "    "
     String[] response = new String[4]
     String idMethod = "", idName = ""
+    HashMap<String, List<String>> provHierarchy = new HashMap<>()
+    HashMap<String, List<Object>> provFields = new HashMap<>()
+    HashMap<String, String> methodNameMap = new HashMap<>()
+    List<String> provKeys = new ArrayList<>()
+    boolean cache = file.name.contains("cached")
 
     def temp = file.getPath().split("/")
     String filepath = ""
@@ -170,7 +208,8 @@ String[] generate(def map, def class_name, def file) {
             "import java.util.ArrayList;\n"
     String declarations = ""
     String constructor = \
-            "\n" + tab + "public " + class_name + "(HashMap<String, Object> rawdata) {\n"
+            "\n" + tab + "@Deprecated\n" + tab +
+            "public " + class_name + "(HashMap<String, Object> rawdata) {\n"
     String methods = ""
 
     println(
@@ -181,6 +220,7 @@ String[] generate(def map, def class_name, def file) {
     for(int pass = 0; pass < 3; pass++) {
         boolean ubh = false
         for (int i = 0; i < map.size(); i++) {
+            ArrayList<String> provTested = new ArrayList<>()
             for (int z = 0; z < map.get(i).size(); z++) {
                 def cmap = map.get(i).get(z)
                 int csize = cmap.size()
@@ -199,21 +239,36 @@ String[] generate(def map, def class_name, def file) {
                     if (size > 1)
                         mname = mname.concat(ss.substring(1))
                 }
+                methodNameMap.put(name, mname)
 
                 switch(pass) {
                     case 0:
                         println(cmap)
                         if (i == 0) {
+                            if(z == 0) {
+                                constructor = constructor.concat(
+                                        tab + tab + "ArrayList<String> rawKeys = new ArrayList<>(rawdata != null ? rawdata.keySet() : new ArrayList<>());\n"
+                                )
+                            }
                             if(type == "String") {
                                 idName = name
                                 idMethod = mname
                             }
                             constructor = constructor.concat(
-                                    tab + tab + "super.put(\"" + name + "\", rawdata.get(\"" + name + "\"));\n"
+                                    tab + tab + "super.put(\"" + name + "\", rawKeys.contains(\"" + name + "\") ? rawdata.get(\"" + name + "\") : null);\n"
                             )
                         }
+                        if(!provHierarchy.containsKey(prov)) {
+                            provHierarchy.put(prov, new ArrayList<>())
+                            provKeys.add(prov)
+                        }
+                        List<Object> provColl = new ArrayList<>()
+                        provColl.add(type)
+                        provColl.add(name)
+                        provHierarchy.get(prov).add(provColl)
                         declarations = declarations.concat(
-                                tab + "private " + type + " " + name + " = null;\n"
+                                tab + "private " + type + " " + name + " = " +
+                                (type.contains("<") ? "new " + type.split("<.*>")[0] + "<>()" : "null") + ";\n"
                         )
                         methods = methods.concat(
                                 "\n\n" + tab + "public " + type + " get" +
@@ -221,8 +276,24 @@ String[] generate(def map, def class_name, def file) {
                         )
                         break
                     case 1:
+                        if(z == 0 && i == 0) {
+                            provCrawl("super", provHierarchy, provFields)
+                            println(provHierarchy)
+                        }
+                        if(!provTested.contains(prov)) {
+                            provTested.add(prov)
+                            if(prov != "super") {
+                                constructor = constructor.concat(
+                                        tab + tab + "ArrayList<String> " + prov + "Keys = new ArrayList<>(" + prov + " != null ? " + prov + ".keySet() : new ArrayList<>());\n"
+                                )
+                            } else {
+                                constructor = constructor.concat(
+                                        tab + tab + "ArrayList<String> " + prov + "Keys = new ArrayList<>(" + prov + ".keySet());\n"
+                                )
+                            }
+                        }
                         constructor = constructor.concat(
-                                tab + tab + name + " = (" + type + ") " + prov + ".get(\"" + name + "\");\n"
+                                tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : null;\n"
                         )
 
                         if (generic == "<HashMap>") {
@@ -237,17 +308,43 @@ String[] generate(def map, def class_name, def file) {
                         }
                         break
                     case 2:
-                        if (prov == "super") {
+                        if(type.contains("HashMap<")) {
+                            HashMap<String, String> provHash = (HashMap<String, String>) provFields.get(name).get(1)
+                            List<String> provNested = provHash.keySet().asList()
                             methods = methods.concat(
-                                    "\n\n" + tab + "public void set" +
-                                            mname + "(" + type + " " + name + ") { super.put(\"" +
-                                            name + "\", " + name + "); }"
+                                    "\n\n" + tab + "public void set" + mname +
+                                    "(" + provFields.get(name).get(0) + ") {\n"
+                            )
+                            for(provKey in provNested) {
+                                if(provKey != name) {
+                                    methods = methods.concat(
+                                            tab + tab + "set" + methodNameMap.get(provKey) + "(" + provHash.get(provKey) + ");\n"
+                                    )
+                                }
+                            }
+                            for(provItem in provFields.get(name).get(2).split(",")) {
+                                if(provItem.size() != 0) {
+                                    methods = methods.concat(
+                                            tab + tab + "this." + provItem + " = " + provItem + ";\n"
+                                    )
+                                }
+                            }
+                            methods = methods.concat(
+                                    tab + tab + "formatSuper();\n" +
+                                    tab + "}"
+                            )
+                        } else {
+                            methods = methods.concat(
+                                    "\n\n" + tab + "public void set" + mname + "(" + type + " " + name + ") {\n" +
+                                    tab + tab + "this." + name + " = " + name + ";\n" + tab + tab + "formatSuper();\n" +
+                                    tab + "}"
                             )
                         }
-                        if (generic == "<HashMap>") {
+
+                        if(generic == "<HashMap>") {
                             constructor = constructor.concat(
-                                    "\n" + tab + tab + "for(Object o : " + name + ") {\n" +
-                                            tab + tab + tab + "Data.mergeHash(" + name + "Map, (HashMap<String, Object>) o);\n" +
+                                    "\n" + tab + tab + "for(int i = 0; " + name + " != null && i < " + name + ".size(); i++) {\n" +
+                                            tab + tab + tab + "Data.mergeHash(" + name + "Map, (HashMap<String, Object>) " + name + ".get(i));\n" +
                                             tab + tab + "}\n"
                             )
                         }
@@ -259,8 +356,66 @@ String[] generate(def map, def class_name, def file) {
         if(pass == 1 && ubh)
             imports = imports.concat("import com.example.universitymarket.utilities.Data;\n")
     }
-    constructor = constructor.concat(tab + "}")
+    constructor = constructor.concat(
+            tab + tab + "formatSuper();\n" + tab + "}"
+    )
+
+    HashMap<String, String> provHash = (HashMap<String, String>) provFields.get("super").get(1)
+    List<String> provNested = provHash.keySet().asList()
+    constructor = constructor.concat(
+            "\n\n" + tab + "public " + class_name +
+            "(" + provFields.get("super").get(0) + ") {\n"
+    )
+    for(provKey in provNested) {
+        if(provKey != "super") {
+            constructor = constructor.concat(
+                    tab + tab + "set" + methodNameMap.get(provKey) + "(" + provHash.get(provKey) + ");\n"
+            )
+        }
+    }
+    for(provItem in provFields.get("super").get(2).split(",")) {
+        if(provItem.size() != 0) {
+            constructor = constructor.concat(
+                    tab + tab + "this." + provItem + " = " + provItem + ";\n"
+            )
+        }
+    }
+    constructor = constructor.concat(
+            tab + tab + "formatSuper();\n" + tab + "}"
+    )
+
+    if(!cache) {
+        constructor = constructor.concat(
+                "\n\n" + tab + "public " + class_name + "() {\n" +
+                tab + tab + "formatSuper();\n" + tab + "}"
+        )
+    } else {
+        constructor = constructor.concat(
+                "\n\n" + tab + "public " + class_name + "(String " + idName +") {\n" +
+                tab + tab + "this." + idName + " = " + idName + ";\n" +
+                tab + tab + "formatSuper();\n" + tab + "}"
+        )
+    }
+
+
     methods = methods.concat("\n\n" + tab + "public HashMap<String, Object> getSuper() { return this; }")
+
+    methods = methods.concat("\n\n" + tab + "private void formatSuper() {\n")
+    for(int i = provKeys.size() - 1; i >= 0; i--) {
+        List<Object> curProv = provHierarchy.get(provKeys.get(i))
+        for(int z = 0; z < curProv.size(); z++) {
+            if(z == 0) {
+                methods = methods.concat(
+                        tab + tab + provKeys.get(i) +
+                        (provKeys.get(i) != "super" ? " = new HashMap<>" : ".clear") + "();\n"
+                )
+            }
+            methods = methods.concat(
+                    tab + tab + provKeys.get(i) + ".put(\"" + curProv.get(z).get(1) + "\", " + curProv.get(z).get(1) + ");\n"
+            )
+        }
+    }
+    methods = methods.concat(tab + "}")
 
     String body = declarations + constructor + methods
     String definition = \
@@ -269,7 +424,6 @@ String[] generate(def map, def class_name, def file) {
     String object = packag + imports + comments + definition
     response[0] = new String(object)
 
-    boolean cache = file.name.contains("cached")
     String coll_name = "\"" + class_name.toLowerCase() + "s\""
     String obj_name = class_name.toLowerCase() + "OBJ"
     String setters = ""
@@ -278,7 +432,7 @@ String[] generate(def map, def class_name, def file) {
         setters = setters.concat(
                 "\n    public static void set" + class_name + "FromCache" +
                 "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<" + class_name + "> response) {\n" +
-                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear);\n" +
+                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear, null);\n" +
                 "        if(response != null) {\n" +
                 "            echo.addOnSuccessListener(task -> {\n" +
                 "                " + class_name + " result = new " + class_name + "(task);\n" +
@@ -290,37 +444,13 @@ String[] generate(def map, def class_name, def file) {
                 \
                 "    public static void set" + class_name + "FromCache" +
                 "(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<" + class_name + "> response) {\n" +
-                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear);\n" +
+                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear, null);\n" +
                 "        if(response != null) {\n" +
                 "            echo.addOnSuccessListener(task -> {\n" +
                 "                " + class_name + " result = new " + class_name + "(task);\n" +
                 "                response.onSuccess(result);\n" +
                 "            });\n" +
                 "            echo.addOnFailureListener(response::onFailure);\n" +
-                "        }\n" +
-                "    }\n\n" +
-                \
-                "    public static void set" + class_name + "sFromCache" +
-                "(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<List<" + class_name + ">> response) {\n" +
-                "        File[] files = Data.getCachedFiles(cur_act, " + coll_name + ");\n" +
-                "        List<" + class_name + "> responses = new ArrayList<>();\n" +
-                "        for(int i = 0; i < files.length; i++) {\n" +
-                "            Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", files[i].getName().split(\"(.json)\")[0], clear);\n" +
-                "            if(response != null) {\n" +
-                "                echo.addOnFailureListener(response::onFailure);\n" +
-                "                if(i == files.length - 1) {\n" +
-                "                    echo.addOnSuccessListener(task -> {\n" +
-                "                        " + class_name + " result = new " + class_name + "(task);\n" +
-                "                        responses.add(result);\n" +
-                "                        response.onSuccess(responses);\n" +
-                "                    });\n" +
-                "                } else {\n" +
-                "                    echo.addOnSuccessListener(task -> {\n" +
-                "                    " + class_name + " result = new " + class_name + "(task);\n" +
-                "                    responses.add(result);\n" +
-                "                    });\n" +
-                "                }\n" +
-                "            }\n" +
                 "        }\n" +
                 "    }\n"
         )
@@ -329,8 +459,7 @@ String[] generate(def map, def class_name, def file) {
                 "        getDoc(cur_act, " + coll_name + ", Active" +  class_name  + "." + idName + ")\n" +
                 "                .addOnSuccessListener(task -> {\n" +
                 "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                "                    Data.setActive" +  class_name  + "(result, null);\n" +
-                "                    Data.setCache(cur_act, task, false);\n" +
+                "                    Data.setActive" +  class_name  + "(cur_act, result);\n" +
                 "                })\n" +
                 "                .addOnFailureListener(e -> Toast.makeText(\n" +
                 "                        cur_act,\n" +
@@ -462,21 +591,31 @@ String[] generate(def map, def class_name, def file) {
         def buff = line.split("( )")
         String type = buff[0], name = buff[1]
         details = details.concat(
-                "        Active" + class_name + "." + name + " = (" + type + ") pojo.get(\"" + name + "\");\n"
+                "        Active" + class_name + "." + name + " = " + obj_name +
+                ".get" + methodNameMap.get(name) + "();\n"
         )
     }
+    String provOrdered = ""
+    temp = provFields.get("super").get(0).split("[^,]* ")
+    for(line in temp) {
+        if(line.length() > 0)
+            provOrdered = provOrdered.concat("Active" + class_name + "." + line + " ")
+    }
+    details = details.concat(
+            "\n" + tab + tab + "Log.d(\"setActive" + class_name + "\", \"Success = \" + " +
+            "setCache(cur_act, \"Active" + class_name + "\", " + obj_name + ", false));\n"
+    )
     String method = \
-            "\n\n    public static void setActive" + class_name + "(Map<String, Object> pojo, String json) {\n" +
-            "        if(json != null) {\n" +
-            "            pojo = jsonToPOJO(json);\n" +
-            "        }\n" + details +
-            "    }"
+            "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +
+            class_name + " " + obj_name + ") {\n" + details + "    }" +
+            "\n\n    public static HashMap<String, Object> active" + class_name + "ToPOJO() {\n" +
+            "        return new " + class_name + "(" + provOrdered + ");\n    }"
     response[3] = method
 
     return response
 }
 
-static void update(String nString, String dString, def active_names, def obj_names, def utility_path) {
+static void update(String nString, String dString, def active_names, def obj_names, def file_names, def utility_path, def policy_path) {
     String redc_comments_top = \
             "/**\n * <b>\n * ANY MODIFICATIONS ABOVE THESE JAVADOC BOUNDS WILL BE OVERWRITTEN ON BUILD \n" +
             " * <div>\n * DO NOT REMOVE THIS \n" +
@@ -500,18 +639,45 @@ static void update(String nString, String dString, def active_names, def obj_nam
         header_obj = header_obj.concat("import com.example.universitymarket.objects." + val + ";\n")
     for(val in active_names) {
         header_obj = header_obj.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
+        header_active = header_active.concat("import com.example.universitymarket.objects." + val.split("(Active)")[1] + ";\n")
         header_active = header_active.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
     }
 
-    for(int i = 0; i < 2; i++) {
-        if((i == 0 ? nString : dString).size() != 0) {
-            File cur_file = new File(utility_path.getAbsolutePath() + (i == 0 ? "/Network.java" : "/Data.java"))
+    String pString = "    String[] json_filenames = { \n"
+    for(fn in file_names) {
+        pString = pString.concat("            \"" + fn + "\",\n")
+    }
+    pString = pString.substring(0, pString.length() - 2).concat("\n    };\n")
+
+    for(int i = 0; i < 3; i++) {
+        String header = ""
+        String body
+        String path
+        switch(i) {
+            case 0:
+                body = nString
+                path = utility_path.getAbsolutePath() + "/Network.java"
+                header = header_obj + redc_comments_top
+                break
+            case 1:
+                body = dString;
+                path = utility_path.getAbsolutePath() + "/Data.java"
+                header = header_active + redc_comments_top
+                break
+            case 2:
+                body = pString;
+                path = policy_path.getAbsolutePath() + "/Policy.Java"
+                break
+        }
+
+        if(body.length() != 0) {
+            File cur_file = new File(path)
             InputStream inp = new FileInputStream(cur_file)
             BufferedReader reader = new BufferedReader(new InputStreamReader(inp, StandardCharsets.UTF_8))
             StringBuilder data = new StringBuilder()
 
             String line = reader.readLine()
-            while(line != null) {
+            while(line != null && i < 2) {
                 if(line.contains("*/")) {
                     line = reader.readLine()
                     break
@@ -524,8 +690,8 @@ static void update(String nString, String dString, def active_names, def obj_nam
                 data.append(line).append("\n")
                 line = reader.readLine()
             }
-            new File(utility_path, (i == 0 ? "Network.java" : "Data.java")).write(
-                    (i == 0 ? header_obj : header_active) + redc_comments_top + data.toString() + redc_comments_bottom + (i == 0 ? nString : dString)  + "\n}"
+            new File(path).write(
+                    header + data.toString() + redc_comments_bottom + body  + "\n}"
             )
             inp.close()
         }
@@ -539,10 +705,13 @@ task generateSupported {
     object_path.mkdir()
     File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals/actives")
     global_path.mkdir()
+    File policy_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals")
     File utility_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/utilities")
     List<String> active_names = new ArrayList<>()
     List<String> obj_names = new ArrayList<>()
+    List<String> file_names = new ArrayList<>()
     for (s in skeletons) {
+        file_names.add(s.getName())
         String temp = s.getName().split("(_skeleton)(_cached)?(\\.json)")[0]
         StringBuilder name = new StringBuilder()
                 .append(temp.charAt(0).toUpperCase())
@@ -568,5 +737,5 @@ task generateSupported {
             dString = dString.concat(generated[3])
         }
     }
-    update(nString, dString, active_names, obj_names, utility_path)
+    update(nString, dString, active_names, obj_names, file_names, utility_path, policy_path)
 }

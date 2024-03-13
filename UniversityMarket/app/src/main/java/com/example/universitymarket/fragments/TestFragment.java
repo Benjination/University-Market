@@ -13,20 +13,17 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
-import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.*;
-import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.NetListener;
 import com.example.universitymarket.utilities.Network;
-
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class TestFragment extends Fragment implements View.OnClickListener {
 
     private View root;
     private LayoutInflater inflater;
     private ViewGroup container;
-    private static Test test;
+    private static Test test = new Test();
 
     public TestFragment() {
         // Required empty public constructor
@@ -67,7 +64,6 @@ public class TestFragment extends Fragment implements View.OnClickListener {
         TextView c1 = popupView.findViewById(R.id.test_coll_lvl1_txt);
         TextView f1 = popupView.findViewById(R.id.test_field_lvl1_txt);
         TextView f2 = popupView.findViewById(R.id.test_field_lvl2_txt);
-        TextView f3 = popupView.findViewById(R.id.test_field_lvl3_txt);
         TextView l1 = popupView.findViewById(R.id.test_list_lvl1_txt);
         TextView l2 = popupView.findViewById(R.id.test_list_lvl2_txt);
         c1.setText(test.getCollLvl1().toString());
@@ -88,27 +84,61 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == R.id.test_upload_button) {
-            ActiveUser.id = "test";
-            //Network.setTestFromCache(requireActivity(),"test2", false,null);
+            test.setFieldLvl1("test");
+            ArrayList<Object> list = new ArrayList<>();
+            list.add("Obj1");
+            list.add(2);
+            test.setCollLvl1(list, "Sample");
+
+            Network.setTest(requireActivity(), test, false, new NetListener<Test>() {
+                @Override
+                public void onSuccess(Test result) {
+                    Toast.makeText(
+                            getContext(),
+                            "Successfully uploaded",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("setTest", error.getMessage());
+                    Toast.makeText(
+                            getContext(),
+                            error.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
         }
         if(ID == R.id.test_clear_button) {
-            Toast.makeText(
-                    getContext(),
-                    ActiveUser.id,
-                    Toast.LENGTH_SHORT
-            ).show();
-            //Network.setTestFromCache(requireActivity(),"test2", false,null);
+            Network.setTest(requireActivity(), test, true, new NetListener<Test>() {
+                @Override
+                public void onSuccess(Test result) {
+                    Toast.makeText(
+                            getContext(),
+                            "Successfully cleared",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("setTest clear", error.getMessage());
+                    Toast.makeText(
+                            getContext(),
+                            error.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
         }
         if(ID == R.id.test_download_button) {
             Network.getTest(requireActivity(),"test", new NetListener<Test>() {
                 @Override
                 public void onSuccess(Test result) {
-                    Data.setCache(requireActivity(), result, false);
-                    HashMap<String, Object> data = Data.getCachedToPOJO(requireActivity(), result);
-                    if(data != null) {
-                        test = new Test(data);
-                        displayPopup(v);
-                    }
+                    test = result;
+                    displayPopup(v);
                 }
 
                 @Override
