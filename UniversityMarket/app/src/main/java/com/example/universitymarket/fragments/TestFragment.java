@@ -14,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.objects.*;
-import com.example.universitymarket.utilities.NetListener;
+import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import java.util.ArrayList;
 
@@ -32,7 +32,6 @@ public class TestFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -90,7 +89,7 @@ public class TestFragment extends Fragment implements View.OnClickListener {
             list.add(2);
             test.setCollLvl1(list, "Sample");
 
-            Network.setTest(requireActivity(), test, false, new NetListener<Test>() {
+            Network.setTest(requireActivity(), test, false, new Callback<Test>() {
                 @Override
                 public void onSuccess(Test result) {
                     Toast.makeText(
@@ -112,7 +111,7 @@ public class TestFragment extends Fragment implements View.OnClickListener {
             });
         }
         if(ID == R.id.test_clear_button) {
-            Network.setTest(requireActivity(), test, true, new NetListener<Test>() {
+            Network.setTest(requireActivity(), test, true, new Callback<Test>() {
                 @Override
                 public void onSuccess(Test result) {
                     Toast.makeText(
@@ -134,7 +133,7 @@ public class TestFragment extends Fragment implements View.OnClickListener {
             });
         }
         if(ID == R.id.test_download_button) {
-            Network.getTest(requireActivity(),"test", new NetListener<Test>() {
+            Network.getTest(requireActivity(),"test", new Callback<Test>() {
                 @Override
                 public void onSuccess(Test result) {
                     test = result;

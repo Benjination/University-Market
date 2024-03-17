@@ -204,11 +204,12 @@ String[] generate(def map, def class_name, def file) {
             "*/\n"
     String packag = "package com.example.universitymarket.objects;\n"
     String imports = \
-            "\nimport java.util.HashMap;\n" +
+            "\nimport androidx.annotation.Discouraged;\n" +
+            "import java.util.HashMap;\n" +
             "import java.util.ArrayList;\n"
     String declarations = ""
     String constructor = \
-            "\n" + tab + "@Deprecated\n" + tab +
+            "\n" + tab + "@Discouraged(message = \"Unless you are initializing with data directly from database, do not use this constructor\")\n" + tab +
             "public " + class_name + "(HashMap<String, Object> rawdata) {\n"
     String methods = ""
 
@@ -431,7 +432,7 @@ String[] generate(def map, def class_name, def file) {
     if(cache) {
         setters = setters.concat(
                 "\n    public static void set" + class_name + "FromCache" +
-                "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable NetListener<" + class_name + "> response) {\n" +
+                "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
                 "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear, null);\n" +
                 "        if(response != null) {\n" +
                 "            echo.addOnSuccessListener(task -> {\n" +
@@ -443,7 +444,7 @@ String[] generate(def map, def class_name, def file) {
                 "    }\n\n" +
                 \
                 "    public static void set" + class_name + "FromCache" +
-                "(@NonNull Activity cur_act, boolean clear, @Nullable NetListener<" + class_name + "> response) {\n" +
+                "(@NonNull Activity cur_act, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
                 "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear, null);\n" +
                 "        if(response != null) {\n" +
                 "            echo.addOnSuccessListener(task -> {\n" +
@@ -470,7 +471,7 @@ String[] generate(def map, def class_name, def file) {
         )
     }
     setters = setters.concat(
-            "\n    public static void set" + class_name + "(@NonNull Activity cur_act, @NonNull " + class_name + " " + obj_name + ", boolean clear, @Nullable NetListener<" + class_name + "> response) {\n" +
+            "\n    public static void set" + class_name + "(@NonNull Activity cur_act, @NonNull " + class_name + " " + obj_name + ", boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
             "        if(response == null && " + obj_name + ".get" + idMethod + "() == null)\n" +
             "            return;\n" +
             "        else if(response != null && " + obj_name + ".get" + idMethod + "() == null) {\n" +
@@ -487,7 +488,7 @@ String[] generate(def map, def class_name, def file) {
             "        }\n" +
             "    }\n\n" +
             \
-            "    public static void set" + class_name + "s(@NonNull Activity cur_act, @NonNull " + class_name + "[] " + obj_name + ", boolean clear, @Nullable NetListener<List<" + class_name + ">> response) {\n" +
+            "    public static void set" + class_name + "s(@NonNull Activity cur_act, @NonNull " + class_name + "[] " + obj_name + ", boolean clear, @Nullable Callback<List<" + class_name + ">> response) {\n" +
             "        List<" + class_name + "> responses = new ArrayList<>();\n" +
             "        for(int i = 0; i < " + obj_name + ".length; i++) {\n" +
             "            if(response == null && " + obj_name + "[i].get" + idMethod + "() == null)\n" +
@@ -516,7 +517,7 @@ String[] generate(def map, def class_name, def file) {
             "    }\n"
     )
     getters = getters.concat(
-            "\n    public static void get" +  class_name  + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull NetListener<" +  class_name  + "> response) {\n" +
+            "\n    public static void get" +  class_name  + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<" +  class_name  + "> response) {\n" +
             "        getDoc(cur_act," +  coll_name  + ", docID)\n" +
             "                .addOnSuccessListener(task -> {\n" +
             "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
@@ -525,7 +526,7 @@ String[] generate(def map, def class_name, def file) {
             "                .addOnFailureListener(response::onFailure);\n" +
             "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull String[] docID, @NonNull NetListener<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull String[] docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
             "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
             "        for(int i = 0; i < docID.length; i++) {\n" +
             "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID[i]);\n" +
@@ -545,7 +546,7 @@ String[] generate(def map, def class_name, def file) {
             "        }\n" +
             "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull NetListener<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
             "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
             "        getColl(cur_act," +  coll_name  + ", filter, Math.max(pageNo, 0))\n" +
             "                .addOnSuccessListener(task -> {\n" +
@@ -558,7 +559,7 @@ String[] generate(def map, def class_name, def file) {
             "                .addOnFailureListener(response::onFailure);\n" +
             "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, int pageNo, @NonNull NetListener<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
             "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
             "        getColl(cur_act," +  coll_name  + ", null, (char) (Math.max(pageNo, 0)))\n" +
             "                .addOnSuccessListener(task -> {\n" +

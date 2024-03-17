@@ -29,8 +29,15 @@
     <string name="actionbar_filter_option5_txt">Miscellaneous</string>
 
     <string name="test_upload_button_txt">Upload Test</string>
-    <string name="test_clear_button_txt">Clear Test Collection</string>
+    <string name="test_clear_button_txt">Clear Test</string>
     <string name="test_download_button_txt">Download Test</string>
+
+    <string name="post_submit_button_txt">Post Item</string>
+    <string name="post_image_submit_hint">Image upload</string>
+    <string name="post_title_field_hint">Title</string>
+    <string name="post_genre_label_txt">Genre</string>
+    <string name="post_description_field_hint">Description</string>
+    <string name="post_price_field_hint">Price</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
