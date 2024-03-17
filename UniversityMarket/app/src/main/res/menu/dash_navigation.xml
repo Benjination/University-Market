@@ -9,7 +9,7 @@
         android:id="@+id/dash_watch_button"
         android:icon="@drawable/watch_icon"
         android:title="@string/dash_watch_button_txt"
-        android:visible="false" />
+        android:visible="true" />
     <item
         android:id="@+id/dash_home_button"
         android:checked="true"

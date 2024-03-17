@@ -1,169 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/post_name_textfield"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:alpha="500"
     tools:context=".fragments.PostFragment">
 
-    <ScrollView
+    <View
+        android:id="@+id/post_load_screen"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:alpha="0.6"
+        android:foreground="@color/black"
+        android:translationZ="5dp"
+        android:visibility="invisible" />
 
-        <LinearLayout
+    <ProgressBar
+        android:id="@+id/post_load_animation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:progressTint="@color/design_default_color_secondary"
+        android:translationZ="10dp"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/post_submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginRight="20dp"
+        android:text="@string/post_submit_button_txt"
+        app:icon="@drawable/send_icon" />
+
+    <ScrollView
+        android:id="@+id/post_scrollview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/post_submit_button"
+        android:layout_marginTop="20dp">
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp">
+
+            <HorizontalScrollView
+                android:id="@+id/post_image_carousel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp">
+
+                <LinearLayout
+                    android:id="@+id/post_images"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                    <ImageButton
+                        android:id="@+id/post_imageupload_button"
+                        style="@android:style/Widget.ImageButton"
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:contentDescription="@string/post_image_submit_hint"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/add_picture" />
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <EditText
+                android:id="@+id/post_title_field"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_image_carousel"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:autofillHints="@string/post_title_field_hint"
+                android:ems="10"
+                android:hint="@string/post_title_field_hint"
+                android:inputType="textPersonName"
+                android:minHeight="48dp" />
+
+            <Space
+                android:id="@+id/post_space_inbetween"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/post_title_field"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/post_left_layout"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_below="@id/post_title_field"
+                android:layout_marginTop="20dp"
+                android:layout_toLeftOf="@id/post_space_inbetween"
                 android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/imageButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/minTouchTargetSize"
-                    android:layout_gravity="right"
-                    android:backgroundTint="@color/design_default_color_primary"
-                    android:scaleType="center"
-                    android:src="@drawable/send_icon"
-                    android:tintMode="multiply"
-                    app:tint="@color/design_default_color_on_primary" />
-
-                <ImageView
-                    android:id="@+id/imageView8"
+                <TextView
+                    android:id="@+id/post_genre_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    android:src="@drawable/image_placeholder" />
+                    android:paddingLeft="2dp"
+                    android:text="@string/post_genre_label_txt"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp" />
+                <RadioGroup
+                    android:id="@+id/post_genre_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
                 <EditText
-                    android:id="@+id/editTextTextPersonName"
+                    android:id="@+id/post_price_field"
                     android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:layout_gravity="center"
+                    android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="Title"
-                    android:inputType="textPersonName" />
-
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:orientation="horizontal">
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-
-                    <EditText
-                        android:id="@+id/editTextNumber"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:ems="10"
-                        android:hint="Price"
-                        android:inputType="number" />
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:paddingHorizontal="20dp"
-                        android:text="Genres"
-                        android:textAlignment="textEnd"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" />
-
-                    <EditText
-                        android:id="@+id/editTextTextMultiLine2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:ems="10"
-                        android:gravity="start|top"
-                        android:hint="Description"
-                        android:inputType="textMultiLine"
-                        android:paddingVertical="20dp" />
-
-                    <RadioGroup
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1">
-
-                        <RadioButton
-                            android:id="@+id/radioButton5"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option0_txt" />
-
-                        <RadioButton
-                            android:id="@+id/radioButton3"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option1_txt" />
-
-                        <RadioButton
-                            android:id="@+id/radioButton4"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option2_txt" />
-
-                        <RadioButton
-                            android:id="@+id/radioButton2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option3_txt" />
-
-                        <RadioButton
-                            android:id="@+id/radioButton6"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option4_txt" />
-
-                        <RadioButton
-                            android:id="@+id/radioButton7"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@string/actionbar_filter_option5_txt" />
-
-                    </RadioGroup>
-
-                    <Space
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1" />
-                </LinearLayout>
+                    android:hint="@string/post_price_field_hint"
+                    android:inputType="numberDecimal"
+                    android:minHeight="48dp" />
 
             </LinearLayout>
 
-        </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/post_right_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/post_title_field"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/post_space_inbetween"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/post_description_field"
+                    android:layout_width="wrap_content"
+                    android:layout_height="200dp"
+                    android:ems="10"
+                    android:hint="@string/post_description_field_hint"
+                    android:inputType="textLongMessage|textMultiLine" />
+            </LinearLayout>
+
+
+        </RelativeLayout>
     </ScrollView>
 
-</FrameLayout>
+</RelativeLayout>

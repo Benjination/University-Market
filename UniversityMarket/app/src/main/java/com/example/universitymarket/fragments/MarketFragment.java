@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,21 +17,14 @@ import com.example.universitymarket.utilities.PostModel;
 
 import java.util.ArrayList;
 
-//public class MarketFragment extends Fragment {
-//
-//    // TODO: Rename parameter arguments, choose names that match
-//    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-//    private static final String ARG_PARAM1 = "param1";
-//    private static final String ARG_PARAM2 = "param2";
-//
-//    // TODO: Rename and change types of parameters
-//    private String mParam1;
-//    private String mParam2;
-//
-//    public MarketFragment() {
-//        // Required empty public constructor
-//    }
 public class MarketFragment extends Fragment {
+
+    FragmentManager fm;
+
+    public MarketFragment(FragmentManager fm) {
+        this.fm = fm;
+    }
+
     private String mParam1;
     private String mParam2;
     private static final String ARG_PARAM1 = "param1";

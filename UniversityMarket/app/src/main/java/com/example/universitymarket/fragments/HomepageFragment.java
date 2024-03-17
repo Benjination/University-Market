@@ -39,7 +39,7 @@ public class HomepageFragment extends Fragment {
         Drawable market_icon = ContextCompat.getDrawable(view.getContext(), R.drawable.market_icon);
         Drawable post_icon = ContextCompat.getDrawable(view.getContext(), R.drawable.post_icon);
 
-        HomepageAdapter adapter = new HomepageAdapter((FragmentActivity) getContext());
+        HomepageAdapter adapter = new HomepageAdapter(requireActivity(), getParentFragmentManager());
         pager.setAdapter(adapter);
         pager.setUserInputEnabled(true);
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
@@ -55,6 +55,4 @@ public class HomepageFragment extends Fragment {
         }
         ).attach();
     }
-
-
 }
