@@ -13,36 +13,10 @@
         android:id="@+id/invalidEmail"
         android:layout_width="357dp"
         android:layout_height="287dp"
-        android:layout_marginBottom="396dp"
+        android:layout_marginBottom="388dp"
         android:background="#d6f2eb"
         android:gravity="center"
-        android:textSize= "20sp"
         android:text="@string/invalid_email"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/emailSent"
-        android:layout_width="357dp"
-        android:layout_height="287dp"
-        android:layout_marginBottom="396dp"
-        android:background="#d6f2eb"
-        android:gravity="center"
-        android:text="@string/emailsentstudent"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <TextView
-        android:id="@+id/emailSentMod"
-        android:layout_width="357dp"
-        android:layout_height="287dp"
-        android:layout_marginBottom="396dp"
-        android:background="#d6f2eb"
-        android:gravity="center"
-        android:text="@string/emailsentmod"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="380dp"
-        android:text="@string/log_in"
+        android:text="Sign up"
         android:textColor="#4A148C"
         app:backgroundTint="#4DAFA7"
         app:layout_constraintEnd_toEndOf="parent"
@@ -129,6 +103,29 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/mavlogo" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="182dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="90dp"
+        android:background="#89B3F0"
+        android:gravity="center"
+        android:text="Already Have an Account?"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/signin"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="92dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="84dp"
+        android:layout_marginEnd="92dp"
+        android:text="Sign In"
+        app:backgroundTint="#db6380"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
