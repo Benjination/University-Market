@@ -14,19 +14,21 @@ static Object typeString(String line) {
             field = new BigDecimal(line)
     } else if(line.matches("[0-9]+")) {
         BigInteger val = new BigInteger(line)
-        if(val <= Integer.MAX_VALUE)
+        if (val <= Integer.MAX_VALUE)
             field = Integer.parseInt(line)
-        else if(val <= Long.MAX_VALUE)
+        else if (val <= Long.MAX_VALUE)
             field = Long.parseLong(line)
         else
             field = val
+    } else if(line.toLowerCase().matches("(true|false)")) {
+        field = Boolean.parseBoolean(line)
     } else {
         field = line
     }
     return field
 }
 
-static String checkGeneric(def type, def parent, def map, int index) {
+static String checkGeneric(def name, def type, def parent, def map, int index) {
     if(index == -1)
         return "super"
     def arr = ((String) parent.getClass()).split("\\.")
@@ -38,11 +40,15 @@ static String checkGeneric(def type, def parent, def map, int index) {
         if (!cmap.get(i).toString().contains(parent.toString()))
             continue
 
-        for(int z = 0; z < cmap.size(); z++) {
+        for(int z = 0; z < cmap.get(i).size(); z++) {
+            if(pname != null)
+                break
             Object elem = cmap.get(i).get(z)
             if (elem == ptype + "<Object>")
                 return
             if (elem.toString().contains(ptype)) {
+                if(z == 1 && name == null && elem.toString().contains("<"))
+                    continue
                 ptype = elem
                 pidx = i
                 idx = z
@@ -54,7 +60,6 @@ static String checkGeneric(def type, def parent, def map, int index) {
     }
     if(idx < 0 || pidx < 0)
         return
-
     def pmap = cmap.get(pidx)
     def temp = ptype.split("(>)+[^,]*")[0].split(".*[^a-zA-Z]+")
     ptype = ptype.split("<")[0]
@@ -81,7 +86,7 @@ static void elemAdd(Object first, Object second, Object third, def list, def map
         list.add(first)
         name = first
     }
-    if(third instanceof String | third instanceof Number) {
+    if(third instanceof String | third instanceof Number | third instanceof Boolean) {
         third = typeString(third.toString())
     } else if(third.size == 0) {
         if(third instanceof Map)
@@ -93,7 +98,7 @@ static void elemAdd(Object first, Object second, Object third, def list, def map
     String buffer = type
     type = arr[arr.length - 1].concat(buffer)
     Object parent = list.size() != 0 ? second : first
-    String from = checkGeneric(type, parent, map, index - 1)
+    String from = checkGeneric(name, type, parent, map, index - 1)
     list.add(type)
 
     if(second instanceof Number)
@@ -226,6 +231,8 @@ String[] generate(def map, def class_name, def file) {
                 def cmap = map.get(i).get(z)
                 int csize = cmap.size()
 
+                if(pass == 0)
+                    println(cmap + " i = " + i)
                 if (csize < 4)
                     continue
 
@@ -244,7 +251,7 @@ String[] generate(def map, def class_name, def file) {
 
                 switch(pass) {
                     case 0:
-                        println(cmap)
+                        //println(cmap)
                         if (i == 0) {
                             if(z == 0) {
                                 constructor = constructor.concat(
@@ -526,12 +533,14 @@ String[] generate(def map, def class_name, def file) {
             "                .addOnFailureListener(response::onFailure);\n" +
             "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull String[] docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
             "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-            "        for(int i = 0; i < docID.length; i++) {\n" +
-            "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID[i]);\n" +
+            "        if(docID.size() == 0)\n" +
+            "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
+            "        for(int i = 0; i < docID.size(); i++) {\n" +
+            "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID.get(i));\n" +
             "            echo.addOnFailureListener(response::onFailure);\n" +
-            "            if(i == docID.length - 1) {\n" +
+            "            if(i == docID.size() - 1) {\n" +
             "                echo.addOnSuccessListener(task -> {\n" +
             "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
             "                    list.add(result);\n" +
@@ -609,7 +618,7 @@ String[] generate(def map, def class_name, def file) {
     String method = \
             "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +
             class_name + " " + obj_name + ") {\n" + details + "    }" +
-            "\n\n    public static HashMap<String, Object> active" + class_name + "ToPOJO() {\n" +
+            "\n\n    public static " + class_name + " active" + class_name + "ToPOJO() {\n" +
             "        return new " + class_name + "(" + provOrdered + ");\n    }"
     response[3] = method
 
