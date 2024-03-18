@@ -172,7 +172,7 @@ public abstract class Network {
             Query query = db.collection(collID);
             query = filter != null ? query.where(filter) : query;
             if(pageNo >= 0) {
-                query.startAt(Policy.max_docs_loaded * pageNo);
+                query.startAt();
                 query.limit(Policy.max_docs_loaded);
             }
             Task<QuerySnapshot> reference = query.get();

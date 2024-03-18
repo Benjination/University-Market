@@ -2,11 +2,11 @@ package com.example.universitymarket.utilities;
 
 public class PostModel {
     private String post_name;
-    private int imgid;
+    private String imageURL;
 
-    public PostModel(String post_name, int imgid) {
+    public PostModel(String post_name, String imageURL) {
         this.post_name = post_name;
-        this.imgid = imgid;
+        this.imageURL = imageURL;
     }
 
     public String getPost_name() {
@@ -17,11 +17,11 @@ public class PostModel {
         this.post_name = post_name;
     }
 
-    public int getImgid() {
-        return imgid;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void setImgid(int imgid) {
-        this.imgid = imgid;
+    public void setImgid(String imageURL) {
+        this.imageURL = imageURL;
     }
 }
