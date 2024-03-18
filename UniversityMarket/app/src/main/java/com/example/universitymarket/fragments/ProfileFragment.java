@@ -11,10 +11,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import com.example.universitymarket.Login;
 import com.example.universitymarket.R;
+import com.example.universitymarket.globals.actives.ActiveUser;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private View root;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,8 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         Intent btn_i;
         switch (v.getId()) {
             case R.id.profile_signout_button:
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut();
                 btn_i = new Intent(getContext(), Login.class);
                 startActivity(btn_i);
                 break;
