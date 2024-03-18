@@ -52,7 +52,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private TaskCompletionSource<String> load;
     private Thread uploadImages;
     private final FragmentManager fm;
-    private final HashMap<Integer, Spanned> requiredHints = new HashMap<>();
+    private final HashMap<Integer, Spanned> requiredText = new HashMap<>();
 
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
     private ArrayList<String> imageURLs = new ArrayList<>();
@@ -104,21 +104,23 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
     private void requiredFields(TextView... views) {
         for(TextView v : views) {
-            String base = v.getHint().toString();
+            String base = v.getHint() != null ? v.getHint().toString() : v.getText().toString();
             Spanned hint = Html.fromHtml(
                    "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
                     Html.FROM_HTML_MODE_LEGACY
             );
-            requiredHints.put(v.getId(), hint);
+            requiredText.put(v.getId(), hint);
         }
-        setRequiredHints(views);
+        setRequiredText(views);
     }
 
-    private void setRequiredHints(TextView... views) {
+    private void setRequiredText(TextView... views) {
         imagelabel.setVisibility(View.VISIBLE);
         for(TextView v : views) {
-            v.setHint(requiredHints.get(v.getId()));
-            Log.e(v.getHint().toString(), v.getText().toString().length() + "");
+            if(v.getHint() != null)
+                v.setHint(requiredText.get(v.getId()));
+            else
+                v.setText(requiredText.get(v.getId()));
         }
     }
 
@@ -165,7 +167,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         for(View v : remove)
             carousel.removeView(v);
 
-        setRequiredHints(title, price, description);
+        setRequiredText(title, price, description);
         Data.clearImageCache(requireActivity());
     }
 

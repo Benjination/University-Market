@@ -64,7 +64,7 @@
 
                     <ImageButton
                         android:id="@+id/post_imageupload_button"
-                        style="@android:style/Widget.ImageButton"
+                        style="@android:style/Widget.Holo.Light.ImageButton"
                         android:layout_width="200dp"
                         android:layout_height="200dp"
                         android:contentDescription="@string/post_image_submit_hint"
