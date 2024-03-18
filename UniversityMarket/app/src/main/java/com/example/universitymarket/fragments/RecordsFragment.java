@@ -63,9 +63,9 @@ public class RecordsFragment extends Fragment {
         loadbar = v.findViewById(R.id.records_load_animation);
         loadscreen = v.findViewById(R.id.records_load_screen);
         recyclerView = v.findViewById(R.id.records_recycle_view);
+
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-
         Network.getTransactions(requireActivity(), ActiveUser.transact_ids, new Callback<List<Transaction>>() {
             @Override
             public void onSuccess(List<Transaction> result) {
@@ -76,6 +76,7 @@ public class RecordsFragment extends Fragment {
                     userIds.add(transaction.getSellerEmail());
                 });
 
+                Log.e("huh","");
                 Network.getPosts(requireActivity(), postIds, new Callback<List<Post>>() {
                     @Override
                     public void onSuccess(List<Post> result) {
@@ -110,12 +111,12 @@ public class RecordsFragment extends Fragment {
                 retrieve.start();
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if(posts.size() != transactions.size() && users.size() != transactions.size()) {
+                        load.setResult("getPosts and getUsers");
+                        retrieve.interrupt();
                         Log.e("retrieve", String.format(
                                         "tsct: %d, usrs: %d, psts: %d",
                                         transactions.size(), users.size(), posts.size()),
                                 new TimeoutException("Post and User retrieval timeout"));
-                        load.setResult("getPosts and getUsers");
-                        retrieve.interrupt();
                     }
                 }, Policy.max_seconds_before_timeout * 1000);
             }

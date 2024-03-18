@@ -27,6 +27,7 @@ import com.example.universitymarket.R;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
@@ -133,11 +134,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         task.addOnCompleteListener(res -> {
             String val = res.getResult();
             if(val.equals("post")) {
-                Toast.makeText(
-                        getContext(),
-                        "Posted to marketplace",
-                        Toast.LENGTH_LONG
-                ).show();
                 resetPage();
             }
             loadscreen.setVisibility(View.INVISIBLE);
@@ -148,7 +144,46 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     }
 
     private void resetPage() {
-        Network.setPost(requireActivity(), post, false, null);
+        //is called after image-less post object was successfully
+        //created and every image was able to be uploaded
+        ActiveUser.post_ids.add(post.getId());
+        Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+            @Override
+            public void onSuccess(User ignored) {
+                //setActiveUser caches ActiveUser
+                Data.setActiveUser(requireActivity(), Data.activeUserToPOJO());
+                Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+                    @Override
+                    public void onSuccess(Post result) {
+                        Toast.makeText(
+                                getContext(),
+                                "Posted to marketplace",
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        Toast.makeText(
+                                getContext(),
+                                "Could not finish uploading: " + error.getMessage(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Network.setPost(requireActivity(), post, true, null);
+                Toast.makeText(
+                        getContext(),
+                        "Could not finish uploading: " + error.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+
         title.getText().clear();
         price.getText().clear();
         description.getText().clear();

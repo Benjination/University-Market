@@ -535,6 +535,8 @@ String[] generate(def map, def class_name, def file) {
             \
             "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
             "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
+            "        if(docID.size() == 0)\n" +
+            "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
             "        for(int i = 0; i < docID.size(); i++) {\n" +
             "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID.get(i));\n" +
             "            echo.addOnFailureListener(response::onFailure);\n" +
@@ -616,7 +618,7 @@ String[] generate(def map, def class_name, def file) {
     String method = \
             "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +
             class_name + " " + obj_name + ") {\n" + details + "    }" +
-            "\n\n    public static HashMap<String, Object> active" + class_name + "ToPOJO() {\n" +
+            "\n\n    public static " + class_name + " active" + class_name + "ToPOJO() {\n" +
             "        return new " + class_name + "(" + provOrdered + ");\n    }"
     response[3] = method
 
