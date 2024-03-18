@@ -31,9 +31,8 @@
         android:id="@+id/post_submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginRight="20dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
         android:text="@string/post_submit_button_txt"
         app:icon="@drawable/send_icon" />
 
@@ -49,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp">
+
 
             <HorizontalScrollView
                 android:id="@+id/post_image_carousel"
@@ -74,11 +74,19 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <TextView
+                android:id="@+id/post_image_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/post_image_carousel"
+                android:text="@string/post_image_required_txt" />
+
             <EditText
                 android:id="@+id/post_title_field"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/post_image_carousel"
+                android:layout_below="@id/post_image_label"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:autofillHints="@string/post_title_field_hint"
