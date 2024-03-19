@@ -46,7 +46,7 @@ public class SignIn extends AppCompatActivity
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null)
+        if (currentUser != null && currentUser.isEmailVerified())
         {
             Log.d(TAG, "User is signed in");
             Intent intent = new Intent(SignIn.this, DashboardActivity.class);
@@ -56,6 +56,7 @@ public class SignIn extends AppCompatActivity
         else
         {
             Log.d(TAG, "User is not signed in");
+
         }
 
 
@@ -126,8 +127,18 @@ public class SignIn extends AppCompatActivity
                                 // Update UI with user information
                                 Toast.makeText(SignIn.this, "Sign in successful.",
                                         Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(SignIn.this, DashboardActivity.class);
-                                startActivity(intent);
+
+                                if(currentUser != null && currentUser.isEmailVerified()) {
+                                    Intent intent = new Intent(SignIn.this, DashboardActivity.class);
+                                    startActivity(intent);
+                                }
+                                else
+                                {
+                                    Toast.makeText(SignIn.this, "Please Verify your email and try again.",
+                                            Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(SignIn.this, SignIn.class);
+                                    startActivity(intent);
+                                }
                             }
                         }
                         else

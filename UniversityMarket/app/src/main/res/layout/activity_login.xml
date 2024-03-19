@@ -30,7 +30,7 @@
         style="@style/Widget.AppCompat.AutoCompleteTextView"
         android:layout_width="322dp"
         android:layout_height="48dp"
-        android:layout_marginTop="228dp"
+        android:layout_marginTop="110dp"
         android:layout_marginEnd="44dp"
         android:background="#89B3F0"
         android:hint="@string/enter_your_email"
@@ -46,7 +46,7 @@
         style="@style/Widget.AppCompat.AutoCompleteTextView"
         android:layout_width="322dp"
         android:layout_height="48dp"
-        android:layout_marginTop="292dp"
+        android:layout_marginTop="168dp"
         android:layout_marginEnd="44dp"
         android:background="#89B3F0"
         android:hint="@string/enter_your_password"
@@ -62,10 +62,42 @@
         style="@style/Widget.AppCompat.AutoCompleteTextView"
         android:layout_width="322dp"
         android:layout_height="48dp"
-        android:layout_marginTop="360dp"
+        android:layout_marginTop="226dp"
         android:layout_marginEnd="44dp"
         android:background="#89B3F0"
         android:hint="Re-Enter Your Password"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/fname"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="284dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="First Name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/lname"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="342dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="Last Name"
         android:importantForAutofill="no"
         android:inputType="text"
         android:minHeight="48dp"
@@ -138,7 +170,7 @@
         android:id="@+id/invalidEmail"
         android:layout_width="360dp"
         android:layout_height="307dp"
-        android:layout_marginBottom="376dp"
+        android:layout_marginBottom="52dp"
         android:background="#d6f2eb"
         android:gravity="center"
         android:text="@string/invalid_email"
@@ -147,7 +179,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.49"
         app:layout_constraintStart_toStartOf="parent" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,9 +17,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.universitymarket.objects.User;
+import com.example.universitymarket.utilities.Callback;
+import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -43,6 +48,20 @@ public class Login extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        ActionCodeSettings actionCodeSettings =
+                ActionCodeSettings.newBuilder()
+                        // URL you want to redirect back to. The domain (www.example.com) for this
+                        // URL must be whitelisted in the Firebase Console.
+                        .setUrl("https://www.example.com/finishSignUp?cartId=1234")
+                        // This must be true
+                        .setHandleCodeInApp(true)
+                        .setIOSBundleId("com.example.ios")
+                        .setAndroidPackageName(
+                                "com.example.android",
+                                true, /* installIfNotAvailable */
+                                "12"    /* minimumVersion */)
+                        .build();
+
 
 
         FirebaseAuth mAuth;
@@ -52,6 +71,7 @@ public class Login extends AppCompatActivity
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+
         if(currentUser != null)
         {
             Intent intent = new Intent(Login.this, DashboardActivity.class);
@@ -64,6 +84,8 @@ public class Login extends AppCompatActivity
         EditText emailBox = findViewById(R.id.email);
         EditText passwordBox = findViewById(R.id.password);
         EditText passwordBox2 = findViewById(R.id.password2);
+        EditText fname = findViewById(R.id.fname);
+        EditText lname = findViewById(R.id.lname);
         // needs code to change entered password to asterisks
 
         TextView invalid = findViewById(R.id.invalidEmail);
@@ -113,6 +135,8 @@ public class Login extends AppCompatActivity
             String email = emailBox.getText().toString();
             String password = passwordBox.getText().toString();
             String password2 = passwordBox2.getText().toString();
+            String first = fname.getText().toString();
+            String last = lname.getText().toString();
             String domain = email.substring(email.indexOf("@") + 1);
 
             if (domain.equals(domain1) && !password.equals(""))
@@ -133,19 +157,67 @@ public class Login extends AppCompatActivity
                                 {
                                     if (task.isSuccessful())
                                     {
+
+
                                         // Sign in success, update UI with the signed-in user's information
                                         Log.d(TAG, "createUserWithEmail:success");
                                         FirebaseUser user = mAuth.getCurrentUser();
+                                        user.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Toast.makeText(Login.this, "Verification Email Sent",
+                                                        Toast.LENGTH_SHORT);
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                Log.d(TAG, "Failed to Email.");
+                                            }
+                                        });
                                         //updateUI(user);
                                         User currUser = new User(email);
                                         currUser.setId(email);
                                         Date date = new Date();
-                                        currUser.setAbout(date.toString(), null, null, null, email, password);
-                                        Network.setUser(Login.this, currUser, false, null);
-                                        Toast.makeText(Login.this, "Account Created.",
-                                                Toast.LENGTH_SHORT).show();
-                                        Intent intent = new Intent(Login.this, DashboardActivity.class);
-                                        startActivity(intent);
+                                        currUser.setAbout(date.toString(), last, null, first, email, null);
+                                        Network.setUser(Login.this, currUser, false, new Callback<User>() {
+                                            @Override
+                                            public void onSuccess(User result) {
+                                                Data.setActiveUser(Login.this,currUser);
+                                                Toast.makeText(Login.this, "Account Created.",
+                                                        Toast.LENGTH_SHORT).show();
+                                                ////////////
+                                                FirebaseAuth auth = FirebaseAuth.getInstance();
+                                                auth.sendSignInLinkToEmail(email, actionCodeSettings)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Log.d(TAG, "Email sent.");
+                                                                    FirebaseUser currentUser = auth.getCurrentUser();
+                                                                    if (currentUser != null && currentUser.isEmailVerified()) {
+                                                                        Intent intent = new Intent(Login.this, SignIn.class);
+                                                                        startActivity(intent);
+                                                                    } else {
+                                                                        Intent intent = new Intent(Login.this, SignIn.class);
+                                                                        startActivity(intent);
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    Intent intent = new Intent(Login.this, SignIn.class);
+                                                                    startActivity(intent);
+                                                                }
+                                                            }
+                                                        });
+                                                ////////////
+
+                                            }
+
+                                            @Override
+                                            public void onFailure(Exception error) {
+                                                Log.d(TAG, "Account not Created");
+                                            }
+                                        });
+
                                     } else
                                     {
                                     // If sign in fails, display a message to the user.
