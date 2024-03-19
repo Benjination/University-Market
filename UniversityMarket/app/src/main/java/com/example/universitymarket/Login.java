@@ -97,7 +97,6 @@ public class Login extends AppCompatActivity
         Button gotit = findViewById(R.id.got_it);
         gotit.setVisibility(View.INVISIBLE);
         Button login = findViewById(R.id.login);
-        Button backToMain = findViewById(R.id.back);
         Button signIn = findViewById(R.id.signin);
 
         //Button functionality
@@ -105,11 +104,6 @@ public class Login extends AppCompatActivity
         signIn.setOnClickListener(v ->
         {
             Intent intent = new Intent(Login.this, SignIn.class);
-            startActivity(intent);
-        });
-        backToMain.setOnClickListener(v ->
-        {
-            Intent intent = new Intent(Login.this, MainActivity.class);
             startActivity(intent);
         });
 

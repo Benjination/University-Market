@@ -58,12 +58,6 @@
                     android:textColor="@color/design_default_color_on_primary" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="20dp"
-                android:src="@drawable/image_placeholder" />
         </LinearLayout>
 
         <Space
@@ -88,18 +82,6 @@
         android:paddingHorizontal="20dp">
 
         <Button
-            android:id="@+id/button657"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="My Posts" />
-
-        <Button
-            android:id="@+id/button55"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="My impressions" />
-
-        <Button
             android:id="@+id/profile_signout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -115,16 +97,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingHorizontal="20dp">
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="This is a sample blah blah blah"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/textView14"
