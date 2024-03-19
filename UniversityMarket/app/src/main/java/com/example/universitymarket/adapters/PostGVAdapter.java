@@ -7,24 +7,24 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+//import androidx.annotation.NonNull;
+//import androidx.annotation.Nullable;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.utilities.PostModel;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 public class PostGVAdapter extends ArrayAdapter<PostModel> {
 
-    public PostGVAdapter(@NonNull Context context, ArrayList<PostModel> postModelArrayList) {
+    public PostGVAdapter( Context context, ArrayList<PostModel> postModelArrayList) {
         super(context, 0, postModelArrayList);
     }
 
 
-    @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
 
         View listitemView = convertView;
         if (listitemView == null) {
@@ -37,7 +37,7 @@ public class PostGVAdapter extends ArrayAdapter<PostModel> {
         ImageView postIMG = listitemView.findViewById(R.id.postIMG);
 
         postTitle.setText(postModel.getPost_name());
-        postIMG.setImageResource(postModel.getImgid());
+        Picasso.get().load(postModel.getImageURL()).into(postIMG);
         return listitemView;
     }
 }
