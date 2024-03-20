@@ -199,13 +199,13 @@ public class Login extends AppCompatActivity
                                                         });
                                                 ////////////
 
-                                            }
+                                                        }
 
-                                            @Override
-                                            public void onFailure(Exception error) {
-                                                Log.d(TAG, "Account not Created");
-                                            }
-                                        });
+                                                        @Override
+                                                        public void onFailure(Exception error) {
+                                                            Log.d(TAG, "Account not Created");
+                                                        }
+                                                    });
 
                                     } else {
                                         // If sign in fails, display a message to the user.

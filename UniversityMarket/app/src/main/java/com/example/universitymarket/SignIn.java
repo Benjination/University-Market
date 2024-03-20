@@ -19,7 +19,10 @@ import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,12 +35,27 @@ public class SignIn extends AppCompatActivity
 {
 
     private static final String TAG = "Signin";
+    String email, password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+        ActionCodeSettings actionCodeSettings =
+                ActionCodeSettings.newBuilder()
+                        // URL you want to redirect back to. The domain (www.example.com) for this
+                        // URL must be whitelisted in the Firebase Console.
+                        .setUrl("https://www.example.com/finishSignUp?cartId=1234")
+                        // This must be true
+                        .setHandleCodeInApp(true)
+                        .setIOSBundleId("com.example.ios")
+                        .setAndroidPackageName(
+                                "com.example.android",
+                                true, /* installIfNotAvailable */
+                                "12"    /* minimumVersion */)
+                        .build();
 
         FirebaseAuth mAuth;
         // ...
@@ -70,6 +88,8 @@ public class SignIn extends AppCompatActivity
 
         //Buttons
         Button gotit = findViewById(R.id.got_it);
+        Button resend = findViewById(R.id.resend);
+        resend.setVisibility(View.INVISIBLE);
         gotit.setVisibility(View.INVISIBLE);
         Button login = findViewById(R.id.login);
         Button back = findViewById(R.id.back);
@@ -83,6 +103,8 @@ public class SignIn extends AppCompatActivity
             Intent intent = new Intent(SignIn.this, Login.class);
             startActivity(intent);
         });
+
+
 
         gotit.setOnClickListener(v ->
         {
@@ -103,8 +125,8 @@ public class SignIn extends AppCompatActivity
             //passwordBox.setVisibility(View.INVISIBLE);
             //login.setVisibility(View.INVISIBLE);
             String domain1 = "mavs.uta.edu", domain2 = "uta.edu";
-            String email = emailBox.getText().toString();
-            String password = passwordBox.getText().toString();
+            email = emailBox.getText().toString();
+            password = passwordBox.getText().toString();
             String domain = email.substring(email.indexOf("@") + 1);
 
             if ((domain.equals(domain2) || domain.equals(domain1)) && !password.equals(""))
@@ -137,9 +159,11 @@ public class SignIn extends AppCompatActivity
                                 {
                                     Toast.makeText(SignIn.this, "Please Verify your email and try again.",
                                             Toast.LENGTH_SHORT).show();
+                                    resend.setVisibility(View.VISIBLE);
                                 }
-                                Intent intent = new Intent(SignIn.this, SignIn.class);
-                                startActivity(intent);
+                                //Intent intent = new Intent(SignIn.this, SignIn.class);
+                                //startActivity(intent);
+                                resend.setVisibility(View.VISIBLE);
                             }
                         }
                         else
@@ -162,7 +186,36 @@ public class SignIn extends AppCompatActivity
                 gotit.setVisibility(View.VISIBLE);
                 System.out.println("Email not accepted");
             }
+
         });
+        resend.setOnClickListener(v->{
+            //////////
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task)
+                        {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            user.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(SignIn.this, "Verification Email Sent",
+                                            Toast.LENGTH_SHORT);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Log.d(TAG, "Failed to Email.");
+                                }
+                            });
+                        }
+                    });
+            /////////
+
+
+                });
 
     }
+
 }
