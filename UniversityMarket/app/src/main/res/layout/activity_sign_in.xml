@@ -8,18 +8,7 @@
     android:background="@drawable/drip">
 
 
-    <TextView
-        android:id="@+id/invalidEmail"
-        android:layout_width="357dp"
-        android:layout_height="287dp"
-        android:layout_marginBottom="388dp"
-        android:background="#d6f2eb"
-        android:gravity="center"
-        android:text="@string/invalid_email"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+
 
     <Button
         android:id="@+id/got_it"
@@ -103,6 +92,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/mavlogo" />
+
+    <TextView
+        android:id="@+id/invalidEmail"
+        android:layout_width="357dp"
+        android:layout_height="287dp"
+        android:layout_marginBottom="388dp"
+        android:background="#d6f2eb"
+        android:gravity="center"
+        android:text="@string/invalid_email"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

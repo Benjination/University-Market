@@ -133,7 +133,7 @@ public class Login extends AppCompatActivity
             String last = lname.getText().toString();
             String domain = email.substring(email.indexOf("@") + 1);
 
-            if (domain.equals(domain1) && !password.equals(""))
+            if ((domain.equals(domain2) || domain.equals(domain1)) && !password.equals(""))
             {
                 //emailBox.setVisibility(View.INVISIBLE);
                 //passwordBox.setVisibility(View.INVISIBLE);
@@ -141,16 +141,12 @@ public class Login extends AppCompatActivity
                 //gotit.setVisibility(View.VISIBLE);
                 System.out.println("User is a student.");
 
-                if (password.equals(password2))
-                {
+                if (password.equals(password2)) {
                     mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
-                            {
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                                 @Override
-                                public void onComplete(@NonNull Task<AuthResult> task)
-                                {
-                                    if (task.isSuccessful())
-                                    {
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
 
 
                                         // Sign in success, update UI with the signed-in user's information
@@ -176,7 +172,7 @@ public class Login extends AppCompatActivity
                                         Network.setUser(Login.this, currUser, false, new Callback<User>() {
                                             @Override
                                             public void onSuccess(User result) {
-                                                Data.setActiveUser(Login.this,currUser);
+                                                Data.setActiveUser(Login.this, currUser);
                                                 Toast.makeText(Login.this, "Account Created.",
                                                         Toast.LENGTH_SHORT).show();
                                                 ////////////
@@ -195,8 +191,7 @@ public class Login extends AppCompatActivity
                                                                         Intent intent = new Intent(Login.this, SignIn.class);
                                                                         startActivity(intent);
                                                                     }
-                                                                }
-                                                                else{
+                                                                } else {
                                                                     Intent intent = new Intent(Login.this, SignIn.class);
                                                                     startActivity(intent);
                                                                 }
@@ -212,29 +207,31 @@ public class Login extends AppCompatActivity
                                             }
                                         });
 
-                                    } else
-                                    {
-                                    // If sign in fails, display a message to the user.
-                                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                                    Toast.makeText(Login.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(Login.this, "If you have already created an account, Try signing in instead",
-                                            Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(Login.this, Login.class);
-                                    startActivity(intent);
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                        Toast.makeText(Login.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(Login.this, "If you have already created an account, Try signing in instead",
+                                                Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(Login.this, Login.class);
+                                        startActivity(intent);
                                     }
+
                                 }
                             });
-                } else if (domain.equals(domain2) && !password.equals("")) {
 
-                    System.out.println("User is a faculty/staff.");
-
-                } else
-                    {
-                    invalid.setVisibility(View.VISIBLE);
-                    gotit.setVisibility(View.VISIBLE);
-                    System.out.println("Email not accepted");
                 }
+
+            }
+             else
+            {
+                invalid.setVisibility(View.VISIBLE);
+                gotit.setVisibility(View.VISIBLE);
+                emailBox.setVisibility(View.INVISIBLE);
+                passwordBox.setVisibility(View.INVISIBLE);
+                login.setVisibility(View.INVISIBLE);
+                System.out.println("Email not accepted");
             }
         });
     }

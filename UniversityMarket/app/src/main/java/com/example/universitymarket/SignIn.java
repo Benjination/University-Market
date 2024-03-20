@@ -79,6 +79,7 @@ public class SignIn extends AppCompatActivity
 
         back.setOnClickListener(v ->
         {
+            mAuth.signOut();
             Intent intent = new Intent(SignIn.this, Login.class);
             startActivity(intent);
         });
@@ -106,7 +107,7 @@ public class SignIn extends AppCompatActivity
             String password = passwordBox.getText().toString();
             String domain = email.substring(email.indexOf("@") + 1);
 
-            if (domain.equals(domain1) && !password.equals(""))
+            if ((domain.equals(domain2) || domain.equals(domain1)) && !password.equals(""))
             {
                 // Check if the user already exists in Firebase Authentication
                 mAuth.signInWithEmailAndPassword(email, password)
@@ -128,7 +129,7 @@ public class SignIn extends AppCompatActivity
                                 Toast.makeText(SignIn.this, "Sign in successful.",
                                         Toast.LENGTH_SHORT).show();
 
-                                if(currentUser != null && currentUser.isEmailVerified()) {
+                                if(firebaseUser.isEmailVerified()) {
                                     Intent intent = new Intent(SignIn.this, DashboardActivity.class);
                                     startActivity(intent);
                                 }
@@ -136,9 +137,9 @@ public class SignIn extends AppCompatActivity
                                 {
                                     Toast.makeText(SignIn.this, "Please Verify your email and try again.",
                                             Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(SignIn.this, SignIn.class);
-                                    startActivity(intent);
                                 }
+                                Intent intent = new Intent(SignIn.this, SignIn.class);
+                                startActivity(intent);
                             }
                         }
                         else
@@ -154,15 +155,7 @@ public class SignIn extends AppCompatActivity
                     }
                 });
             }
-            else if (domain.equals(domain2) && !password.equals(""))
-            {
-                //emailBox.setVisibility(View.INVISIBLE);
-                //passwordBox.setVisibility(View.INVISIBLE);
-                //login.setVisibility(View.INVISIBLE);
-                //gotit.setVisibility(View.VISIBLE);
-                System.out.println("User is a faculty/staff.");
 
-            }
             else
                 {
                 invalid.setVisibility(View.VISIBLE);

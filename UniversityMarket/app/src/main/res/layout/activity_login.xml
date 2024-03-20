@@ -10,12 +10,11 @@
     >
 
 
-
     <Button
         android:id="@+id/got_it"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="304dp"
+        android:layout_marginTop="380dp"
         android:text="@string/got_it"
         android:textColor="#212121"
         app:backgroundTint="#db6380"
@@ -23,7 +22,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <EditText
         android:id="@+id/email"
@@ -157,7 +155,7 @@
         android:id="@+id/invalidEmail"
         android:layout_width="360dp"
         android:layout_height="307dp"
-        android:layout_marginBottom="52dp"
+        android:layout_marginBottom="324dp"
         android:background="#d6f2eb"
         android:gravity="center"
         android:text="@string/invalid_email"
