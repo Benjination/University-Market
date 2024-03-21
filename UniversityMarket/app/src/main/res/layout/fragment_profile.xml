@@ -49,13 +49,6 @@
                     android:text="abc1234@mavs.uta.edu"
                     android:textColor="@color/design_default_color_on_primary" />
 
-                <TextView
-                    android:id="@+id/textView13"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="5 Posts"
-                    android:textColor="@color/design_default_color_on_primary" />
             </LinearLayout>
 
         </LinearLayout>
