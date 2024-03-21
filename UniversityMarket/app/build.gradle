@@ -3,7 +3,7 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
-//apply from: './generate.gradle'
+apply from: './generate.gradle'
 
 allprojects {
     tasks.withType(JavaCompile) {
