@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.universitymarket.R;
+import com.example.universitymarket.globals.actives.ActiveUser;
 
 public class WatchFragment extends Fragment {
+    private View root;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -48,6 +51,9 @@ public class WatchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        root = inflater.inflate(R.layout.fragment_profile, container, false);
+        configureButtons(root);
+
         return inflater.inflate(R.layout.fragment_watch, container, false);
     }
 }
