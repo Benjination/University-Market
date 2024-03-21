@@ -52,7 +52,6 @@ public class WatchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_profile, container, false);
-        configureButtons(root);
 
         return inflater.inflate(R.layout.fragment_watch, container, false);
     }

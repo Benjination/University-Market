@@ -1,4 +1,5 @@
 package com.example.universitymarket;
+import com.example.universitymarket.utilities.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -71,6 +72,7 @@ public class SignIn extends AppCompatActivity
             Intent intent = new Intent(SignIn.this, DashboardActivity.class);
             startActivity(intent);
             currentUser.reload();
+            ActiveUser.email = currentUser.getEmail();
         }
         else
         {
@@ -145,17 +147,29 @@ public class SignIn extends AppCompatActivity
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             if (firebaseUser != null) {
                                 String userEmail = firebaseUser.getEmail();
-                                String Password = firebaseUser.getDisplayName();
                                 ActiveUser.email = userEmail;
-                                System.out.println(Password + " " + userEmail);
+
+
                                 // Update UI with user information
                                 Toast.makeText(SignIn.this, "Sign in successful.",
                                         Toast.LENGTH_SHORT).show();
 
                                 if(firebaseUser.isEmailVerified()) {
                                     //Data.setActiveUser(SignIn.this, firebaseUser);
-                                    Intent intent = new Intent(SignIn.this, DashboardActivity.class);
-                                    startActivity(intent);
+                                    Network.getUser(SignIn.this, userEmail, new Callback<User>() {
+                                        @Override
+                                        public void onSuccess(User result) {
+                                            Data.setActiveUser(SignIn.this, result);
+                                            Intent intent = new Intent(SignIn.this, DashboardActivity.class);
+                                            startActivity(intent);
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception error) {
+
+                                        }
+                                    });
+
                                 }
                                 else
                                 {

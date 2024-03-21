@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
@@ -79,10 +80,24 @@ public class Login extends AppCompatActivity
 
         if(currentUser != null && currentUser.isEmailVerified())
         {
-            Intent intent = new Intent(Login.this, DashboardActivity.class);
-            startActivity(intent);
+
             currentUser.reload();
+            ActiveUser.email = currentUser.getEmail();
+            Network.getUser(Login.this, currentUser.getEmail(), new Callback<User>() {
+                @Override
+                public void onSuccess(User result) {
+                    Data.setActiveUser(Login.this, result);
+                    Intent intent = new Intent(Login.this, DashboardActivity.class);
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+
+                }
+            });
         }
+
 
 
 
