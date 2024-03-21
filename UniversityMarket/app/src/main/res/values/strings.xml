@@ -39,6 +39,9 @@
     <string name="post_description_field_hint">Description</string>
     <string name="post_price_field_hint">Price</string>
 
+    <string name="back_to_marketplace">Back to Market</string>
+    <string name="item_title_with_price">Back to Market</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="login_demo">Login Demo</string>
