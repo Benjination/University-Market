@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
+import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -152,6 +153,7 @@ public class SignIn extends AppCompatActivity
                                         Toast.LENGTH_SHORT).show();
 
                                 if(firebaseUser.isEmailVerified()) {
+                                    //Data.setActiveUser(SignIn.this, firebaseUser);
                                     Intent intent = new Intent(SignIn.this, DashboardActivity.class);
                                     startActivity(intent);
                                 }
@@ -189,7 +191,6 @@ public class SignIn extends AppCompatActivity
 
         });
         resend.setOnClickListener(v->{
-            //////////
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
                     {
@@ -211,7 +212,7 @@ public class SignIn extends AppCompatActivity
                             });
                         }
                     });
-            /////////
+
 
 
                 });

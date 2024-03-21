@@ -31,6 +31,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Date;
 
 
@@ -39,6 +41,9 @@ public class Login extends AppCompatActivity
 {
 
     private static final String TAG = "Login";
+    String cache;
+    String delim;
+
 
 
 
@@ -165,14 +170,17 @@ public class Login extends AppCompatActivity
                                             }
                                         });
                                         //updateUI(user);
+
+
                                         User currUser = new User(email);
                                         currUser.setId(email);
                                         Date date = new Date();
                                         currUser.setAbout(date.toString(), last, null, first, email, null);
+                                        Data.setActiveUser(Login.this, currUser);
                                         Network.setUser(Login.this, currUser, false, new Callback<User>() {
                                             @Override
                                             public void onSuccess(User result) {
-                                                Data.setActiveUser(Login.this, currUser);
+
                                                 Toast.makeText(Login.this, "Account Created.",
                                                         Toast.LENGTH_SHORT).show();
                                                 ////////////

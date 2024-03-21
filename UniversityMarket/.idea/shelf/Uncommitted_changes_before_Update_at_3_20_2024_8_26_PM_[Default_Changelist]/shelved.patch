@@ -1,0 +1,149 @@
+Index: app/src/main/java/com/example/universitymarket/fragments/WatchFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.universitymarket.fragments;\r\n\r\nimport android.os.Bundle;\r\n\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\n\r\nimport com.example.universitymarket.R;\r\n\r\npublic class WatchFragment extends Fragment {\r\n\r\n    // TODO: Rename parameter arguments, choose names that match\r\n    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER\r\n    private static final String ARG_PARAM1 = \"param1\";\r\n    private static final String ARG_PARAM2 = \"param2\";\r\n\r\n    // TODO: Rename and change types of parameters\r\n    private String mParam1;\r\n    private String mParam2;\r\n\r\n    public WatchFragment() {\r\n        // Required empty public constructor\r\n    }\r\n\r\n    // TODO: Rename and change types and number of parameters\r\n    public static WatchFragment newInstance(String param1, String param2) {\r\n        WatchFragment fragment = new WatchFragment();\r\n        Bundle args = new Bundle();\r\n        args.putString(ARG_PARAM1, param1);\r\n        args.putString(ARG_PARAM2, param2);\r\n        fragment.setArguments(args);\r\n        return fragment;\r\n    }\r\n\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        if (getArguments() != null) {\r\n            mParam1 = getArguments().getString(ARG_PARAM1);\r\n            mParam2 = getArguments().getString(ARG_PARAM2);\r\n        }\r\n    }\r\n\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n        // Inflate the layout for this fragment\r\n        return inflater.inflate(R.layout.fragment_watch, container, false);\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/universitymarket/fragments/WatchFragment.java b/app/src/main/java/com/example/universitymarket/fragments/WatchFragment.java
+--- a/app/src/main/java/com/example/universitymarket/fragments/WatchFragment.java	(revision 6be34c1b1081decf026cc5b22cbd6a0ead8f447c)
++++ b/app/src/main/java/com/example/universitymarket/fragments/WatchFragment.java	(date 1710956632050)
+@@ -7,8 +7,11 @@
+ import android.view.LayoutInflater;
+ import android.view.View;
+ import android.view.ViewGroup;
++import android.widget.Button;
++import android.widget.TextView;
+ 
+ import com.example.universitymarket.R;
++import com.example.universitymarket.globals.actives.ActiveUser;
+ 
+ public class WatchFragment extends Fragment {
+ 
+@@ -16,6 +19,7 @@
+     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+     private static final String ARG_PARAM1 = "param1";
+     private static final String ARG_PARAM2 = "param2";
++    private View root;
+ 
+     // TODO: Rename and change types of parameters
+     private String mParam1;
+@@ -48,6 +52,20 @@
+     public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                              Bundle savedInstanceState) {
+         // Inflate the layout for this fragment
++        /*
++        root = inflater.inflate(R.layout.fragment_profile, container, false);
++        configureButtons(root);
++        TextView title = root.findViewById(R.id.records_title_label);
++        title.setText(ActiveUser.first_name + " " + ActiveUser.last_name);
++        TextView email = root.findViewById(R.id.email);
++        email.setText(ActiveUser.email);
++         */
+         return inflater.inflate(R.layout.fragment_watch, container, false);
+     }
++/*
++    private void configureButtons(View view) {
++        Button signoutButton = view.findViewById(R.id.profile_signout_button);
++        signoutButton.setOnClickListener(this);
++    }
++*/
+ }
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"DesignSurface\">\r\n    <option name=\"filePathToZoomLevelMap\">\r\n      <map>\r\n        <entry key=\"app/src/main/res/drawable/cart_icon.xml\" value=\"0.3260416666666667\" />\r\n        <entry key=\"app/src/main/res/drawable/home_filled_icon.xml\" value=\"0.1\" />\r\n        <entry key=\"app/src/main/res/drawable/image_placeholder.xml\" value=\"0.1\" />\r\n        <entry key=\"app/src/main/res/layout/activity_dashboard.xml\" value=\"0.16770833333333332\" />\r\n        <entry key=\"app/src/main/res/layout/activity_login.xml\" value=\"0.3926247288503254\" />\r\n        <entry key=\"app/src/main/res/layout/activity_main.xml\" value=\"0.2936893203883495\" />\r\n        <entry key=\"app/src/main/res/layout/activity_sign_in.xml\" value=\"0.3098958333333333\" />\r\n        <entry key=\"app/src/main/res/layout/fragment_homepage.xml\" value=\"0.1\" />\r\n        <entry key=\"app/src/main/res/layout/fragment_item.xml\" value=\"0.1\" />\r\n        <entry key=\"app/src/main/res/layout/fragment_market.xml\" value=\"0.1\" />\r\n        <entry key=\"app/src/main/res/layout/fragment_post.xml\" value=\"0.25\" />\r\n        <entry key=\"app/src/main/res/layout/switch_item.xml\" value=\"0.67\" />\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" languageLevel=\"JDK_15\" project-jdk-name=\"11\" project-jdk-type=\"JavaSDK\">\r\n    <output url=\"file://$PROJECT_DIR$/build/classes\" />\r\n  </component>\r\n  <component name=\"ProjectType\">\r\n    <option name=\"id\" value=\"Android\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 6be34c1b1081decf026cc5b22cbd6a0ead8f447c)
++++ b/.idea/misc.xml	(date 1710957551619)
+@@ -3,6 +3,11 @@
+   <component name="DesignSurface">
+     <option name="filePathToZoomLevelMap">
+       <map>
++        <entry key="..\:/Users/275RR/University-Market/UniversityMarket/app/src/main/res/layout/activity_dashboard.xml" value="0.3703125" />
++        <entry key="..\:/Users/275RR/University-Market/UniversityMarket/app/src/main/res/layout/activity_login.xml" value="0.3703125" />
++        <entry key="..\:/Users/275RR/University-Market/UniversityMarket/app/src/main/res/layout/fragment_records.xml" value="0.2921195652173913" />
++        <entry key="..\:/Users/275RR/University-Market/UniversityMarket/app/src/main/res/layout/fragment_test.xml" value="0.3703125" />
++        <entry key="..\:/Users/275RR/University-Market/UniversityMarket/app/src/main/res/layout/fragment_watch.xml" value="0.25" />
+         <entry key="app/src/main/res/drawable/cart_icon.xml" value="0.3260416666666667" />
+         <entry key="app/src/main/res/drawable/home_filled_icon.xml" value="0.1" />
+         <entry key="app/src/main/res/drawable/image_placeholder.xml" value="0.1" />
+Index: app/src/main/res/layout/fragment_watch.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    tools:context=\".fragments.WatchFragment\">\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:background=\"@color/design_default_color_primary\"\r\n        android:orientation=\"vertical\">\r\n\r\n        <Space\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"50dp\" />\r\n\r\n        <TextView\r\n            android:id=\"@+id/records_title_label\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:paddingHorizontal=\"20dp\"\r\n            android:text=\"@string/dash_watch_view_txt\"\r\n            android:textAppearance=\"@style/TextAppearance.AppCompat.Large\"\r\n            android:textColor=\"@color/design_default_color_on_primary\"\r\n            android:textSize=\"34sp\" />\r\n\r\n        <Space\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"30dp\" />\r\n\r\n        <View\r\n            android:id=\"@+id/records_title_divider\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"3dp\"\r\n            android:background=\"?android:attr/listDivider\" />\r\n\r\n    </LinearLayout>\r\n\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"200dp\" />\r\n\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_watch.xml b/app/src/main/res/layout/fragment_watch.xml
+--- a/app/src/main/res/layout/fragment_watch.xml	(revision 6be34c1b1081decf026cc5b22cbd6a0ead8f447c)
++++ b/app/src/main/res/layout/fragment_watch.xml	(date 1710983239191)
+@@ -17,7 +17,7 @@
+             android:layout_height="50dp" />
+ 
+         <TextView
+-            android:id="@+id/records_title_label"
++            android:id="@+id/watch_title_label"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+@@ -32,7 +32,7 @@
+             android:layout_height="30dp" />
+ 
+         <View
+-            android:id="@+id/records_title_divider"
++            android:id="@+id/watch_title_divider"
+             android:layout_width="match_parent"
+             android:layout_height="3dp"
+             android:background="?android:attr/listDivider" />
+@@ -40,6 +40,7 @@
+     </LinearLayout>
+ 
+     <androidx.recyclerview.widget.RecyclerView
++        android:id="@+id/watch_list"
+         android:layout_width="match_parent"
+         android:layout_height="200dp" />
+ 
+Index: app/src/main/res/layout/activity_dashboard.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<RelativeLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\">\r\n\r\n    <View\r\n        android:id=\"@+id/actionbar_placeholder\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"?android:attr/actionBarSize\" />\r\n\r\n\r\n    <FrameLayout\r\n        android:id=\"@+id/dash_fragment_buffer\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:layout_above=\"@+id/dash_buttons\"\r\n        android:layout_alignParentTop=\"true\"/>\r\n\r\n\r\n    <com.google.android.material.bottomnavigation.BottomNavigationView\r\n        android:id=\"@+id/dash_buttons\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_alignParentBottom=\"true\"\r\n        app:menu=\"@menu/dash_navigation\" />\r\n</RelativeLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_dashboard.xml b/app/src/main/res/layout/activity_dashboard.xml
+--- a/app/src/main/res/layout/activity_dashboard.xml	(revision 6be34c1b1081decf026cc5b22cbd6a0ead8f447c)
++++ b/app/src/main/res/layout/activity_dashboard.xml	(date 1710957551277)
+@@ -15,7 +15,7 @@
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_above="@+id/dash_buttons"
+-        android:layout_alignParentTop="true"/>
++        android:layout_alignParentTop="true" />
+ 
+ 
+     <com.google.android.material.bottomnavigation.BottomNavigationView
+Index: app/src/main/res/layout/fragment_records.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<RelativeLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    tools:context=\".fragments.RecordsFragment\">\r\n\r\n\r\n    <Space\r\n        android:id=\"@+id/records_center_reference\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_centerInParent=\"true\"/>\r\n\r\n    <View\r\n        android:id=\"@+id/records_load_screen\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:layout_below=\"@id/records_module_label\"\r\n        android:alpha=\"0.6\"\r\n        android:foreground=\"@color/black\"\r\n        android:translationZ=\"5dp\"\r\n        android:visibility=\"invisible\" />\r\n\r\n    <ProgressBar\r\n        android:id=\"@+id/records_load_animation\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_below=\"@id/records_center_reference\"\r\n        android:layout_centerHorizontal=\"true\"\r\n        android:layout_marginTop=\"20dp\"\r\n        android:indeterminate=\"true\"\r\n        android:progressTint=\"@color/design_default_color_secondary\"\r\n        android:translationZ=\"10dp\"\r\n        android:visibility=\"invisible\" />\r\n\r\n    <LinearLayout\r\n        android:id=\"@+id/records_module_label\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:background=\"@color/design_default_color_primary\"\r\n        android:orientation=\"vertical\">\r\n\r\n        <TextView\r\n            android:id=\"@+id/records_title_label\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginStart=\"20dp\"\r\n            android:layout_marginTop=\"?attr/actionBarSize\"\r\n            android:text=\"@string/dash_records_view_txt\"\r\n            android:textAppearance=\"@style/TextAppearance.AppCompat.Large\"\r\n            android:textColor=\"@color/design_default_color_on_primary\"\r\n            android:textSize=\"34sp\" />\r\n\r\n        <View\r\n            android:id=\"@+id/records_title_divider\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"3dp\"\r\n            android:layout_marginTop=\"30dp\"\r\n            android:background=\"?android:attr/listDivider\" />\r\n    </LinearLayout>\r\n\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:id=\"@+id/records_recycle_view\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:layout_below=\"@id/records_module_label\"\r\n        android:scrollbars=\"vertical\"\r\n        >\r\n\r\n    </androidx.recyclerview.widget.RecyclerView>\r\n\r\n</RelativeLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/fragment_records.xml b/app/src/main/res/layout/fragment_records.xml
+--- a/app/src/main/res/layout/fragment_records.xml	(revision 6be34c1b1081decf026cc5b22cbd6a0ead8f447c)
++++ b/app/src/main/res/layout/fragment_records.xml	(date 1710953430385)
+@@ -66,8 +66,7 @@
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+         android:layout_below="@id/records_module_label"
+-        android:scrollbars="vertical"
+-        >
++        android:scrollbars="vertical">
+ 
+     </androidx.recyclerview.widget.RecyclerView>
+ 

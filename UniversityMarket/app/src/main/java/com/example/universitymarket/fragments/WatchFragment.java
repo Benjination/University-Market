@@ -7,8 +7,10 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.universitymarket.R;
+import com.example.universitymarket.globals.actives.ActiveUser;
 
 public class WatchFragment extends Fragment {
 
