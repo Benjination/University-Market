@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="?listPreferredItemHeightLarge"
+    android:id="@+id/record_card_item"
+    app:cardBackgroundColor="@color/design_default_color_secondary"
+    app:cardUseCompatPadding="false">
+
+    <RelativeLayout
+        android:id="@+id/record_card_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?listPreferredItemHeightLarge">
+
+        <TextView
+            android:id="@+id/record_title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="?listPreferredItemPaddingLeft"
+            android:layout_marginTop="?android:listPreferredItemPaddingStart"
+            android:layout_toLeftOf="@id/record_price_text"
+            android:singleLine="true"
+            android:text="Test"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/design_default_color_on_secondary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/record_price_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?android:listPreferredItemPaddingStart"
+            android:layout_marginRight="?android:listPreferredItemPaddingRight"
+            android:layout_toLeftOf="@id/record_arrow_icon"
+            android:text="$99999999.99"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/design_default_color_on_secondary"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/record_seller_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/record_price_text"
+            android:layout_marginRight="?android:listPreferredItemPaddingRight"
+            android:layout_toLeftOf="@id/record_arrow_icon"
+            android:text="Johnny Appleseed"
+            android:textColor="@color/design_default_color_on_secondary" />
+
+        <TextView
+            android:id="@+id/record_date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/record_title_text"
+            android:layout_marginLeft="?listPreferredItemPaddingLeft"
+            android:text="31 December 2022"
+            android:textColor="@color/design_default_color_on_secondary" />
+
+        <ImageView
+            android:id="@+id/record_arrow_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="?android:listPreferredItemPaddingRight"
+            app:srcCompat="@drawable/arrow_right_icon"
+            app:tint="@color/design_default_color_on_secondary" />
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

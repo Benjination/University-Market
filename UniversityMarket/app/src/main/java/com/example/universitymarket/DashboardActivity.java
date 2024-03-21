@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -17,9 +18,13 @@ import com.example.universitymarket.fragments.HomepageFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.TestFragment;
+import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.utilities.Data;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.HashMap;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -27,6 +32,8 @@ public class DashboardActivity extends AppCompatActivity {
     private TaskCompletionSource<Uri> uriRetrieval = new TaskCompletionSource<>();
     private HashMap<String, Fragment> fragMap = new HashMap<>();
     private FragmentManager fm = getSupportFragmentManager();
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

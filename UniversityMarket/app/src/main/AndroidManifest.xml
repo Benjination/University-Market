@@ -12,8 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UniversityMarket">
         <activity
-            android:name=".Login"
+            android:name=".SignIn"
             android:exported="false" />
+
         <activity
             android:name=".DashboardActivity"
             android:exported="false">
@@ -30,7 +31,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

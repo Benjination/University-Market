@@ -9,24 +9,12 @@
     tools:context=".Login"
     >
 
-    <TextView
-        android:id="@+id/invalidEmail"
-        android:layout_width="357dp"
-        android:layout_height="287dp"
-        android:layout_marginBottom="388dp"
-        android:background="#d6f2eb"
-        android:gravity="center"
-        android:text="@string/invalid_email"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/got_it"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="304dp"
+        android:layout_marginTop="380dp"
         android:text="@string/got_it"
         android:textColor="#212121"
         app:backgroundTint="#db6380"
@@ -35,13 +23,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <EditText
         android:id="@+id/email"
         style="@style/Widget.AppCompat.AutoCompleteTextView"
         android:layout_width="322dp"
         android:layout_height="48dp"
-        android:layout_marginTop="228dp"
+        android:layout_marginTop="110dp"
         android:layout_marginEnd="44dp"
         android:background="#89B3F0"
         android:hint="@string/enter_your_email"
@@ -57,7 +44,7 @@
         style="@style/Widget.AppCompat.AutoCompleteTextView"
         android:layout_width="322dp"
         android:layout_height="48dp"
-        android:layout_marginTop="292dp"
+        android:layout_marginTop="168dp"
         android:layout_marginEnd="44dp"
         android:background="#89B3F0"
         android:hint="@string/enter_your_password"
@@ -68,31 +55,68 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="TextContrastCheck" />
 
+    <EditText
+        android:id="@+id/password2"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="226dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="Re-Enter Your Password"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/fname"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="284dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="First Name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/lname"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="342dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="Last Name"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
     <Button
         android:id="@+id/login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="380dp"
+        android:layout_width="166dp"
+        android:layout_height="82dp"
+        android:layout_marginTop="428dp"
         android:text="Sign up"
         android:textColor="#4A148C"
+        android:textSize="20sp"
         app:backgroundTint="#4DAFA7"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="628dp"
-        android:text="@string/back_to_main"
-        android:textColor="#4A148C"
-        app:backgroundTint="#4DAFA7"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -108,8 +132,8 @@
         android:id="@+id/textView"
         android:layout_width="182dp"
         android:layout_height="35dp"
-        android:layout_marginTop="90dp"
-        android:background="#89B3F0"
+        android:layout_marginTop="568dp"
+        android:background="#BF40BF"
         android:gravity="center"
         android:text="Already Have an Account?"
         android:textColor="@color/black"
@@ -120,12 +144,26 @@
         android:id="@+id/signin"
         android:layout_width="92dp"
         android:layout_height="48dp"
-        android:layout_marginTop="84dp"
+        android:layout_marginTop="562dp"
         android:layout_marginEnd="92dp"
         android:text="Sign In"
         app:backgroundTint="#db6380"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/invalidEmail"
+        android:layout_width="360dp"
+        android:layout_height="307dp"
+        android:layout_marginBottom="324dp"
+        android:background="#d6f2eb"
+        android:gravity="center"
+        android:text="@string/invalid_email"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

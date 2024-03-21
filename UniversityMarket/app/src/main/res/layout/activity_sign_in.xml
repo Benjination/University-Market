@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignIn"
+    android:background="@drawable/drip">
+
+
+
+
+    <Button
+        android:id="@+id/got_it"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="304dp"
+        android:text="@string/got_it"
+        android:textColor="#212121"
+        app:backgroundTint="#db6380"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <EditText
+        android:id="@+id/email"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="228dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="@string/enter_your_email"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/password"
+        style="@style/Widget.AppCompat.AutoCompleteTextView"
+        android:layout_width="322dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="292dp"
+        android:layout_marginEnd="44dp"
+        android:background="#89B3F0"
+        android:hint="@string/enter_your_password"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:minHeight="48dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="TextContrastCheck" />
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="166dp"
+        android:layout_height="82dp"
+        android:layout_marginTop="380dp"
+        android:text="Sign in"
+        android:textColor="#4A148C"
+        android:textSize="20sp"
+        app:backgroundTint="#4DAFA7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="628dp"
+        android:text="Back"
+        android:textColor="#4A148C"
+        app:backgroundTint="#4DAFA7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="320dp"
+        android:src="@drawable/maverick"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/mavlogo" />
+
+    <TextView
+        android:id="@+id/invalidEmail"
+        android:layout_width="357dp"
+        android:layout_height="287dp"
+        android:layout_marginBottom="388dp"
+        android:background="#d6f2eb"
+        android:gravity="center"
+        android:text="@string/invalid_email"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/resend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="29dp"
+        android:layout_marginBottom="192dp"
+        android:text="Resend Email?"
+        android:textColor="#212121"
+        app:backgroundTint="#db6380"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

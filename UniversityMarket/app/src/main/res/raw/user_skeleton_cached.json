@@ -2,15 +2,13 @@
   "id": "",
   "about": {
     "email": "",
-    "username": "",
     "first_name": "",
-    "middle_name": "",
     "last_name": "",
     "date_created": ""
   },
   "interactions": {
-    "post_ids": [],
-    "watch_ids": [],
-    "transact_ids": []
+    "post_ids": [""],
+    "watch_ids": [""],
+    "transact_ids": [""]
   }
 }

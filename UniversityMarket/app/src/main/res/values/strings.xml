@@ -7,7 +7,7 @@
     <string name="sample_sample_spinner0_txt0">This is a preset sample option</string>
     <string name="sample_sample_spinner0_txt1">This is another preset sample option</string>
 
-    <string name="dash_records_view_txt">Receipt History</string>
+    <string name="dash_records_view_txt">Receipts</string>
     <string name="dash_watch_view_txt">Watchlist</string>
     <string name="dash_test_view_txt">Test Page</string>
     <string name="home_events_tab_txt">Events</string>
@@ -38,6 +38,7 @@
     <string name="post_genre_label_txt">Genre</string>
     <string name="post_description_field_hint">Description</string>
     <string name="post_price_field_hint">Price</string>
+    <string name="post_image_required_txt">at least one image is required</string>
 
     <string name="back_to_marketplace">Back to Market</string>
     <string name="refresh">Refresh</string>

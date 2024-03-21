@@ -89,7 +89,7 @@ public class viewPostFragment extends Fragment {
 
                 postTitle.setText("$" + result.getListPrice() + " - " + result.getItemTitle());
                 postDescription.setText("Item Description: \n\n\t\t\t" + result.getItemDescription());
-                sellerInfo.setText("Seller Contact: \n\n\t\t\t" + result.getAuthorEmail() + "hardCoded@email.com");
+                sellerInfo.setText("Seller Contact: \n\n\t\t\t" + result.getAuthorEmail());
 
                 // Set up ImageSwitcher
                 postImageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {

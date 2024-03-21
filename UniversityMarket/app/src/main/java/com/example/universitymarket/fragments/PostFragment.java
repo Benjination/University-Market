@@ -4,6 +4,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -24,6 +27,7 @@ import com.example.universitymarket.R;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
@@ -32,6 +36,7 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
 
 public class PostFragment extends Fragment implements View.OnClickListener {
 
@@ -44,13 +49,15 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private LinearLayout carousel;
     private ProgressBar loadbar;
     private View loadscreen;
+    private TextView genrelabel, imagelabel;
     private TaskCompletionSource<String> load;
+    private Thread uploadImages;
     private final FragmentManager fm;
-    private final HashMap<Integer, Spanned> requiredHints = new HashMap<>();
+    private final HashMap<Integer, Spanned> requiredText = new HashMap<>();
 
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
     private ArrayList<String> imageURLs = new ArrayList<>();
-    private static Post post = new Post();
+    private final Post post = new Post();
 
     public PostFragment(FragmentManager fm) {
         this.fm = fm;
@@ -81,8 +88,10 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         carousel = v.findViewById(R.id.post_images);
         loadbar = v.findViewById(R.id.post_load_animation);
         loadscreen = v.findViewById(R.id.post_load_screen);
+        genrelabel = v.findViewById(R.id.post_genre_label);
+        imagelabel = v.findViewById(R.id.post_image_label);
 
-        requiredFields(title, price, description);
+        requiredFields(title, price, description, genrelabel, imagelabel);
 
         for(String genre : Policy.genres) {
             RadioButton newGenre = new RadioButton(requireContext());
@@ -96,20 +105,23 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
     private void requiredFields(TextView... views) {
         for(TextView v : views) {
-            String base = v.getHint().toString();
+            String base = v.getHint() != null ? v.getHint().toString() : v.getText().toString();
             Spanned hint = Html.fromHtml(
                    "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
                     Html.FROM_HTML_MODE_LEGACY
             );
-            requiredHints.put(v.getId(), hint);
+            requiredText.put(v.getId(), hint);
         }
-        setRequiredHints(views);
+        setRequiredText(views);
     }
 
-    private void setRequiredHints(TextView... views) {
+    private void setRequiredText(TextView... views) {
+        imagelabel.setVisibility(View.VISIBLE);
         for(TextView v : views) {
-            v.setHint(requiredHints.get(v.getId()));
-            Log.e(v.getHint().toString(), v.getText().toString().length() + "");
+            if(v.getHint() != null)
+                v.setHint(requiredText.get(v.getId()));
+            else
+                v.setText(requiredText.get(v.getId()));
         }
     }
 
@@ -122,11 +134,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         task.addOnCompleteListener(res -> {
             String val = res.getResult();
             if(val.equals("post")) {
-                Toast.makeText(
-                        getContext(),
-                        "Posted to marketplace",
-                        Toast.LENGTH_LONG
-                ).show();
                 resetPage();
             }
             loadscreen.setVisibility(View.INVISIBLE);
@@ -137,13 +144,54 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     }
 
     private void resetPage() {
-        Network.setPost(requireActivity(), post, false, null);
+        //is called after image-less post object was successfully
+        //created and every image was able to be uploaded
+        ActiveUser.post_ids.add(post.getId());
+        Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+            @Override
+            public void onSuccess(User ignored) {
+                //setActiveUser caches ActiveUser
+                Data.setActiveUser(requireActivity(), Data.activeUserToPOJO());
+                Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+                    @Override
+                    public void onSuccess(Post result) {
+                        Toast.makeText(
+                                getContext(),
+                                "Posted to marketplace",
+                                Toast.LENGTH_LONG
+                        ).show();
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        Toast.makeText(
+                                getContext(),
+                                "Could not finish uploading: " + error.getMessage(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Network.setPost(requireActivity(), post, true, null);
+                Toast.makeText(
+                        getContext(),
+                        "Could not finish uploading: " + error.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+
         title.getText().clear();
         price.getText().clear();
         description.getText().clear();
         title.clearFocus();
         price.clearFocus();
         description.clearFocus();
+        imageURLsToBeUploaded = new ArrayList<>();
+        imageURLs = new ArrayList<>();
         ((RadioButton) root.findViewById(genres.getCheckedRadioButtonId())).setChecked(false);
         ArrayList<View> remove = new ArrayList<>();
         for(int i = 0; i < carousel.getChildCount(); i++) {
@@ -154,7 +202,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         for(View v : remove)
             carousel.removeView(v);
 
-        setRequiredHints(title, price, description);
+        setRequiredText(title, price, description);
         Data.clearImageCache(requireActivity());
     }
 
@@ -178,6 +226,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                             } else {
                                 imageURLsToBeUploaded.add(buffer);
                                 addToCarousel(Uri.parse(buffer));
+                                imagelabel.setVisibility(View.INVISIBLE);
                                 fm.clearFragmentResultListener("retrieveImage");
                             }
                             load.setResult("image");
@@ -227,7 +276,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == imageupload.getId()) {
-            retrievePhoto();
+            if(imageURLsToBeUploaded.size() < Policy.max_images_per_post)
+                retrievePhoto();
         }
         if(ID == submit.getId()) {
             RadioButton selected = genres.findViewById(genres.getCheckedRadioButtonId());
@@ -271,10 +321,17 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
                     load = new TaskCompletionSource<>();
                     loadPage(load.getTask());
-                    new Thread(() -> {
-                        while(imageURLs.size() != imageURLsToBeUploaded.size()) {}
+                    uploadImages = new Thread(() -> {
+                        while(imageURLs.size() != imageURLsToBeUploaded.size());
                         load.setResult("post");
-                    }).start();
+                    });
+                    uploadImages.start();
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                        if (!load.getTask().isComplete()) {
+                            load.setException(new TimeoutException());
+                            uploadImages.interrupt();
+                        }
+                    }, Policy.max_seconds_before_timeout * 1000);
                 }
 
                 @Override
