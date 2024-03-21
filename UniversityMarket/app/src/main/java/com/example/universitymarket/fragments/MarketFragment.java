@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 
 import com.example.universitymarket.R;
@@ -48,30 +49,20 @@ public class MarketFragment extends Fragment {
         // Find the GridView in your layout
         GridView postsGV = view.findViewById(R.id.idGVposts);
 
-        //get all posts
-        Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
-            @Override
-            public void onSuccess(List<Post> result) {
-                postsArrayList.addAll(result);
-                // Optionally notify your adapter or update UI here
-                Log.d("GETTING FIREBASE POSTS", "SUCCESS");
+        //find refresh button
+        Button refreshButton = view.findViewById(R.id.refreshBtn);
 
-                //check if posts are in postsArrayList
-                for(Post p : postsArrayList){
-                    Log.d("current post:" , p.getItemTitle());
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().get(0)));
-                    Log.d("added " + p.getItemTitle() , "success");
-                }
-
-                PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
-                GridView postsGV = view.findViewById(R.id.idGVposts);
-                postsGV.setAdapter(adapter1);
-            }
+        // Set an OnClickListener for the button
+        refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFailure(Exception error) {
-                Log.e("Error loading posts", error.getMessage());
+            public void onClick(View v) {
+                getAllPosts(v);
             }
         });
+
+
+        //get all posts
+        getAllPosts(view);
 
         // Set maximum length for post name
         int maxLength = 20; // Change this value as needed
@@ -113,6 +104,32 @@ public class MarketFragment extends Fragment {
                 fragmentTransaction.replace(R.id.dash_fragment_buffer, postFragment); // Ensure you have a valid container ID
                 fragmentTransaction.addToBackStack(null); // If you want to add it to back stack
                 fragmentTransaction.commit();
+            }
+        });
+    }
+
+    private void getAllPosts(View view){
+        //get all posts
+        Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
+            @Override
+            public void onSuccess(List<Post> result) {
+                postsArrayList.addAll(result);
+                // Optionally notify your adapter or update UI here
+                Log.d("GETTING FIREBASE POSTS", "SUCCESS");
+
+                //check if posts are in postsArrayList
+                for(Post p : postsArrayList){
+                    Log.d("current post:" , p.getItemTitle());
+                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().get(0)));
+                    Log.d("added " + p.getItemTitle() , "success");
+                }
+                PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
+                GridView postsGV = view.findViewById(R.id.idGVposts);
+                postsGV.setAdapter(adapter1);
+            }
+            @Override
+            public void onFailure(Exception error) {
+                Log.e("Error loading posts", error.getMessage());
             }
         });
     }
