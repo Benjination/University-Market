@@ -1,5 +1,6 @@
 package com.example.universitymarket;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -19,7 +20,10 @@ import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.TestFragment;
 import com.example.universitymarket.globals.actives.ActiveUser;
+import com.example.universitymarket.objects.User;
+import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
+import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,15 +37,40 @@ public class DashboardActivity extends AppCompatActivity {
     private HashMap<String, Fragment> fragMap = new HashMap<>();
     private FragmentManager fm = getSupportFragmentManager();
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        updateUserInformation();
         configureFragmentManager();
         configureActionBar();
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private void updateUserInformation() {
+        if(Data.isAnyObjectNull(Data.activeUserToPOJO().getAbout().values())) {
+            Data.setActiveUser(
+                    this,
+                    new User(Data.getCachedToPOJO(this, "ActiveUser"))
+            );
+        }
+
+        Network.getUser(this, ActiveUser.email, new Callback<User>() {
+            @Override
+            public void onSuccess(User result) {
+                Data.setActiveUser(DashboardActivity.this, result);
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Toast.makeText(
+                        DashboardActivity.this,
+                        error.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
     }
 
     private void configureFragmentManager() {
