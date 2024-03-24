@@ -1,13 +1,41 @@
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.github.spotbugs'
 }
 
 apply from: './generate.gradle'
 
+spotbugs {
+    toolVersion = '4.8.3'
+    ignoreFailures = true
+    reportsDir = file("$project.buildDir/SpotBugsReports")
+}
+
+def browse(path) {
+    def os = org.gradle.internal.os.OperatingSystem.current()
+    if (os.isWindows()) {
+        exec { commandLine 'cmd', '/c', "start $path" }
+    } else if (os.isMacOsX()) {
+        exec { commandLine 'open', "$path" }
+    }
+}
+
 allprojects {
     tasks.withType(JavaCompile) {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+    tasks.withType(com.github.spotbugs.snom.SpotBugsTask) {
+        dependsOn 'assembleDebug'
+        classes = files("$project.buildDir/intermediates/javac")
+        excludeFilter = file("$project.projectDir/spot-bugs-exclude.xml")
+        reports {
+            html.enabled = true
+            xml.enabled = false
+        }
+        doLast {
+            browse project.file("$project.buildDir/SpotBugsReports/debug.html")
+        }
     }
 }
 
@@ -38,7 +66,9 @@ android {
 }
 
 dependencies {
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.annotation:annotation:1.0.2'
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.code.gson:gson:2.8.6'
