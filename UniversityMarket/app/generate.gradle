@@ -669,7 +669,7 @@ static void update(String nString, String dString, def active_names, def obj_nam
                 break
             case 2:
                 body = pString;
-                path = policy_path.getAbsolutePath() + "/Policy.Java"
+                path = policy_path.getAbsolutePath() + "/Policy.java"
                 break
         }
 
