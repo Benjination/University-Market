@@ -16,7 +16,7 @@ def browse(path) {
     def os = org.gradle.internal.os.OperatingSystem.current()
     if (os.isWindows()) {
         exec { commandLine 'cmd', '/c', "start $path" }
-    } else if (os.isMacOsX()) {
+    } else {
         exec { commandLine 'open', "$path" }
     }
 }
