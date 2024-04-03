@@ -93,7 +93,7 @@ public class Login extends AppCompatActivity
 
                 @Override
                 public void onFailure(Exception error) {
-
+                    Log.e("getUser", error.getMessage());
                 }
             });
         }
@@ -181,7 +181,7 @@ public class Login extends AppCompatActivity
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(Exception e) {
-                                                Log.d(TAG, "Failed to Email.");
+                                                Log.e("sendEmailVerification", e.getMessage());
                                             }
                                         });
                                         //updateUI(user);
@@ -226,13 +226,13 @@ public class Login extends AppCompatActivity
 
                                                         @Override
                                                         public void onFailure(Exception error) {
-                                                            Log.d(TAG, "Account not Created");
+                                                            Log.e("setUser", error.getMessage());
                                                         }
                                                     });
 
                                     } else {
                                         // If sign in fails, display a message to the user.
-                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                        Log.e(TAG, "createUserWithEmail:failure", task.getException());
                                         Toast.makeText(Login.this, "Authentication failed.",
                                                 Toast.LENGTH_SHORT).show();
                                         Toast.makeText(Login.this, "If you have already created an account, Try signing in instead",

@@ -1,27 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/actionbar_placeholder"
-        android:layout_width="wrap_content"
-        android:layout_height="?android:attr/actionBarSize" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/dash_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="112dp"
+        android:background="?attr/colorPrimary"
+        android:elevation="5dp"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/dash_toolbar_menu"
+        app:popupTheme="@style/Theme.UniversityMarket" />
 
 
     <FrameLayout
         android:id="@+id/dash_fragment_buffer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/dash_buttons"
-        android:layout_alignParentTop="true"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/dash_buttons"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dash_toolbar">
 
+
+        <View
+            android:id="@+id/load_screen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0.6"
+            android:clickable="true"
+            android:foreground="@color/black"
+            android:translationZ="5dp"
+            android:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/load_animation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:progressTint="?colorSecondaryVariant"
+            android:translationZ="10dp"
+            android:visibility="invisible" />
+    </FrameLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/dash_buttons"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/dash_navigation" />
-</RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

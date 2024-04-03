@@ -51,12 +51,13 @@ public abstract class Network {
         String illReqObj = "Cached data for '" + docID + "' not found";
         String illFormat = "'" + docID + "' from '" + collID + "' is not in skeleton format!";
         String illColl = collID + " is not among the existing collections + ( ";
+        String illTime = "Connection timeout";
         for(String s : collNames)
             illColl = illColl.concat(s + " ");
         illColl = illColl.concat(")");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!source.getTask().isComplete())
-                source.setException(new TimeoutException());
+                source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
         if(collNames.contains(collID)) {
@@ -113,12 +114,13 @@ public abstract class Network {
         }
         String illNullData = "Collection '" + collID + "' or document '" + docID + "' does not exist";
         String illColl = collID + " is not among the existing collections + ( ";
+        String illTime = "Connection timeout";
         for(String s : collNames)
             illColl = illColl.concat(s + " ");
         illColl = illColl.concat(")");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!source.getTask().isComplete())
-                source.setException(new TimeoutException());
+                source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
         if(collNames.contains(collID)) {
@@ -160,12 +162,13 @@ public abstract class Network {
         String illNullData = "Collection '" + collID + "' does not exist";
         String illColl = collID + " is not among the existing collections + ( ";
         String illPageNo = "Page number must be 1 or greater";
+        String illTime = "Connection timeout";
         for(String s : collNames)
             illColl = illColl.concat(s + " ");
         illColl = illColl.concat(")");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!source.getTask().isComplete())
-                source.setException(new TimeoutException());
+                source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
         if(collNames.contains(collID)) {

@@ -1,61 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.HomepageFragment">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/home_actionbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:menu="@menu/actionbar_navigation" />
-
-    <ImageView
-        android:id="@+id/imageView7"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="?attr/actionBarSize"
-        android:scaleType="centerInside"
-        android:src="@drawable/search_icon"
-        android:tintMode="multiply"
-        app:tint="@color/design_default_color_on_primary" />
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/home_tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/home_actionbar"
-        android:background="@color/design_default_color_primary"
-        app:tabIconTint="@color/design_default_color_on_primary"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?colorTertiary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:tabIconTintMode="multiply"
-        app:tabIndicatorColor="@color/design_default_color_primary_variant"
+        app:tabIndicatorColor="?colorSecondary"
         app:tabMode="fixed"
         app:tabTextAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:tabTextColor="@color/design_default_color_on_primary">
+        app:tabTextColor="?colorOnPrimary">
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/home_market_tab"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/home_market_tab_txt" />
+            android:layout_height="wrap_content" />
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/home_post_tab"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/home_post_tab_txt" />
+            android:layout_height="wrap_content" />
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/home_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/home_tabs">
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/home_tabs">
 
     </androidx.viewpager2.widget.ViewPager2>
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

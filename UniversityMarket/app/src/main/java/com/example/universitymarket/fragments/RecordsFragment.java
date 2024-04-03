@@ -2,6 +2,7 @@ package com.example.universitymarket.fragments;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
@@ -32,9 +33,6 @@ public class RecordsFragment extends Fragment {
 
     private View root;
     private LayoutInflater inflater;
-    private LinearLayout titlebar;
-    private ProgressBar loadbar;
-    private View loadscreen;
     private RecyclerView recyclerView;
     private TaskCompletionSource<String> load;
     private RecordsAdapter adapter;
@@ -43,6 +41,8 @@ public class RecordsFragment extends Fragment {
     private List<Post> posts;
     private List<User> users;
     private Thread retrieve;
+    private FragmentManager fm;
+    private final Bundle dashMessage = new Bundle();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,9 +59,7 @@ public class RecordsFragment extends Fragment {
     }
 
     private void configure(View v) {
-        titlebar = v.findViewById(R.id.records_module_label);
-        loadbar = v.findViewById(R.id.records_load_animation);
-        loadscreen = v.findViewById(R.id.records_load_screen);
+        fm = getParentFragmentManager();
         recyclerView = v.findViewById(R.id.records_recycle_view);
 
         load = new TaskCompletionSource<>();
@@ -134,14 +132,12 @@ public class RecordsFragment extends Fragment {
     }
 
     private void loadPage(Task<String> task) {
-        loadscreen.setEnabled(true);
-        loadscreen.setVisibility(View.VISIBLE);
-        loadbar.setVisibility(View.VISIBLE);
+        dashMessage.putBoolean("isLoading", true);
+        fm.setFragmentResult("setLoading", dashMessage);
 
         task.addOnCompleteListener(res -> {
-            loadscreen.setVisibility(View.INVISIBLE);
-            loadbar.setVisibility(View.INVISIBLE);
-            loadscreen.setEnabled(false);
+            dashMessage.putBoolean("isLoading", false);
+            fm.setFragmentResult("setLoading", dashMessage);
         });
     }
 }

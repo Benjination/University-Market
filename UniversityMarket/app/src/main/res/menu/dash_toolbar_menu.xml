@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/dash_toolbar_toggle"
+        android:visible="false">
+        <item
+            android:id="@+id/dash_toolbar_modetoggle"
+            android:title="Switch"
+            app:actionLayout="@layout/switch_item"
+            app:showAsAction="always" />
+    </group>
+    <group android:visible="false">
+        <item
+            android:id="@+id/dash_toolbar_stars"
+            android:title="" />
+        <item
+            android:id="@+id/dash_toolbar_expiring"
+            android:title="" />
+        <item
+            android:id="@+id/dash_toolbar_genres"
+            android:title=""/>
+        <item
+            android:id="@+id/dash_toolbar_prices"
+            android:title="" />
+    </group>
+    <item
+        android:id="@+id/dash_toolbar_settings"
+        android:icon="@drawable/gear_icon"
+        android:iconTint="?colorOnPrimary"
+        android:iconTintMode="multiply"
+        android:title="@string/dash_toolbar_settings_txt"
+        app:showAsAction="always" />
+    <group
+        android:id="@+id/dash_toolbar_filter"
+        android:menuCategory="container"></group>
+</menu>

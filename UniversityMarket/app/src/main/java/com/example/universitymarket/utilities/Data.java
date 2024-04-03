@@ -13,6 +13,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -95,11 +96,16 @@ public abstract class Data {
         return result;
     }
 
-    public static int convertDpToPixel(@NonNull Activity cur_act, int dp){
+    public static int convertDpToPixel(@NonNull Activity cur_act, int dp) {
         return dp * (int) cur_act.getResources().getDisplayMetrics().density;
     }
-    public static int convertPixelsToDp(@NonNull Activity cur_act, int px){
+
+    public static int convertPixelsToDp(@NonNull Activity cur_act, int px) {
         return px / (int) cur_act.getResources().getDisplayMetrics().density;
+    }
+
+    public static int convertComplexToPixel(@NonNull Activity cur_act, int complex) {
+        return TypedValue.complexToDimensionPixelSize(complex, cur_act.getResources().getDisplayMetrics());
     }
 
     public static boolean isAnyObjectNull(Object... objects) {

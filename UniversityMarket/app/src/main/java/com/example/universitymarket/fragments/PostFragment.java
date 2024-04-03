@@ -47,8 +47,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private EditText title, price, description;
     private RadioGroup genres;
     private LinearLayout carousel;
-    private ProgressBar loadbar;
-    private View loadscreen;
     private TextView genrelabel, imagelabel;
     private TaskCompletionSource<String> load;
     private Thread uploadImages;
@@ -58,6 +56,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
     private ArrayList<String> imageURLs = new ArrayList<>();
     private final Post post = new Post();
+    private final Bundle dashMessage = new Bundle();
 
     public PostFragment(FragmentManager fm) {
         this.fm = fm;
@@ -86,8 +85,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         description = v.findViewById(R.id.post_description_field);
         genres = v.findViewById(R.id.post_genre_group);
         carousel = v.findViewById(R.id.post_images);
-        loadbar = v.findViewById(R.id.post_load_animation);
-        loadscreen = v.findViewById(R.id.post_load_screen);
         genrelabel = v.findViewById(R.id.post_genre_label);
         imagelabel = v.findViewById(R.id.post_image_label);
 
@@ -126,20 +123,15 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     }
 
     private void loadPage(Task<String> task) {
-        submit.setEnabled(false);
-        loadscreen.setEnabled(true);
-        loadscreen.setVisibility(View.VISIBLE);
-        loadbar.setVisibility(View.VISIBLE);
+        dashMessage.putBoolean("isLoading", true);
+        fm.setFragmentResult("setLoading", dashMessage);
 
         task.addOnCompleteListener(res -> {
             String val = res.getResult();
-            if(val.equals("post")) {
+            if(val.equals("post"))
                 resetPage();
-            }
-            loadscreen.setVisibility(View.INVISIBLE);
-            loadbar.setVisibility(View.INVISIBLE);
-            loadscreen.setEnabled(false);
-            submit.setEnabled(true);
+            dashMessage.putBoolean("isLoading", false);
+            fm.setFragmentResult("setLoading", dashMessage);
         });
     }
 
@@ -207,7 +199,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     }
 
     private void retrievePhoto() {
-        fm.setFragmentResult("requestGallery", new Bundle());
+        fm.setFragmentResult("requestGallery", dashMessage);
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
         fm
@@ -215,9 +207,9 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                         "retrieveImage",
                         this,
                         (requestKey, result) -> {
-                            String buffer = result.getString(null);
+                            String buffer = result.getString("uri");
 
-                            if(buffer.contains("uriRetreival")) {
+                            if(buffer.contains("failure")) {
                                 Toast.makeText(
                                         getContext(),
                                         buffer.split("~")[1],
