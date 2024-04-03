@@ -32,7 +32,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     private View root;
     User user;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +45,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         root = inflater.inflate(R.layout.fragment_profile, container, false);
         configureButtons(root);
 
-
-
+        /*
         TextView name = root.findViewById(R.id.name);
         name.setText(ActiveUser.first_name + " " + ActiveUser.last_name);
         TextView email = root.findViewById(R.id.email);
         email.setText(ActiveUser.email);
-
+        */
 
         return root;
     }

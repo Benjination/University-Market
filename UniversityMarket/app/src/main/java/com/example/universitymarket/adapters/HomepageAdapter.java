@@ -1,10 +1,15 @@
 package com.example.universitymarket.adapters;
 
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+
+import com.example.universitymarket.R;
 import com.example.universitymarket.fragments.MarketFragment;
 import com.example.universitymarket.fragments.PostFragment;
 

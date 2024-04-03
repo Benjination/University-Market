@@ -166,7 +166,7 @@ public class SignIn extends AppCompatActivity
 
                                         @Override
                                         public void onFailure(Exception error) {
-
+                                            Log.e("getUser", error.getMessage());
                                         }
                                     });
 
@@ -221,14 +221,11 @@ public class SignIn extends AppCompatActivity
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(Exception e) {
-                                    Log.d(TAG, "Failed to Email.");
+                                    Log.e("sendEmailVerification", e.getMessage());
                                 }
                             });
                         }
                     });
-
-
-
                 });
 
     }
