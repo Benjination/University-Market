@@ -253,12 +253,14 @@ public class Login extends AppCompatActivity
             }
              else
             {
-                invalid.setVisibility(View.VISIBLE);
-                gotit.setVisibility(View.VISIBLE);
-                emailBox.setVisibility(View.INVISIBLE);
-                passwordBox.setVisibility(View.INVISIBLE);
-                login.setVisibility(View.INVISIBLE);
+                //invalid.setVisibility(View.VISIBLE);
+                //gotit.setVisibility(View.VISIBLE);
+                //emailBox.setVisibility(View.INVISIBLE);
+                //passwordBox.setVisibility(View.INVISIBLE);
+                //login.setVisibility(View.INVISIBLE);
                 System.out.println("Email not accepted");
+                Toast.makeText(Login.this, "Invalid Email or Password",
+                        Toast.LENGTH_LONG).show();
             }
         });
     }

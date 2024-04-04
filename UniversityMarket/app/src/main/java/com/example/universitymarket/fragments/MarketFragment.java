@@ -29,6 +29,7 @@ public class MarketFragment extends Fragment {
 
     FragmentManager fm;
 
+
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
     }
@@ -45,6 +46,8 @@ public class MarketFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
+
+
 
         // Find the GridView in your layout
         GridView postsGV = view.findViewById(R.id.idGVposts);
