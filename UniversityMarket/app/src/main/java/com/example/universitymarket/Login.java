@@ -167,8 +167,6 @@ public class Login extends AppCompatActivity
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-
-
                                         // Sign in success, update UI with the signed-in user's information
                                         Log.d(TAG, "createUserWithEmail:success");
                                         FirebaseUser user = mAuth.getCurrentUser();
@@ -207,6 +205,7 @@ public class Login extends AppCompatActivity
                                                                 if (task.isSuccessful()) {
                                                                     Log.d(TAG, "Email sent.");
                                                                     FirebaseUser currentUser = auth.getCurrentUser();
+                                                                    /*
                                                                     if (currentUser != null && currentUser.isEmailVerified()) {
                                                                         Intent intent = new Intent(Login.this, SignIn.class);
                                                                         startActivity(intent);
@@ -214,6 +213,11 @@ public class Login extends AppCompatActivity
                                                                         Intent intent = new Intent(Login.this, SignIn.class);
                                                                         startActivity(intent);
                                                                     }
+                                                                    Found this error with Static Analysis. If/Else Executed identical code.
+                                                                    */
+                                                                    Intent intent = new Intent(Login.this, SignIn.class);
+                                                                    startActivity(intent);
+
                                                                 } else {
                                                                     Intent intent = new Intent(Login.this, SignIn.class);
                                                                     startActivity(intent);

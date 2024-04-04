@@ -45,19 +45,20 @@ public class SignIn extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        ActionCodeSettings actionCodeSettings =
-                ActionCodeSettings.newBuilder()
-                        // URL you want to redirect back to. The domain (www.example.com) for this
-                        // URL must be whitelisted in the Firebase Console.
-                        .setUrl("https://www.example.com/finishSignUp?cartId=1234")
-                        // This must be true
-                        .setHandleCodeInApp(true)
-                        .setIOSBundleId("com.example.ios")
-                        .setAndroidPackageName(
-                                "com.example.android",
-                                true, /* installIfNotAvailable */
-                                "12"    /* minimumVersion */)
-                        .build();
+        //ActionCodeSettings actionCodeSettings =
+          //      ActionCodeSettings.newBuilder()
+            //            // URL you want to redirect back to. The domain (www.example.com) for this
+              //          // URL must be whitelisted in the Firebase Console.
+                //        .setUrl("https://www.example.com/finishSignUp?cartId=1234")
+                  //      // This must be true
+                    //    .setHandleCodeInApp(true)
+                      //  .setIOSBundleId("com.example.ios")
+                        //.setAndroidPackageName(
+                          //      "com.example.android",
+                            //    true, /* installIfNotAvailable */
+                              //  "12"    /* minimumVersion */)
+                      //  .build();
+        //Found error in Static Analysis. This code block was not being used for anything in the SignIn Class.
 
         FirebaseAuth mAuth;
         // ...
@@ -72,7 +73,6 @@ public class SignIn extends AppCompatActivity
             Intent intent = new Intent(SignIn.this, DashboardActivity.class);
             startActivity(intent);
             currentUser.reload();
-            ActiveUser.email = currentUser.getEmail();
         }
         else
         {
@@ -146,9 +146,10 @@ public class SignIn extends AppCompatActivity
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser firebaseUser = mAuth.getCurrentUser();
                             if (firebaseUser != null) {
-                                String userEmail = firebaseUser.getEmail();
-                                ActiveUser.email = userEmail;
-
+                               // String userEmail = firebaseUser.getEmail();
+                               // ActiveUser.email = userEmail;
+                                //Replaced userEmail with ActiveUser.Email going forward
+                                ActiveUser.email = firebaseUser.getEmail();
 
                                 // Update UI with user information
                                 Toast.makeText(SignIn.this, "Sign in successful.",
@@ -156,7 +157,7 @@ public class SignIn extends AppCompatActivity
 
                                 if(firebaseUser.isEmailVerified()) {
                                     //Data.setActiveUser(SignIn.this, firebaseUser);
-                                    Network.getUser(SignIn.this, userEmail, new Callback<User>() {
+                                    Network.getUser(SignIn.this, ActiveUser.email, new Callback<User>() {
                                         @Override
                                         public void onSuccess(User result) {
                                             Data.setActiveUser(SignIn.this, result);
