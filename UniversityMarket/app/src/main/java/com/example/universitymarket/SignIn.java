@@ -199,9 +199,11 @@ public class SignIn extends AppCompatActivity
 
             else
                 {
-                invalid.setVisibility(View.VISIBLE);
-                gotit.setVisibility(View.VISIBLE);
+                //invalid.setVisibility(View.VISIBLE);
+                //gotit.setVisibility(View.VISIBLE);
                 System.out.println("Email not accepted");
+                    Toast.makeText(SignIn.this, "Invalid Email or Password",
+                            Toast.LENGTH_LONG).show();
             }
 
         });

@@ -65,6 +65,7 @@ public class viewPostFragment extends Fragment {
                 if (getFragmentManager() != null) {
                     getFragmentManager().popBackStack();
                 }
+
             }
         });
 
