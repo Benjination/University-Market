@@ -277,7 +277,7 @@ public abstract class Data {
 
     @NonNull
     public static String generateID(@Nullable String prefix) {
-        DateTimeFormatter idFormat = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+        DateTimeFormatter idFormat = DateTimeFormatter.ofPattern("HH:mm:ss:SSS");
         String refine = "";
         if(prefix != null)
             refine = prefix.replaceAll("[^a-zA-Z]", "").toLowerCase();
@@ -300,6 +300,7 @@ public abstract class Data {
         ActiveUser.last_name = userOBJ.getLastName();
         ActiveUser.first_name = userOBJ.getFirstName();
         ActiveUser.email = userOBJ.getEmail();
+        ActiveUser.deactivated = userOBJ.getDeactivated();
         ActiveUser.watch_ids = userOBJ.getWatchIds();
         ActiveUser.transact_ids = userOBJ.getTransactIds();
         ActiveUser.post_ids = userOBJ.getPostIds();
@@ -308,6 +309,6 @@ public abstract class Data {
     }
 
     public static User activeUserToPOJO() {
-        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
+        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.deactivated, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
     }
 }

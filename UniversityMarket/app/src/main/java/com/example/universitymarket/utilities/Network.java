@@ -225,7 +225,7 @@ public abstract class Network {
 
     public static void uploadImage(@NonNull Uri uri, @NonNull String directory, @NonNull String filename, @Nullable Callback<Uri> response) {
         final FirebaseStorage storage = FirebaseStorage.getInstance();
-        final StorageReference reference = storage.getReference(directory + "/" + Data.generateID(filename));
+        final StorageReference reference = storage.getReference(directory + "/" + Data.generateID(filename) + ".png");
         UploadTask upload = reference.putFile(uri);
 
         if(response != null) {

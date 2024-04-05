@@ -4,7 +4,8 @@
     "email": "",
     "first_name": "",
     "last_name": "",
-    "date_created": ""
+    "date_created": "",
+    "deactivated": false
   },
   "interactions": {
     "post_ids": [""],

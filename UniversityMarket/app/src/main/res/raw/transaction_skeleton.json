@@ -1,12 +1,21 @@
 {
   "id": "",
   "about": {
-    "post_id": "",
-    "total_amount": "",
+    "final_amount": "",
     "buyer_email": "",
     "seller_email": "",
     "closing_date": "",
     "status": ""
+  },
+  "record": {
+    "post_id": "",
+    "dead_post": false,
+    "title": "",
+    "description": "",
+    "image_contexts": [""],
+    "genre": "",
+    "serial_number": 1,
+    "descriptors": [{}]
   },
   "payments": [{}]
 }

@@ -42,7 +42,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
 
         String name = pair.first.getFirstName() + " " + pair.first.getLastName();
         holder.title.setText(pair.second.getItemTitle());
-        holder.price.setText(transaction.getTotalAmount());
+        holder.price.setText(transaction.getFinalAmount());
         holder.date.setText(transaction.getClosingDate());
         holder.seller.setText(name);
     }
