@@ -1,9 +1,5 @@
 import groovy.json.*
-import java.lang.*
-import java.util.HashMap
 import java.nio.charset.StandardCharsets
-import java.time.*
-import java.time.format.*
 
 static Object typeString(String line) {
     Object field
