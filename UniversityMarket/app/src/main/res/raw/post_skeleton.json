@@ -6,8 +6,10 @@
     "author_email": "",
     "list_price": "",
     "image_urls": [""],
+    "image_contexts": [""],
     "date_created": "",
     "genre": "",
+    "quantity": 1,
     "transact_ids": [""]
   },
   "descriptors": [{}]

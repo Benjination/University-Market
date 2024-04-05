@@ -188,7 +188,7 @@ public class Login extends AppCompatActivity
                                         User currUser = new User(email);
                                         currUser.setId(email);
                                         Date date = new Date();
-                                        currUser.setAbout(date.toString(), last, first, email);
+                                        currUser.setAbout(date.toString(), last, first, email, false);
                                         Data.setActiveUser(Login.this, currUser);
                                         Network.setUser(Login.this, currUser, false, new Callback<User>() {
                                             @Override

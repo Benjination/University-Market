@@ -294,12 +294,14 @@ public class PostFragment extends Fragment implements View.OnClickListener {
             Log.e("desc", description.getText().toString().length() + "");
             post.setId(Data.generateID("pst"));
             post.setAbout(
+                    1,
                     Data.getDate(),
                     new ArrayList<>(),
                     selected.getText().toString(),
                     ActiveUser.email,
                     imageURLs,
                     price.getText().toString(),
+                    new ArrayList<>(),
                     title.getText().toString(),
                     description.getText().toString()
             );
