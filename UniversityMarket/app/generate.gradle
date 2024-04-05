@@ -1,7 +1,5 @@
 import groovy.json.*
 import java.nio.charset.StandardCharsets
-import java.time.*
-import java.time.format.*
 
 static Object typeString(String line) {
     Object field
@@ -299,9 +297,28 @@ String[] generate(def map, def class_name, def file) {
                                 )
                             }
                         }
-                        constructor = constructor.concat(
-                                tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : null;\n"
-                        )
+                        if(
+                            type == "Integer" ||
+                            type == "Float" ||
+                            type == "Double" ||
+                            type == "BigInteger" ||
+                            type == "BigDecimal" ||
+                            type == "Long"
+                        ) {
+                            if(type == "Integer") {
+                                constructor = constructor.concat(
+                                        tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? ((Number) " + prov + ".get(\"" + name + "\")).intValue() : null;\n"
+                                )
+                            } else {
+                                constructor = constructor.concat(
+                                        tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? ((Number) " + prov + ".get(\"" + name + "\"))." + type.toLowerCase() + "Value() : null;\n"
+                                )
+                            }
+                        } else {
+                            constructor = constructor.concat(
+                                    tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : null;\n"
+                            )
+                        }
 
                         if (generic == "<HashMap>") {
                             ubh = true
