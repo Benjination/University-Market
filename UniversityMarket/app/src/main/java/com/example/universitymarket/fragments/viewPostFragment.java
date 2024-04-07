@@ -1,7 +1,9 @@
 package com.example.universitymarket.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -16,7 +18,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import com.example.universitymarket.DashboardActivity;
 import com.example.universitymarket.R;
+import com.example.universitymarket.SignIn;
 import com.example.universitymarket.adapters.PostGVAdapter;
 import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.utilities.Callback;
@@ -62,9 +66,11 @@ public class viewPostFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Pop the back stack to return to the previous fragment
-                if (getFragmentManager() != null) {
-                    getFragmentManager().popBackStack();
-                }
+                //if (getFragmentManager() != null) {
+                //    getFragmentManager().popBackStack();
+                Intent intent = new Intent(requireActivity(), DashboardActivity.class);
+                startActivity(intent);
+                //}
 
             }
         });
