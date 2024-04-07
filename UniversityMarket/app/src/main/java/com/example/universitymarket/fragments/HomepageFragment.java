@@ -1,16 +1,23 @@
 package com.example.universitymarket.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
+
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.universitymarket.DashboardActivity;
 import com.example.universitymarket.R;
+import com.example.universitymarket.SignIn;
 import com.example.universitymarket.adapters.HomepageAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -68,10 +75,13 @@ public class HomepageFragment extends Fragment {
                 if(custView == null)
                     return;
 
+
                 ((ImageView) custView.findViewById(R.id.tab_icon)).setColorFilter(colorPrimary.data);
                 ((TextView) custView.findViewById(R.id.tab_text)).setTextColor(colorPrimary.data);
                 dashMessage.putString("currentTab", (String) ((TextView) custView.findViewById(R.id.tab_text)).getText());
                 fm.setFragmentResult("homeTab", dashMessage);
+
+
             }
 
             @Override
@@ -85,7 +95,8 @@ public class HomepageFragment extends Fragment {
             }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
 
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
