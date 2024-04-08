@@ -29,6 +29,7 @@ public class HomepageFragment extends Fragment {
     private ViewGroup container;
     private FragmentManager fm;
     private final Bundle dashMessage = new Bundle();
+    String tabName = "NONE";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,12 +75,25 @@ public class HomepageFragment extends Fragment {
                 View custView = tab.getCustomView();
                 if(custView == null)
                     return;
+                /*
+                int posi = tabs.getSelectedTabPosition();
+                TabLayout.Tab merc = tabs.getTabAt(posi);
 
+                if(merc != null)
+                    tabName = merc.getText().toString();
+                Toast.makeText(requireActivity(), tabName, Toast.LENGTH_SHORT).show();
+                if(tabName.equals("Post")) {
+                    Intent intent = new Intent(requireActivity(), DashboardActivity.class);
+                    startActivity(intent);
+                }
+                else {
 
-                ((ImageView) custView.findViewById(R.id.tab_icon)).setColorFilter(colorPrimary.data);
-                ((TextView) custView.findViewById(R.id.tab_text)).setTextColor(colorPrimary.data);
-                dashMessage.putString("currentTab", (String) ((TextView) custView.findViewById(R.id.tab_text)).getText());
-                fm.setFragmentResult("homeTab", dashMessage);
+                 */
+                    ((ImageView) custView.findViewById(R.id.tab_icon)).setColorFilter(colorPrimary.data);
+                    ((TextView) custView.findViewById(R.id.tab_text)).setTextColor(colorPrimary.data);
+                    dashMessage.putString("currentTab", (String) ((TextView) custView.findViewById(R.id.tab_text)).getText());
+                    fm.setFragmentResult("homeTab", dashMessage);
+               // }
 
 
             }
