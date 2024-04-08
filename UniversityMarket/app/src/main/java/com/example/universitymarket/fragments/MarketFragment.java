@@ -29,7 +29,6 @@ public class MarketFragment extends Fragment {
 
     FragmentManager fm;
 
-
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
     }
@@ -38,16 +37,10 @@ public class MarketFragment extends Fragment {
     ArrayList <PostModel> postModelArrayList = new ArrayList<>();
     LayoutInflater viewPostInflater;
     ViewGroup viewSinglePostContainer;
-    private String mParam1;
-    private String mParam2;
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
-
-
 
         // Find the GridView in your layout
         GridView postsGV = view.findViewById(R.id.idGVposts);
@@ -92,21 +85,12 @@ public class MarketFragment extends Fragment {
             @Override
             public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
                 Post selectedPost = postsArrayList.get(position); // Assuming this matches your data
-                viewPostFragment postFragment = new viewPostFragment();
 
-                // Create a bundle to pass the post details
-                Bundle args = new Bundle();
-                args.putString("postID", selectedPost.getId()); // for example
-                // Add more details as needed
-
-                postFragment.setArguments(args);
-
-                // Replace the current fragment with viewPostFragment
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.dash_fragment_buffer, postFragment); // Ensure you have a valid container ID
-                fragmentTransaction.addToBackStack(null); // If you want to add it to back stack
-                fragmentTransaction.commit();
+                Bundle popupArgs = new Bundle();
+                popupArgs.putString("popupTitle", selectedPost.getItemTitle());
+                popupArgs.putString("popupFragment", "viewPostFragment");
+                popupArgs.putString("popupArgument", selectedPost.getId());
+                getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
             }
         });
     }
