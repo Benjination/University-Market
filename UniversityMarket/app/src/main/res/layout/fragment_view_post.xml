@@ -59,6 +59,12 @@
                 android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
+                <Button
+                    android:id="@+id/addwl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add to Watchlist" />
+
                 <TextView
                     android:id="@+id/post_description_field"
                     android:layout_width="match_parent"
