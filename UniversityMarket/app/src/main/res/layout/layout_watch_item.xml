@@ -4,7 +4,6 @@
     android:id="@+id/watch_card_item"
     android:layout_width="match_parent"
     android:layout_height="?listPreferredItemHeightLarge"
-    app:cardBackgroundColor="?colorSecondary"
     app:cardCornerRadius="5dp"
     app:cardElevation="5dp"
     app:cardUseCompatPadding="false">
@@ -23,7 +22,6 @@
             android:singleLine="true"
             android:text="Test Title"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="?colorOnSecondary"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/watch_price_text"
@@ -37,7 +35,6 @@
             android:layout_marginRight="?android:listPreferredItemPaddingRight"
             android:text="$99999999.99"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="?colorOnSecondary"
             android:textStyle="bold"
             app:layout_constraintRight_toLeftOf="@id/watch_arrow_icon"
             app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +46,6 @@
             android:layout_marginRight="?android:listPreferredItemPaddingRight"
             android:text="james.hofer@mavs.uta.edu"
             android:textAlignment="textEnd"
-            android:textColor="?colorOnSecondary"
             app:layout_constraintRight_toLeftOf="@id/watch_arrow_icon"
             app:layout_constraintLeft_toRightOf="@+id/watch_date_text"
             app:layout_constraintTop_toBottomOf="@id/watch_price_text" />
@@ -60,7 +56,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="?listPreferredItemPaddingLeft"
             android:text="31 December 2022"
-            android:textColor="?colorOnSecondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/watch_title_text" />
 
@@ -73,7 +68,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/arrow_right_icon"
-            app:tint="?colorOnSecondary"
             android:tintMode="multiply"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

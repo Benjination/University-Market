@@ -32,7 +32,7 @@ public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull WatchAdapter.ViewHolder holder, int position) {
         Post post = watched_posts.get(position);
         holder.title.setText(post.getItemTitle());
-        holder.price.setText(post.getListPrice());
+        holder.price.setText("$"+post.getListPrice());
         holder.date.setText(post.getDateCreated());
         holder.seller.setText(post.getAuthorEmail());
     }

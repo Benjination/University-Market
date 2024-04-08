@@ -25,7 +25,6 @@ import java.util.List;
 
 public class WatchFragment extends Fragment {
     private View root;
-    private LayoutInflater inflater;
     private RecyclerView recyclerView;
     private TaskCompletionSource<String> load;
     private WatchAdapter adapter;
@@ -38,8 +37,7 @@ public class WatchFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        this.inflater = inflater;
-        root = inflater.inflate(R.layout.fragment_records, container, false);
+        root = inflater.inflate(R.layout.fragment_watch, container, false);
         configure(root);
         return root;
     }
