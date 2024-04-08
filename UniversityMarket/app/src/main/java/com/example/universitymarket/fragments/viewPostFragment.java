@@ -33,12 +33,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class viewPostFragment extends Fragment {
-    private static final String ARG_PARAM1 = "hello1";
-    private static final String ARG_PARAM2 = "hello2";
 
-    //private final FragmentManager fm;
+    private final String postId;
 
-    // public viewPostFragment(FragmentManager fm) {this.fm = fm;}
+    public viewPostFragment(String postId) {
+        this.postId = postId;
+    }
 
     private View viewSinglePost;
     private int currentIndex = 0;
@@ -54,26 +54,8 @@ public class viewPostFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate layout for frag
         viewSinglePost = inflater.inflate(R.layout.fragment_view_post, container, false);
-        Button backToMarketButton = viewSinglePost.findViewById(R.id.back_to_market);
         // Check if args are available
-        if (getArguments() != null) {
-            String postID = getArguments().getString("postID");
-            // get current post by postID
-            configureViewPostFragment(viewSinglePost, postID);
-        }
-
-        backToMarketButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Pop the back stack to return to the previous fragment
-                //if (getFragmentManager() != null) {
-                //    getFragmentManager().popBackStack();
-                Intent intent = new Intent(requireActivity(), DashboardActivity.class);
-                startActivity(intent);
-                //}
-
-            }
-        });
+        configureViewPostFragment(viewSinglePost, postId);
 
         return viewSinglePost;
     }

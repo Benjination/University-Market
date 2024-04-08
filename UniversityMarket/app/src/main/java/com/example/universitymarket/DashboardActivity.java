@@ -12,10 +12,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.util.Pair;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,6 +36,7 @@ import com.example.universitymarket.fragments.HomepageFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.TestFragment;
+import com.example.universitymarket.fragments.viewPostFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
@@ -155,6 +160,13 @@ public class DashboardActivity extends AppCompatActivity {
                             );
                         }
                 );
+        fm
+                .setFragmentResultListener(
+                        "createPopup",
+                        this,
+                        (requestKey, result) ->
+                                createPopup(result.getString("popupTitle"), result.getString("popupFragment"), result.getString("popupArgument"))
+                );
     }
 
     private void configureViews() {
@@ -255,6 +267,28 @@ public class DashboardActivity extends AppCompatActivity {
             return true;
         });
         dash_buttons.setSelectedItemId(R.id.dash_home_button);
+    }
+
+    private void createPopup(String title, String fragName, String argument) {
+        ViewGroup root = findViewById(R.id.dash_popup_buffer);
+        View popupView = getLayoutInflater().inflate(R.layout.layout_popup, root);
+        Toolbar popupToolbar = popupView.findViewById(R.id.popup_toolbar);
+        popupToolbar.setTitle(title);
+        popupToolbar.setNavigationOnClickListener((view) -> {
+            Log.e("test","test");
+            root.removeAllViews();
+        });
+        Fragment popupFragment;
+
+        if(fragName.equals("viewPostFragment")) {
+            popupFragment = new viewPostFragment(argument);
+        } else {
+            popupFragment = new Fragment();
+        }
+        fm
+                .beginTransaction()
+                .replace(R.id.popup_fragment_buffer, popupFragment)
+                .commit();
     }
 
     private void displayLoading(boolean isLoading) {
