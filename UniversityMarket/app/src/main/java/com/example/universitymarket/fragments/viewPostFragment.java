@@ -92,6 +92,7 @@ public class viewPostFragment extends Fragment {
                 System.out.println(ActiveUser.watch_ids);
             }
             User user = new User(ActiveUser.email);
+            user.setDateCreated(ActiveUser.date_created);
             user.setFirstName(ActiveUser.first_name);
             user.setLastName(ActiveUser.last_name);
             user.setEmail(ActiveUser.email);
