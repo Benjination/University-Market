@@ -23,7 +23,7 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 
 import java.util.List;
 
-public class WatchFragment extends Fragment {
+public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickListener {
     private View root;
     private RecyclerView recyclerView;
     private TaskCompletionSource<String> load;
@@ -42,6 +42,15 @@ public class WatchFragment extends Fragment {
         return root;
     }
 
+    @Override
+    public void onItemClicked(Post post) {
+        Bundle popupArgs = new Bundle();
+        popupArgs.putString("popupTitle", post.getItemTitle());
+        popupArgs.putString("popupFragment", "viewPostFragment");
+        popupArgs.putString("popupArgument", post.getId());
+        getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
+    }
+
     private void configure(View v) {
         fm = getParentFragmentManager();
         recyclerView = v.findViewById(R.id.watch_recyclerView);
@@ -51,7 +60,7 @@ public class WatchFragment extends Fragment {
         Network.getPosts(requireActivity(), ActiveUser.watch_ids, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
-                adapter = new WatchAdapter(requireContext(), result);
+                adapter = new WatchAdapter(requireContext(), result, WatchFragment.this);
                 load.setResult("getPosts");
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
