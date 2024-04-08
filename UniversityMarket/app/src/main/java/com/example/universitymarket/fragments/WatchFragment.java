@@ -3,56 +3,83 @@ package com.example.universitymarket.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.universitymarket.R;
+import com.example.universitymarket.adapters.WatchAdapter;
 import com.example.universitymarket.globals.actives.ActiveUser;
+import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.utilities.Callback;
+import com.example.universitymarket.utilities.Network;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
+
+import java.util.List;
 
 public class WatchFragment extends Fragment {
     private View root;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public WatchFragment() {
-        // Required empty public constructor
-    }
-
-    // TODO: Rename and change types and number of parameters
-    public static WatchFragment newInstance(String param1, String param2) {
-        WatchFragment fragment = new WatchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private LayoutInflater inflater;
+    private RecyclerView recyclerView;
+    private TaskCompletionSource<String> load;
+    private WatchAdapter adapter;
+    private FragmentManager fm;
+    private final Bundle dashMessage = new Bundle();
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        root = inflater.inflate(R.layout.fragment_profile, container, false);
+        this.inflater = inflater;
+        root = inflater.inflate(R.layout.fragment_records, container, false);
+        configure(root);
+        return root;
+    }
 
-        return inflater.inflate(R.layout.fragment_watch, container, false);
+    private void configure(View v) {
+        fm = getParentFragmentManager();
+        recyclerView = v.findViewById(R.id.watch_recyclerView);
+
+        load = new TaskCompletionSource<>();
+        loadPage(load.getTask());
+        Network.getPosts(requireActivity(), ActiveUser.watch_ids, new Callback<List<Post>>() {
+            @Override
+            public void onSuccess(List<Post> result) {
+                adapter = new WatchAdapter(requireContext(), result);
+                load.setResult("getPosts");
+                recyclerView.setAdapter(adapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
+                        LinearLayoutManager.VERTICAL, false));
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Log.e("getPosts", error.getMessage());
+                Toast.makeText(
+                        getContext(),
+                        error.getMessage(),
+                        Toast.LENGTH_SHORT
+                ).show();
+                load.setResult("getPosts");
+            }
+        });
+    }
+
+    private void loadPage(Task<String> task) {
+        dashMessage.putBoolean("isLoading", true);
+        fm.setFragmentResult("setLoading", dashMessage);
+
+        task.addOnCompleteListener(res -> {
+            dashMessage.putBoolean("isLoading", false);
+            fm.setFragmentResult("setLoading", dashMessage);
+        });
     }
 }
