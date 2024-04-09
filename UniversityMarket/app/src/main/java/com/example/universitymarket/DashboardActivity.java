@@ -237,7 +237,7 @@ public class DashboardActivity extends AppCompatActivity {
                 menu.setGroupVisible(R.id.dash_toolbar_filter, true);
             } else {
                 if(name.equals("Records") || name.equals("Watchlist"))
-                    menu.setGroupVisible(R.id.dash_toolbar_toggle, true);
+                    menu.setGroupVisible(R.id.dash_toolbar_toggle, false);
                 menu.setGroupVisible(R.id.dash_toolbar_filter, false);
                 params.height = actionBarSize * 2;
                 if(name.equals("Profile")) {
