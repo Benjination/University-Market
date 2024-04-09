@@ -263,6 +263,8 @@ public class DashboardActivity extends AppCompatActivity {
                     .replace(R.id.dash_fragment_buffer, frag)
                     .commit();
 
+            ViewGroup root = findViewById(R.id.dash_popup_buffer);
+            root.removeAllViews();
             displayLoading(isLoading);
             return true;
         });
@@ -275,7 +277,6 @@ public class DashboardActivity extends AppCompatActivity {
         Toolbar popupToolbar = popupView.findViewById(R.id.popup_toolbar);
         popupToolbar.setTitle(title);
         popupToolbar.setNavigationOnClickListener((view) -> {
-            Log.e("test","test");
             root.removeAllViews();
         });
         Fragment popupFragment;
