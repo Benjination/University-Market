@@ -96,8 +96,11 @@ public class viewPostFragment extends Fragment {
             user.setFirstName(ActiveUser.first_name);
             user.setLastName(ActiveUser.last_name);
             user.setEmail(ActiveUser.email);
-            user.setWatchIds(ActiveUser.watch_ids);
-            user.setInteractions(ActiveUser.watch_ids, null, null);
+            user.setDeactivated(ActiveUser.deactivated);
+            //user.setWatchIds(ActiveUser.watch_ids);
+            //user.setTransactIds(ActiveUser.transact_ids);
+            //user.setPostIds(ActiveUser.post_ids);
+            user.setInteractions(ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids);
             Network.setUser(requireActivity(), user, false, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
