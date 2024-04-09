@@ -12,8 +12,9 @@ public interface Policy {
 
     String[] genres = {
             "Textbooks",
+            "Technology",
             "Supplies",
-            "Other"
+            "Miscellaneous"
     };
 
     String[] prices = {
