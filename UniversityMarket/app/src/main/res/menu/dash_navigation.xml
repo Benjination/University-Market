@@ -5,7 +5,7 @@
         android:id="@+id/dash_records_button"
         android:icon="@drawable/record_icon"
         android:title="@string/dash_records_button_txt"
-        android:visible="true"/>
+        android:visible="true" />
     <item
         android:id="@+id/dash_watch_button"
         android:icon="@drawable/watch_icon"
@@ -20,8 +20,7 @@
         android:id="@+id/dash_test_button"
         android:icon="@drawable/test_icon"
         android:title="@string/dash_test_button_txt"
-        android:visible="true"
-        />
+        android:visible="true" />
     <item
         android:id="@+id/dash_profile_button"
         android:icon="@drawable/user_icon"
