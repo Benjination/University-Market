@@ -36,6 +36,7 @@ import com.example.universitymarket.fragments.HomepageFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.TestFragment;
+import com.example.universitymarket.fragments.myPostFragment;
 import com.example.universitymarket.fragments.viewPostFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
@@ -103,7 +104,7 @@ public class DashboardActivity extends AppCompatActivity {
         fragMap.put("Records", new Pair<>(new RecordsFragment(), false));
         fragMap.put("Watchlist", new Pair<>(new WatchFragment(), false));
         fragMap.put("Home", new Pair<>(new HomepageFragment(), false));
-        fragMap.put("Test", new Pair<>(new TestFragment(), false));
+        fragMap.put("Test", new Pair<>(new myPostFragment(), false));
         fragMap.put("Profile", new Pair<>(new ProfileFragment(), false));
 
         fm
