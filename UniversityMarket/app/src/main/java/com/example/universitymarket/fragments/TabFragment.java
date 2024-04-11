@@ -1,35 +1,34 @@
 package com.example.universitymarket.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.universitymarket.DashboardActivity;
 import com.example.universitymarket.R;
-import com.example.universitymarket.SignIn;
-import com.example.universitymarket.adapters.HomepageAdapter;
+import com.example.universitymarket.adapters.TabAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-public class HomepageFragment extends Fragment {
+public class TabFragment extends Fragment {
 
     private View root;
     private LayoutInflater inflater;
     private ViewGroup container;
     private FragmentManager fm;
+    private final String context;
     private final Bundle dashMessage = new Bundle();
-    String tabName = "NONE";
+
+    public TabFragment(String context) {
+        this.context = context;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +40,7 @@ public class HomepageFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.inflater = inflater;
         this.container = container;
-        root = inflater.inflate(R.layout.fragment_homepage, container, false);
+        root = inflater.inflate(R.layout.fragment_tab, container, false);
         configure(root);
         return root;
     }
@@ -57,15 +56,32 @@ public class HomepageFragment extends Fragment {
         requireActivity().getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
         requireActivity().getTheme().resolveAttribute(R.attr.colorOnTertiary, colorOnTertiary, true);
 
-        View market = inflater.inflate(R.layout.layout_homepage_tab, container, false);
-        ((ImageView) market.findViewById(R.id.tab_icon)).setImageResource(R.drawable.market_icon);
-        ((TextView) market.findViewById(R.id.tab_text)).setText(R.string.home_market_tab_txt);
+        View left = inflater.inflate(R.layout.layout_homepage_tab, container, false);
+        View right = inflater.inflate(R.layout.layout_homepage_tab, container, false);
 
-        View post = inflater.inflate(R.layout.layout_homepage_tab, container, false);
-        ((ImageView) post.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
-        ((TextView) post.findViewById(R.id.tab_text)).setText(R.string.home_post_tab_txt);
+        if(context.equals("Home")) {
+            ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.market_icon);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_market_txt);
+            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.filter_icon);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_filter_txt);
+        } else if(context.equals("Post")) {
+            ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_compose_txt);
+            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_created_txt);
+        } else if(context.equals("Watch")) {
+            ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.clock_icon);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_watchlist_txt);
+            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.chart_icon);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_analytics_txt);
+        } else {
+            ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.profile_icon);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_profile_txt);
+            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_created_txt);
+        }
 
-        HomepageAdapter adapter = new HomepageAdapter(requireActivity(), getParentFragmentManager());
+        TabAdapter adapter = new TabAdapter(requireActivity(), getParentFragmentManager(), context);
         pager.setAdapter(adapter);
         pager.setUserInputEnabled(true);
 
@@ -76,10 +92,12 @@ public class HomepageFragment extends Fragment {
                 if(custView == null)
                     return;
 
+                int position = Math.max(0, tab.getPosition());
                 ((ImageView) custView.findViewById(R.id.tab_icon)).setColorFilter(colorPrimary.data);
                 ((TextView) custView.findViewById(R.id.tab_text)).setTextColor(colorPrimary.data);
-                dashMessage.putString("currentTab", (String) ((TextView) custView.findViewById(R.id.tab_text)).getText());
-                fm.setFragmentResult("homeTab", dashMessage);
+                dashMessage.putInt("currentTab", position);
+                dashMessage.putString("currentTabGroup", context);
+                fm.setFragmentResult("tabSwitch", dashMessage);
             }
 
             @Override
@@ -100,11 +118,11 @@ public class HomepageFragment extends Fragment {
         new TabLayoutMediator(tabs, pager, (tab, position) -> {
             switch (position) {
                 case 0:
-                    tab.setCustomView(market);
+                    tab.setCustomView(left);
                     tab.select();
                     break;
                 case 1:
-                    tab.setCustomView(post);
+                    tab.setCustomView(right);
             }
         }).attach();
     }

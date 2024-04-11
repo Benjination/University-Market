@@ -1,7 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="sample_sample_spinner0">
-        <item>@string/sample_sample_spinner0_txt0</item>
-        <item>@string/sample_sample_spinner0_txt1</item>
-    </array>
 </resources>
