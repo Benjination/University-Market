@@ -25,6 +25,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.universitymarket.fragments.ChatFragment;
+import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.SettingsFragment;
 import com.example.universitymarket.fragments.TabFragment;
 import com.example.universitymarket.fragments.viewPostFragment;
@@ -291,6 +292,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         if(fragName.equals("viewPostFragment")) {
             popupFragment = new viewPostFragment(argument);
+        } else if(fragName.equals("RecordsFragment")) {
+            popupFragment = new RecordsFragment();
         } else {
             popupFragment = new SettingsFragment();
         }

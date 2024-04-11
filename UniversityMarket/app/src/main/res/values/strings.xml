@@ -28,6 +28,8 @@
     <string name="test_clear_button_txt">Clear Test</string>
     <string name="test_download_button_txt">Download Test</string>
 
+    <string name="records_unavailable_txt">No records are available at this time</string>
+
     <string name="post_submit_button_txt">Post Item</string>
     <string name="post_image_submit_hint">Image upload</string>
     <string name="post_title_field_hint">Title</string>
@@ -36,6 +38,7 @@
     <string name="post_price_field_hint">Price</string>
     <string name="post_image_required_txt">at least one image is required</string>
 
+    <string name="settings_records_button_txt">View my receipts</string>
     <string name="settings_signout_button_txt">Sign out</string>
 
     <string name="profile_save_button_txt">Save</string>

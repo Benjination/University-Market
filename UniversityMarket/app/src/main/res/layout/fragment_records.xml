@@ -8,6 +8,18 @@
     tools:context=".fragments.RecordsFragment">
 
 
+    <TextView
+        android:id="@+id/records_unavailable_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="?listPreferredItemPaddingStart"
+        android:layout_marginTop="?listPreferredItemPaddingStart"
+        android:text="@string/records_unavailable_txt"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="invisible"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/records_recycle_view"
         android:layout_width="0dp"
