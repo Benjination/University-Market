@@ -28,14 +28,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class ProfileFragment extends Fragment {
+public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private View root;
-    private final FragmentManager fm;
-
-    public ProfileFragment(FragmentManager fm) {
-        this.fm = fm;
-    }
+    User user;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +41,25 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_profile, container, false);
+        root = inflater.inflate(R.layout.fragment_settings, container, false);
+        configureButtons(root);
+
         return root;
+    }
+
+    private void configureButtons(View view) {
+        Button signoutButton = view.findViewById(R.id.settings_signout_button);
+        signoutButton.setOnClickListener(SettingsFragment.this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent btn_i;
+        if(v.getId() == R.id.settings_signout_button) {
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            mAuth.signOut();
+            btn_i = new Intent(getContext(), Login.class);
+            startActivity(btn_i);
+        }
     }
 }

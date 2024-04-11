@@ -6,20 +6,14 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Pair;
 import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.SubMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,16 +22,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import com.example.universitymarket.fragments.WatchFragment;
-import com.example.universitymarket.fragments.HomepageFragment;
-import com.example.universitymarket.fragments.ProfileFragment;
-import com.example.universitymarket.fragments.RecordsFragment;
-import com.example.universitymarket.fragments.TestFragment;
+import com.example.universitymarket.fragments.ChatFragment;
+import com.example.universitymarket.fragments.SettingsFragment;
+import com.example.universitymarket.fragments.TabFragment;
 import com.example.universitymarket.fragments.viewPostFragment;
-import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Callback;
@@ -45,19 +35,37 @@ import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private String currentView, currentTab = "Market";
+    private String currentView, currentTabGroup = "Home";
+    private int currentTab = 0;
     private View loadScreen;
     private ProgressBar loadAnimation;
     private Toolbar toolbar;
     private Menu menu;
+    private MenuItem settings;
+    private MenuItem search;
+    private Drawable gear;
+    private ViewGroup.LayoutParams params;
     private TaskCompletionSource<Uri> uriRetrieval = new TaskCompletionSource<>();
-    private final HashMap<String, Pair<Fragment, Boolean>> fragMap = new HashMap<>();
+    private final HashMap<String, ArrayList<Object>> fragMap = new HashMap<>();
     private final FragmentManager fm = getSupportFragmentManager();
     private final Bundle fragResponse = new Bundle();
+
+    ArrayList<Object> toolbarTitles;
+    ArrayList<Object> toolbarSubtitles;
+
+    private enum tabGroup {
+        Home,
+        Post,
+        Watch,
+        Chat,
+        Profile
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,11 +108,37 @@ public class DashboardActivity extends AppCompatActivity {
         Intent photoAlbum = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         photoAlbum.setDataAndType(MediaStore.Images.Media.INTERNAL_CONTENT_URI, "image/*");
 
-        fragMap.put("Records", new Pair<>(new RecordsFragment(), false));
-        fragMap.put("Watchlist", new Pair<>(new WatchFragment(), false));
-        fragMap.put("Home", new Pair<>(new HomepageFragment(), false));
-        fragMap.put("Test", new Pair<>(new TestFragment(), false));
-        fragMap.put("Profile", new Pair<>(new ProfileFragment(), false));
+        toolbarTitles = new ArrayList<>(Arrays.asList(
+                new ArrayList<>(Arrays.asList(
+                        getResources().getString(R.string.dash_toolbar_market_txt),
+                        getResources().getString(R.string.dash_toolbar_filter_txt)
+                )),
+                new ArrayList<>(Arrays.asList(
+                        getResources().getString(R.string.dash_toolbar_compose_txt),
+                        getResources().getString(R.string.dash_toolbar_created_txt)
+                )),
+                new ArrayList<>(Arrays.asList(
+                        getResources().getString(R.string.dash_toolbar_watchlist_txt),
+                        getResources().getString(R.string.dash_toolbar_analytics_txt)
+                )),
+                getResources().getString(R.string.dash_toolbar_messages_txt),
+                ActiveUser.first_name + " " + ActiveUser.last_name
+        ));
+
+        toolbarSubtitles = new ArrayList<>(Arrays.asList(
+                null,
+                null,
+                null,
+                null,
+                ActiveUser.email
+        ));
+
+        // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar
+        fragMap.put("Home", new ArrayList<>(Arrays.asList(new TabFragment("Home"), false, true)));
+        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment("Post"), false, true)));
+        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment("Watch"), false, true)));
+        fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false)));
+        fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment("Profile"), false, false)));
 
         fm
                 .setFragmentResultListener(
@@ -134,30 +168,30 @@ public class DashboardActivity extends AppCompatActivity {
                         "setLoading",
                         this,
                         (requestKey, result) -> {
-                            Pair<Fragment, Boolean> frag_pair = fragMap.get(currentView);
-                            if(frag_pair == null) {
+                            ArrayList<Object> objList = fragMap.get(currentView);
+                            if(objList == null) {
                                 Log.e("setLoading", currentView + " is not a valid fragment");
                                 return;
                             }
 
-                            Fragment frag = frag_pair.first;
                             boolean isLoading = result.getBoolean("isLoading");
-                            fragMap.replace(currentView, frag_pair, new Pair<>(frag, isLoading));
+                            objList.set(1, isLoading);
+                            fragMap.replace(currentView, fragMap.get(currentView), objList);
                             displayLoading(isLoading);
                         }
                 );
         fm
                 .setFragmentResultListener(
-                        "homeTab",
+                        "tabSwitch",
                         this,
                         (requestKey, result) -> {
-                            currentTab = result.getString("currentTab");
-                            toolbar.setTitle(getResources().getIdentifier(
-                                    "dash_toolbar_" + currentTab.toLowerCase() + "_txt",
-                                    "string",
-                                    getPackageName()
-                                    )
-                            );
+                            currentTab = result.getInt("currentTab");
+                            currentTabGroup = result.getString("currentTabGroup");
+
+                            Object title = toolbarTitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+                            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+                            toolbar.setTitle(title.getClass() == ArrayList.class ? ((ArrayList<String>) title).get(currentTab) : (String) title);
+                            toolbar.setSubtitle(subtitle == null ? "" : subtitle.getClass() == ArrayList.class ? ((ArrayList<String>) subtitle).get(currentTab) : (String) subtitle);
                         }
                 );
         fm
@@ -183,81 +217,57 @@ public class DashboardActivity extends AppCompatActivity {
         getTheme().resolveAttribute(R.attr.actionBarSize, actionBarTV, true);
         int actionBarSize = Data.convertComplexToPixel(this, actionBarTV.data);
 
-        // Configure submenus
-        SubMenu stars, genres, prices, expiring;
-        if(Policy.max_stars != 0)
-            stars = menu.addSubMenu(R.id.dash_toolbar_filter, R.id.dash_toolbar_stars, Menu.NONE, "Stars");
-        genres = menu.addSubMenu(R.id.dash_toolbar_filter, R.id.dash_toolbar_genres, Menu.NONE, "Genres");
-        prices = menu.addSubMenu(R.id.dash_toolbar_filter, R.id.dash_toolbar_prices, Menu.NONE, "Prices");
-        expiring = menu.addSubMenu(R.id.dash_toolbar_filter, R.id.dash_toolbar_expiring, Menu.NONE, "Expiring");
-        for(int i = Policy.max_stars; i > 0; i--) {
-            String title = "";
-            for(int z = i; z > 0; z--)
-                title = title + "★";
-            for(int z = Policy.max_stars - i; z > 0; z--)
-                title = title + "☆";
-            stars.add(title);
+        params = toolbar.getLayoutParams();
+
+        // get and tint the gear icon (app doesn't auto format color)
+        gear = AppCompatResources.getDrawable(this, R.drawable.gear_icon);
+        if(gear != null) {
+            TypedValue colorOnPrimary = new TypedValue();
+            getTheme().resolveAttribute(R.attr.colorOnPrimary, colorOnPrimary, true);
+            gear.setColorFilter(colorOnPrimary.data, PorterDuff.Mode.SRC_IN);
+            menu.findItem(R.id.dash_toolbar_settings).setIcon(gear);
         }
-        for(String s : Policy.genres)
-            genres.add(s);
-        for(String s : Policy.prices)
-            prices.add(s);
-        for(String s : Policy.expiring)
-            expiring.add(s);
+
+        search = menu.findItem(R.id.dash_toolbar_search);
+        settings = menu.findItem(R.id.dash_toolbar_settings);
+        settings.setOnMenuItemClickListener((menuItem) -> {
+            createPopup("Settings", "SettingsFragment", null);
+            return false;
+        });
 
         dash_buttons.setOnItemSelectedListener(item -> {
             String name = item.toString();
-            ViewGroup.LayoutParams params = toolbar.getLayoutParams();
-            Pair<Fragment, Boolean> frag_pair = fragMap.get(name);
-            if(frag_pair == null) {
+
+            ArrayList<Object> objList = fragMap.get(name);
+            if(objList == null) {
                 Log.e("configureActionBar", name + " is not a valid fragment");
                 return false;
             }
 
-            // get and tint the gear icon (app doesn't auto format color)
-            Drawable gear = AppCompatResources.getDrawable(this, R.drawable.gear_icon);
-            if(gear != null) {
-                TypedValue colorOnPrimary = new TypedValue();
-                getTheme().resolveAttribute(R.attr.colorOnPrimary, colorOnPrimary, true);
-                gear.setColorFilter(colorOnPrimary.data, PorterDuff.Mode.SRC_IN);
-                menu.findItem(R.id.dash_toolbar_settings).setIcon(gear);
-            }
+            Fragment frag = (Fragment) objList.get(0);
+            boolean isLoading = (boolean) objList.get(1);
+            boolean miniToolbar = (boolean) objList.get(2);
 
-            menu.setGroupVisible(R.id.dash_toolbar_toggle, false);
-            menu.findItem(R.id.dash_toolbar_settings).setVisible(false);
-            if(name.equals("Home")) {
-                toolbar.setTitle(getResources().getIdentifier(
-                                "dash_toolbar_" + currentTab.toLowerCase() + "_txt",
-                                "string",
-                                getPackageName()
-                        )
-                );
-                toolbar.setSubtitle("");
-                params.height = actionBarSize;
-                menu.setGroupVisible(R.id.dash_toolbar_filter, true);
-            } else {
-                if(name.equals("Records") || name.equals("Watchlist"))
-                    menu.setGroupVisible(R.id.dash_toolbar_toggle, false);
-                menu.setGroupVisible(R.id.dash_toolbar_filter, false);
-                params.height = actionBarSize * 2;
-                if(name.equals("Profile")) {
-                    menu.findItem(R.id.dash_toolbar_settings).setVisible(true);
-                    toolbar.setTitle(
-                            ActiveUser.first_name + " " +
-                            ActiveUser.last_name
-                    );
-                    toolbar.setSubtitle(ActiveUser.email);
-                } else {
-                    toolbar.setTitle(name);
-                    toolbar.setSubtitle("");
-                }
-            }
+            params.height = miniToolbar ? actionBarSize : actionBarSize * 2;
             toolbar.setLayoutParams(params);
 
-            currentView = name;
-            Fragment frag = frag_pair.first;
-            boolean isLoading = frag_pair.second;
+            if(name.equals("Chat")) {
+                currentTabGroup = "Chat";
+            } else {
+                if(name.equals("Home")) {
+                    search.setVisible(true);
+                } else {
+                    settings.setVisible(name.equals("Profile"));
+                    search.setVisible(false);
+                }
+            }
 
+            Object title = toolbarTitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+            toolbar.setTitle(title.getClass() == ArrayList.class ? ((ArrayList<String>) title).get(currentTab) : (String) title);
+            toolbar.setSubtitle(subtitle == null ? "" : subtitle.getClass() == ArrayList.class ? ((ArrayList<String>) subtitle).get(currentTab) : (String) subtitle);
+
+            currentView = name;
             fm
                     .beginTransaction()
                     .replace(R.id.dash_fragment_buffer, frag)
@@ -276,15 +286,13 @@ public class DashboardActivity extends AppCompatActivity {
         View popupView = getLayoutInflater().inflate(R.layout.layout_popup, root);
         Toolbar popupToolbar = popupView.findViewById(R.id.popup_toolbar);
         popupToolbar.setTitle(title);
-        popupToolbar.setNavigationOnClickListener((view) -> {
-            root.removeAllViews();
-        });
+        popupToolbar.setNavigationOnClickListener((view) -> root.removeAllViews());
         Fragment popupFragment;
 
         if(fragName.equals("viewPostFragment")) {
             popupFragment = new viewPostFragment(argument);
         } else {
-            popupFragment = new Fragment();
+            popupFragment = new SettingsFragment();
         }
         fm
                 .beginTransaction()

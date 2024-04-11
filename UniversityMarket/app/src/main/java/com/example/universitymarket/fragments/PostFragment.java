@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -50,7 +49,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private TextView genrelabel, imagelabel;
     private TaskCompletionSource<String> load;
     private Thread uploadImages;
-    private final FragmentManager fm;
+    private FragmentManager fm;
     private final HashMap<Integer, Spanned> requiredText = new HashMap<>();
 
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
