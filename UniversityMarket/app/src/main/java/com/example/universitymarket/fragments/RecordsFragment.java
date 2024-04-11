@@ -11,9 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.TextView;
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.RecordsAdapter;
 import com.example.universitymarket.globals.Policy;
@@ -41,6 +39,7 @@ public class RecordsFragment extends Fragment {
     private List<Post> posts;
     private List<User> users;
     private Thread retrieve;
+    private TextView unavailable;
     private FragmentManager fm;
     private final Bundle dashMessage = new Bundle();
 
@@ -60,6 +59,7 @@ public class RecordsFragment extends Fragment {
 
     private void configure(View v) {
         fm = getParentFragmentManager();
+        unavailable = v.findViewById(R.id.records_unavailable_text);
         recyclerView = v.findViewById(R.id.records_recycle_view);
 
         load = new TaskCompletionSource<>();
@@ -121,11 +121,7 @@ public class RecordsFragment extends Fragment {
 
             @Override
             public void onFailure(Exception error) {
-                Toast.makeText(
-                        getContext(),
-                        error.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
+                unavailable.setVisibility(View.VISIBLE);
                 load.setResult("getTransactions");
             }
         });

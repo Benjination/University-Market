@@ -31,7 +31,7 @@ import java.io.IOException;
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private View root;
-    User user;
+    private FragmentManager fm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,20 +42,29 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_settings, container, false);
+        fm = getParentFragmentManager();
         configureButtons(root);
 
         return root;
     }
 
     private void configureButtons(View view) {
+        Button recordsButton = view.findViewById(R.id.settings_records_button);
         Button signoutButton = view.findViewById(R.id.settings_signout_button);
-        signoutButton.setOnClickListener(SettingsFragment.this);
+        recordsButton.setOnClickListener(this);
+        signoutButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         Intent btn_i;
-        if(v.getId() == R.id.settings_signout_button) {
+        if(v.getId() == R.id.settings_records_button) {
+            Bundle popupArgs = new Bundle();
+            popupArgs.putString("popupTitle", "Records");
+            popupArgs.putString("popupFragment", "RecordsFragment");
+            popupArgs.putString("popupArgument", null);
+            fm.setFragmentResult("createPopup", popupArgs);
+        } else if(v.getId() == R.id.settings_signout_button) {
             FirebaseAuth mAuth = FirebaseAuth.getInstance();
             mAuth.signOut();
             btn_i = new Intent(getContext(), Login.class);

@@ -11,6 +11,7 @@ import com.example.universitymarket.fragments.FilterFragment;
 import com.example.universitymarket.fragments.MarketFragment;
 import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
+import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
 
