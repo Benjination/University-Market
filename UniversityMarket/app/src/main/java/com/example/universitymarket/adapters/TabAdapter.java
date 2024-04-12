@@ -30,7 +30,7 @@ public class TabAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if(position == 0) {
-            if(context.equals("Home")) {
+            if(context.equals("Market")) {
                 return new MarketFragment(fm);
             } else if(context.equals("Post")) {
                 return new PostFragment(fm);
@@ -40,7 +40,7 @@ public class TabAdapter extends FragmentStateAdapter {
                 return new ProfileFragment(fm);
             }
         } else {
-            if(context.equals("Home")) {
+            if(context.equals("Market")) {
                 return new FilterFragment(fm);
             } else if(context.equals("Post")) {
                 return new myPostFragment(fm);

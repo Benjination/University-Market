@@ -2,26 +2,24 @@
     <string name="app_name">University Market</string>
     <string name="app_version">v1.0.0</string>
 
-    <string name="tab_market_txt">Market</string>
+    <string name="tab_market_txt">Browse</string>
     <string name="tab_filter_txt">Filter</string>
-    <string name="tab_compose_txt">Compose</string>
-    <string name="tab_created_txt">Created</string>
+    <string name="tab_create_txt">Create</string>
+    <string name="tab_edit_txt">Edit</string>
     <string name="tab_watchlist_txt">Watchlist</string>
     <string name="tab_analytics_txt">Analytics</string>
     <string name="tab_profile_txt">Portfolio</string>
 
-    <string name="dash_home_button_txt">Home</string>
+    <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
     <string name="dash_watch_button_txt">Watch</string>
     <string name="dash_chat_button_txt">Chat</string>
     <string name="dash_profile_button_txt">Profile</string>
+
     <string name="dash_toolbar_settings_txt">Settings</string>
     <string name="dash_toolbar_market_txt">UTA Marketplace</string>
-    <string name="dash_toolbar_filter_txt">Filter Options</string>
-    <string name="dash_toolbar_compose_txt">Create a Post</string>
     <string name="dash_toolbar_created_txt">My Posts</string>
-    <string name="dash_toolbar_watchlist_txt">Your Watchlist</string>
-    <string name="dash_toolbar_analytics_txt">Your Numbers</string>
+    <string name="dash_toolbar_mymarket_txt">My Marketplace</string>
     <string name="dash_toolbar_messages_txt">My Messages</string>
 
     <string name="test_upload_button_txt">Upload Test</string>

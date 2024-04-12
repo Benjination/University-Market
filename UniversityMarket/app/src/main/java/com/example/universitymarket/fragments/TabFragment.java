@@ -59,16 +59,16 @@ public class TabFragment extends Fragment {
         View left = inflater.inflate(R.layout.layout_homepage_tab, container, false);
         View right = inflater.inflate(R.layout.layout_homepage_tab, container, false);
 
-        if(context.equals("Home")) {
+        if(context.equals("Market")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.market_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_market_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.filter_icon);
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_filter_txt);
         } else if(context.equals("Post")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
-            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_compose_txt);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_create_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
-            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_created_txt);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_edit_txt);
         } else if(context.equals("Watch")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.clock_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_watchlist_txt);
@@ -78,7 +78,7 @@ public class TabFragment extends Fragment {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.profile_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_profile_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
-            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_created_txt);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_edit_txt);
         }
 
         TabAdapter adapter = new TabAdapter(requireActivity(), getParentFragmentManager(), context);

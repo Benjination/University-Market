@@ -42,7 +42,7 @@ import java.util.HashMap;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private String currentView, currentTabGroup = "Home";
+    private String currentView, currentTabGroup = "Market";
     private int currentTab = 0;
     private View loadScreen;
     private ProgressBar loadAnimation;
@@ -61,7 +61,7 @@ public class DashboardActivity extends AppCompatActivity {
     ArrayList<Object> toolbarSubtitles;
 
     private enum tabGroup {
-        Home,
+        Market,
         Post,
         Watch,
         Chat,
@@ -110,18 +110,9 @@ public class DashboardActivity extends AppCompatActivity {
         photoAlbum.setDataAndType(MediaStore.Images.Media.INTERNAL_CONTENT_URI, "image/*");
 
         toolbarTitles = new ArrayList<>(Arrays.asList(
-                new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_market_txt),
-                        getResources().getString(R.string.dash_toolbar_filter_txt)
-                )),
-                new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_compose_txt),
-                        getResources().getString(R.string.dash_toolbar_created_txt)
-                )),
-                new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_watchlist_txt),
-                        getResources().getString(R.string.dash_toolbar_analytics_txt)
-                )),
+                getResources().getString(R.string.dash_toolbar_market_txt),
+                getResources().getString(R.string.dash_toolbar_created_txt),
+                getResources().getString(R.string.dash_toolbar_mymarket_txt),
                 getResources().getString(R.string.dash_toolbar_messages_txt),
                 ActiveUser.first_name + " " + ActiveUser.last_name
         ));
@@ -135,7 +126,7 @@ public class DashboardActivity extends AppCompatActivity {
         ));
 
         // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar
-        fragMap.put("Home", new ArrayList<>(Arrays.asList(new TabFragment("Home"), false, true)));
+        fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment("Market"), false, true)));
         fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment("Post"), false, true)));
         fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment("Watch"), false, true)));
         fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false)));
@@ -255,7 +246,7 @@ public class DashboardActivity extends AppCompatActivity {
             if(name.equals("Chat")) {
                 currentTabGroup = "Chat";
             } else {
-                if(name.equals("Home")) {
+                if(name.equals("Market")) {
                     search.setVisible(true);
                 } else {
                     settings.setVisible(name.equals("Profile"));

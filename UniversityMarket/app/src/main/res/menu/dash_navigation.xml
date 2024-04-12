@@ -5,7 +5,7 @@
         android:id="@+id/dash_home_button"
         android:checked="true"
         android:icon="@drawable/home_icon"
-        android:title="@string/dash_home_button_txt" />
+        android:title="@string/dash_market_button_txt" />
     <item
         android:id="@+id/dash_post_button"
         android:icon="@drawable/add_icon"
