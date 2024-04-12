@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mypost_card_item"
     android:layout_width="match_parent"
     android:layout_height="?listPreferredItemHeightLarge"
@@ -34,10 +35,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="?android:listPreferredItemPaddingStart"
             android:layout_marginRight="?android:listPreferredItemPaddingRight"
-            android:text="$99999999.99"
+            android:text="$99999.99"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
-            app:layout_constraintRight_toLeftOf="@id/mypost_trash_icon"
+            app:layout_constraintRight_toLeftOf="@id/mypost_trash_btn"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -47,7 +48,7 @@
             android:layout_marginRight="?android:listPreferredItemPaddingRight"
             android:text="Supplies"
             android:textAlignment="textEnd"
-            app:layout_constraintRight_toLeftOf="@id/mypost_trash_icon"
+            app:layout_constraintRight_toLeftOf="@id/mypost_trash_btn"
             app:layout_constraintLeft_toRightOf="@+id/mypost_date_text"
             app:layout_constraintTop_toBottomOf="@id/mypost_price_text" />
 
@@ -60,16 +61,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mypost_title_text" />
 
-        <ImageView
-            android:id="@+id/mypost_trash_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="?android:listPreferredItemPaddingRight"
-            android:tintMode="multiply"
+        <Button
+            android:id="@+id/mypost_trash_btn"
+            android:layout_width="60dp"
+            android:layout_height="0dp"
+            android:backgroundTint="#EDEDED"
+            app:icon="@drawable/trash_filled_icon"
+            app:iconGravity="textTop"
+            app:iconPadding="0dp"
+            app:iconTint="?attr/colorError"
+            app:iconTintMode="multiply"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/trash_filled_icon"
-            app:tint="?attr/colorError" />
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -25,7 +25,7 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 
 import java.util.List;
 
-public class myPostFragment extends Fragment implements myPostAdapter.OnItemClickListener {
+public class myPostFragment extends Fragment implements myPostAdapter.OnItemClickListener, myPostAdapter.OnItemBtnClickListener {
     private View root;
     private RecyclerView recyclerView;
     private TaskCompletionSource<String> load;
@@ -50,6 +50,15 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
 
     @Override
     public void onItemClicked(Post post) {
+        Bundle popupArgs = new Bundle();
+        popupArgs.putString("popupTitle", post.getItemTitle());
+        popupArgs.putString("popupFragment", "viewPostFragment");
+        popupArgs.putString("popupArgument", post.getId());
+        getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
+    }
+
+    @Override
+    public void onItemBtnClicked(Post post) {
         Network.setPost(requireActivity(), post, true, new Callback<Post>() {
             @Override
             public void onSuccess(Post result) {
@@ -74,7 +83,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
         Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
-                adapter = new myPostAdapter(requireContext(), result, myPostFragment.this);
+                adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this);
                 load.setResult("getMyPosts");
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
