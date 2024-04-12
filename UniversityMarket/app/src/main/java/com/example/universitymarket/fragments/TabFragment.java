@@ -68,7 +68,7 @@ public class TabFragment extends Fragment {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_create_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
-            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_edit_txt);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_view_txt);
         } else if(context.equals("Watch")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.clock_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_watchlist_txt);
@@ -78,7 +78,7 @@ public class TabFragment extends Fragment {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.profile_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_profile_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
-            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_edit_txt);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_view_txt);
         }
 
         TabAdapter adapter = new TabAdapter(requireActivity(), getParentFragmentManager(), context);
