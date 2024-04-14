@@ -3,6 +3,7 @@ package com.example.universitymarket.fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,14 +27,17 @@ import com.squareup.picasso.Picasso;
 
 public class viewPostFragment extends Fragment {
 
+    private final String[] args;
+    private final FragmentManager fm;
     private final String postId;
-
-    public viewPostFragment(String postId) {
-        this.postId = postId;
-    }
-
     private View viewSinglePost;
     private int currentIndex = 0;
+
+    public viewPostFragment(String[] args, FragmentManager fm) {
+        this.args = args;
+        this.fm = fm;
+        postId = this.args[0];
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -51,8 +51,8 @@ public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickL
         Bundle popupArgs = new Bundle();
         popupArgs.putString("popupTitle", post.getItemTitle());
         popupArgs.putString("popupFragment", "viewPostFragment");
-        popupArgs.putString("popupArgument", post.getId());
-        getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
+        popupArgs.putStringArray("popupFragArgs", new String[]{ post.getId() });
+        fm.setFragmentResult("createPopup", popupArgs);
     }
 
     private void configure(View v) {

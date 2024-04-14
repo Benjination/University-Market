@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/post_name_textfield"
@@ -12,135 +12,195 @@
         android:id="@+id/post_submit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginEnd="20dp"
         android:backgroundTint="?colorSecondary"
         android:text="@string/post_submit_button_txt"
         android:textColor="?colorOnSecondary"
-        app:icon="@drawable/send_icon" />
+        app:icon="@drawable/send_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:layout_marginTop="?attr/listPreferredItemPaddingStart"/>
+
 
     <ScrollView
-        android:id="@+id/post_scrollview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/post_submit_button"
-        android:layout_marginTop="20dp">
+        android:id="@+id/post_scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/post_submit_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+        android:layout_marginStart="?attr/listPreferredItemPaddingStart"
+        android:layout_marginEnd="?attr/listPreferredItemPaddingStart"
+        >
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp">
+            android:orientation="vertical">
 
-
-            <HorizontalScrollView
-                android:id="@+id/post_image_carousel"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/post_imageremove_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp">
+                android:layout_marginStart="-36dp"
+                android:clickable="true"
+                android:src="@drawable/close_icon"
+                android:visibility="invisible"
+                app:backgroundTint="?colorPrimaryDark"
+                app:layout_constraintStart_toEndOf="@id/post_imageupload_button"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SpeakableTextPresentCheck" />
 
-                <LinearLayout
-                    android:id="@+id/post_images"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+            <ImageButton
+                android:id="@+id/post_imageupload_button"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                android:backgroundTint="?colorPrimaryVariant"
+                android:contentDescription="@string/post_image_submit_hint"
+                android:paddingHorizontal="?attr/listPreferredItemPaddingStart"
+                android:paddingVertical="?attr/actionBarSize"
+                android:scaleType="centerInside"
+                android:src="@drawable/add_image"
+                android:tintMode="src_in"
+                android:translationZ="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?colorOnSecondary" />
 
-                    <ImageButton
-                        android:id="@+id/post_imageupload_button"
-                        style="@android:style/Widget.Holo.Light.ImageButton"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:contentDescription="@string/post_image_submit_hint"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/add_picture" />
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/post_image_pager"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="?attr/actionBarSize"
+                android:layout_marginEnd="?attr/actionBarSize"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                >
 
-                </LinearLayout>
-            </HorizontalScrollView>
+            </androidx.viewpager2.widget.ViewPager2>
+
+            <LinearLayout
+                android:id="@+id/post_image_carousel"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="?attr/actionBarSize"
+                android:layout_marginEnd="?attr/actionBarSize"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                android:gravity="center_horizontal"
+                android:translationZ="0dp"/>
+
+            <LinearLayout
+                android:id="@+id/post_indicator_container"
+                android:layout_width="200dp"
+                android:layout_height="?attr/listPreferredItemPaddingStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_image_pager"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/post_image_addmore_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/post_image_addmore_button_txt"
+                android:visibility="invisible"
+                app:icon="@drawable/add_image"
+                app:iconSize="?attr/listPreferredItemPaddingStart"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_indicator_container" />
 
             <TextView
                 android:id="@+id/post_image_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_below="@id/post_image_carousel"
-                android:text="@string/post_image_required_txt" />
+                android:text="@string/post_image_required_txt"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_imageupload_button" />
 
             <EditText
                 android:id="@+id/post_title_field"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/post_image_label"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
                 android:autofillHints="@string/post_title_field_hint"
                 android:ems="10"
                 android:hint="@string/post_title_field_hint"
                 android:inputType="textPersonName"
-                android:minHeight="48dp" />
+                android:minHeight="48dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_image_addmore_button"
+                />
 
             <Space
                 android:id="@+id/post_space_inbetween"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/post_title_field"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp" />
+                android:layout_width="?attr/actionBarSize"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-            <LinearLayout
-                android:id="@+id/post_left_layout"
+            <TextView
+                android:id="@+id/post_genre_label"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_below="@id/post_title_field"
-                android:layout_marginTop="20dp"
-                android:layout_toLeftOf="@id/post_space_inbetween"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                android:text="@string/post_genre_label_txt"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_title_field"
+                android:layout_marginTop="?android:expandableListPreferredChildPaddingLeft"
+                android:layout_marginStart="3dp"
+                />
 
-                <TextView
-                    android:id="@+id/post_genre_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="2dp"
-                    android:text="@string/post_genre_label_txt"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            <RadioGroup
+                android:id="@+id/post_genre_group"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_genre_label"
+                app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
+                />
 
-                <RadioGroup
-                    android:id="@+id/post_genre_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/post_price_field"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/post_price_field_hint"
+                android:inputType="numberDecimal"
+                android:minHeight="48dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_genre_group"
+                app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"/>
 
-                <EditText
-                    android:id="@+id/post_price_field"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/post_price_field_hint"
-                    android:inputType="numberDecimal"
-                    android:minHeight="48dp" />
+            <EditText
+                android:id="@+id/post_description_field"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:ems="10"
+                android:hint="@string/post_description_field_hint"
+                android:gravity="start|top"
+                android:inputType="textLongMessage|textMultiLine"
+                app:layout_constraintTop_toBottomOf="@id/post_title_field"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/post_space_inbetween"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"/>
 
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/post_right_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/post_title_field"
-                android:layout_marginTop="20dp"
-                android:layout_toRightOf="@id/post_space_inbetween"
-                android:orientation="vertical">
-
-                <EditText
-                    android:id="@+id/post_description_field"
-                    android:layout_width="wrap_content"
-                    android:layout_height="200dp"
-                    android:ems="10"
-                    android:hint="@string/post_description_field_hint"
-                    android:inputType="textLongMessage|textMultiLine" />
-            </LinearLayout>
-
-
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

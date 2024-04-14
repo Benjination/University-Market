@@ -5,13 +5,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-
 import com.example.universitymarket.fragments.AnalyticsFragment;
 import com.example.universitymarket.fragments.FilterFragment;
 import com.example.universitymarket.fragments.MarketFragment;
 import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
-import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
 
