@@ -5,13 +5,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-
 import com.example.universitymarket.fragments.AnalyticsFragment;
 import com.example.universitymarket.fragments.FilterFragment;
 import com.example.universitymarket.fragments.MarketFragment;
 import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
-import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
 
@@ -30,7 +28,7 @@ public class TabAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if(position == 0) {
-            if(context.equals("Home")) {
+            if(context.equals("Market")) {
                 return new MarketFragment(fm);
             } else if(context.equals("Post")) {
                 return new PostFragment(fm);
@@ -40,7 +38,7 @@ public class TabAdapter extends FragmentStateAdapter {
                 return new ProfileFragment(fm);
             }
         } else {
-            if(context.equals("Home")) {
+            if(context.equals("Market")) {
                 return new FilterFragment(fm);
             } else if(context.equals("Post")) {
                 return new myPostFragment(fm);

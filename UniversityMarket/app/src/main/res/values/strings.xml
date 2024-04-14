@@ -2,26 +2,27 @@
     <string name="app_name">University Market</string>
     <string name="app_version">v1.0.0</string>
 
-    <string name="tab_market_txt">Market</string>
+    <string name="tab_browse_txt">Browse</string>
     <string name="tab_filter_txt">Filter</string>
-    <string name="tab_compose_txt">Compose</string>
-    <string name="tab_created_txt">Created</string>
-    <string name="tab_watchlist_txt">Watchlist</string>
-    <string name="tab_analytics_txt">Analytics</string>
-    <string name="tab_profile_txt">Portfolio</string>
+    <string name="tab_create_txt">Create</string>
+    <string name="tab_view_txt">Posts</string>
+    <string name="tab_watch_txt">Watch</string>
+    <string name="tab_analyze_txt">Analyze</string>
+    <string name="tab_portfolio_txt">Portfolio</string>
 
-    <string name="dash_home_button_txt">Home</string>
+    <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
     <string name="dash_watch_button_txt">Watch</string>
     <string name="dash_chat_button_txt">Chat</string>
     <string name="dash_profile_button_txt">Profile</string>
+
     <string name="dash_toolbar_settings_txt">Settings</string>
-    <string name="dash_toolbar_market_txt">UTA Marketplace</string>
+    <string name="dash_toolbar_browse_txt">UTA Marketplace</string>
     <string name="dash_toolbar_filter_txt">Filter Options</string>
-    <string name="dash_toolbar_compose_txt">Create a Post</string>
-    <string name="dash_toolbar_created_txt">My Posts</string>
-    <string name="dash_toolbar_watchlist_txt">Your Watchlist</string>
-    <string name="dash_toolbar_analytics_txt">Your Numbers</string>
+    <string name="dash_toolbar_create_txt">Create a Post</string>
+    <string name="dash_toolbar_view_txt">My Posts</string>
+    <string name="dash_toolbar_watch_txt">My Watchlist</string>
+    <string name="dash_toolbar_analyze_txt">My Analytics</string>
     <string name="dash_toolbar_messages_txt">My Messages</string>
 
     <string name="test_upload_button_txt">Upload Test</string>
@@ -37,12 +38,15 @@
     <string name="post_description_field_hint">Description</string>
     <string name="post_price_field_hint">Price</string>
     <string name="post_image_required_txt">at least one image is required</string>
+    <string name="post_image_addmore_button_txt">Add more images</string>
 
-    <string name="settings_records_button_txt">View my receipts</string>
-    <string name="settings_signout_button_txt">Sign out</string>
+    <string name="settings_records_button_txt">My Receipts</string>
+    <string name="settings_signout_button_txt">Sign Out</string>
 
     <string name="profile_save_button_txt">Save</string>
     <string name="profile_description_hint">Enter your profile description here!</string>
+    <string name="profile_description_label">Description</string>
+    <string name="profile_rating_label">Rating</string>
 
     <string name="back_to_marketplace">Back to Market</string>
     <string name="refresh">Refresh</string>

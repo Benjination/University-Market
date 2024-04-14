@@ -12,6 +12,8 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
@@ -35,9 +37,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class Data {
     public static void mergeHash(Map<String, Object> from, Map<String, Object> to) {
@@ -45,19 +50,19 @@ public abstract class Data {
                 !oldValue.equals(newValue) ? oldValue : newValue));
     }
 
-    public static Task<Uri> refineImage(@NonNull Activity cur_act, @NonNull Uri uri) {
-        TaskCompletionSource<Uri> result = new TaskCompletionSource<>();
+    public static void callPicasso(@NonNull Activity cur_act, @NonNull List<Uri> uris, @NonNull List<Uri> processed, @NonNull List<Exception> exceptions, int depth, @NonNull TaskCompletionSource<List<Uri>> task) {
         int side = convertDpToPixel(cur_act, 250);
         ImageView image = new ImageView(cur_act);
+
         Picasso
                 .get()
-                .load(uri)
+                .load(uris.get(depth - 1))
                 .resize(side, side)
                 .centerCrop()
                 .into(image, new Callback() {
                     @Override
                     public void onSuccess() {
-                        Bitmap bmp = Bitmap.createBitmap(((BitmapDrawable)image.getDrawable()).getBitmap());
+                        Bitmap bmp = Bitmap.createBitmap(((BitmapDrawable) image.getDrawable()).getBitmap());
                         File path = new File(cachePath(cur_act) + "/images");
                         path.mkdir();
                         File dir = new File(path, generateID("pic") + ".png");
@@ -66,19 +71,77 @@ public abstract class Data {
                             bmp.compress(Bitmap.CompressFormat.PNG, 50, out);
                             out.flush();
                             out.close();
-                            result.setResult(Uri.fromFile(new File(dir.getAbsolutePath())));
-                        } catch(IOException e) {
-                            result.setException(e);
+                            processed.add(Uri.fromFile(new File(dir.getAbsolutePath())));
+                        } catch (IOException e) {
+                            exceptions.add(e);
+                        }
+
+                        if(depth > 1)
+                            callPicasso(cur_act, uris, processed, exceptions, depth - 1, task);
+                        else {
+                            if(exceptions.size() > 0) {
+                                String combined = exceptions.stream().map(Throwable::toString).collect(Collectors.joining(","));
+                                task.setException(new Exception(combined));
+                            } else {
+                                task.setResult(processed);
+                            }
                         }
                     }
 
                     @Override
                     public void onError(Exception e) {
-                        result.setException(e);
+                        exceptions.add(e);
+                        if(depth > 1)
+                            callPicasso(cur_act, uris, processed, exceptions, depth - 1, task);
+                        else {
+                            String combined = exceptions.stream().map(Throwable::toString).collect(Collectors.joining(","));
+                            task.setException(new Exception(combined));
+                        }
+                    }
+                });
+    }
+
+    public static Task<List<Uri>> refineImages(@NonNull Activity cur_act, @NonNull List<Uri> uris) {
+        TaskCompletionSource<List<Uri>> task = new TaskCompletionSource<>();
+        callPicasso(cur_act, uris, new ArrayList<>(), new ArrayList<>(), uris.size(), task);
+        return task.getTask();
+    }
+
+    public static Task<Uri> refineImage(@NonNull Activity cur_act, @NonNull Uri uri) {
+        TaskCompletionSource<Uri> task = new TaskCompletionSource<>();
+        int side = convertDpToPixel(cur_act, 250);
+        ImageView image = new ImageView(cur_act);
+
+        Picasso
+                .get()
+                .load(uri)
+                .resize(side, side)
+                .centerCrop()
+                .into(image, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        Bitmap bmp = Bitmap.createBitmap(((BitmapDrawable) image.getDrawable()).getBitmap());
+                        File path = new File(cachePath(cur_act) + "/images");
+                        path.mkdir();
+                        File dir = new File(path, generateID("pic") + ".png");
+                        try {
+                            FileOutputStream out = new FileOutputStream(dir);
+                            bmp.compress(Bitmap.CompressFormat.PNG, 50, out);
+                            out.flush();
+                            out.close();
+                            task.setResult(Uri.fromFile(new File(dir.getAbsolutePath())));
+                        } catch (IOException e) {
+                            task.setException(e);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        task.setException(e);
                     }
                 });
 
-        return result.getTask();
+        return task.getTask();
     }
 
     public static boolean clearImageCache(@NonNull Activity cur_act) {
@@ -300,7 +363,6 @@ public abstract class Data {
         ActiveUser.last_name = userOBJ.getLastName();
         ActiveUser.first_name = userOBJ.getFirstName();
         ActiveUser.email = userOBJ.getEmail();
-        ActiveUser.deactivated = userOBJ.getDeactivated();
         ActiveUser.watch_ids = userOBJ.getWatchIds();
         ActiveUser.transact_ids = userOBJ.getTransactIds();
         ActiveUser.post_ids = userOBJ.getPostIds();
@@ -309,6 +371,6 @@ public abstract class Data {
     }
 
     public static User activeUserToPOJO() {
-        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.deactivated, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
+        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
     }
 }
