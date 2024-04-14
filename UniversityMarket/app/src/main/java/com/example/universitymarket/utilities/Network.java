@@ -3,7 +3,6 @@ package com.example.universitymarket.utilities;
 import android.widget.Toast;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.objects.Transaction;
-import com.example.universitymarket.objects.Test;
 import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.globals.actives.ActiveUser;
 /**
@@ -480,108 +479,6 @@ public abstract class Network {
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
-                        list.add(result);
-                    }
-                    response.onSuccess(list);
-                })
-                .addOnFailureListener(response::onFailure);
-    }
-
-    public static void setTest(@NonNull Activity cur_act, @NonNull Test testOBJ, boolean clear, @Nullable Callback<Test> response) {
-        if(response == null && testOBJ.getFieldLvl1() == null)
-            return;
-        else if(response != null && testOBJ.getFieldLvl1() == null) {
-            response.onFailure(new NullPointerException("Test ID does not exist in test object " + testOBJ));
-            return;
-        }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"tests", testOBJ.getFieldLvl1(), clear, testOBJ);
-        if(response != null) {
-            echo.addOnSuccessListener(task -> {
-                Test result = new Test(task);
-                response.onSuccess(result);
-            });
-            echo.addOnFailureListener(response::onFailure);
-        }
-    }
-
-    public static void setTests(@NonNull Activity cur_act, @NonNull Test[] testOBJ, boolean clear, @Nullable Callback<List<Test>> response) {
-        List<Test> responses = new ArrayList<>();
-        for(int i = 0; i < testOBJ.length; i++) {
-            if(response == null && testOBJ[i].getFieldLvl1() == null)
-                continue;
-            else if(response != null && testOBJ[i].getFieldLvl1() == null) {
-                response.onFailure(new NullPointerException("Test ID does not exist in test object " + testOBJ[i]));
-                continue;
-            }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"tests", testOBJ[i].getFieldLvl1(), clear, testOBJ[i]);
-            if(response != null) {
-                echo.addOnFailureListener(response::onFailure);
-                if(i == testOBJ.length - 1) {
-                    echo.addOnSuccessListener(task -> {
-                        Test result = new Test(task);
-                        responses.add(result);
-                        response.onSuccess(responses);
-                    });
-                } else {
-                    echo.addOnSuccessListener(task -> {
-                        Test result = new Test(task);
-                        responses.add(result);
-                    });
-                }
-            }
-        }
-    }
-
-    public static void getTest(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Test> response) {
-        getDoc(cur_act,"tests", docID)
-                .addOnSuccessListener(task -> {
-                    Test result = new Test(task);
-                    response.onSuccess(result);
-                })
-                .addOnFailureListener(response::onFailure);
-    }
-
-    public static void getTests(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Test>> response) {
-        List<Test> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"tests", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    Test result = new Test(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    Test result = new Test(task);
-                    list.add(result);
-                });
-            }
-        }
-    }
-
-    public static void getTests(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Test>> response) {
-        List<Test> list = new ArrayList<>();
-        getColl(cur_act,"tests", filter, Math.max(pageNo, 0))
-                .addOnSuccessListener(task -> {
-                    for (HashMap<String, Object> hash : task) {
-                        Test result = new Test(hash);
-                        list.add(result);
-                    }
-                    response.onSuccess(list);
-                })
-                .addOnFailureListener(response::onFailure);
-    }
-
-    public static void getTests(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Test>> response) {
-        List<Test> list = new ArrayList<>();
-        getColl(cur_act,"tests", null, (char) (Math.max(pageNo, 0)))
-                .addOnSuccessListener(task -> {
-                    for (HashMap<String, Object> hash : task) {
-                        Test result = new Test(hash);
                         list.add(result);
                     }
                     response.onSuccess(list);

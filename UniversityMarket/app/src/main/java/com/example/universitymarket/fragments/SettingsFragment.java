@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,13 @@ import java.io.IOException;
 public class SettingsFragment extends Fragment implements View.OnClickListener {
 
     private View root;
-    private FragmentManager fm;
+    private final String[] args;
+    private final FragmentManager fm;
+
+    public SettingsFragment(String[] args, FragmentManager fm) {
+        this.args = args;
+        this.fm = fm;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +49,6 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_settings, container, false);
-        fm = getParentFragmentManager();
         configureButtons(root);
 
         return root;
@@ -62,7 +68,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
             Bundle popupArgs = new Bundle();
             popupArgs.putString("popupTitle", "Records");
             popupArgs.putString("popupFragment", "RecordsFragment");
-            popupArgs.putString("popupArgument", null);
+            popupArgs.putStringArray("popupFragArgs", null);
             fm.setFragmentResult("createPopup", popupArgs);
         } else if(v.getId() == R.id.settings_signout_button) {
             FirebaseAuth mAuth = FirebaseAuth.getInstance();

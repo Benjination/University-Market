@@ -40,8 +40,14 @@ public class RecordsFragment extends Fragment {
     private List<User> users;
     private Thread retrieve;
     private TextView unavailable;
-    private FragmentManager fm;
     private final Bundle dashMessage = new Bundle();
+    private final String[] args;
+    private final FragmentManager fm;
+
+    public RecordsFragment(String[] args, FragmentManager fm) {
+        this.args = args;
+        this.fm = fm;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +64,6 @@ public class RecordsFragment extends Fragment {
     }
 
     private void configure(View v) {
-        fm = getParentFragmentManager();
         unavailable = v.findViewById(R.id.records_unavailable_text);
         recyclerView = v.findViewById(R.id.records_recycle_view);
 

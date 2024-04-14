@@ -39,7 +39,6 @@ public interface Policy {
  * DO NOT REMOVE THIS BLOCK 
 */
     String[] json_filenames = { 
-            "test_skeleton.json",
             "transaction_skeleton.json",
             "user_skeleton_cached.json",
             "post_skeleton.json"

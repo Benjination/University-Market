@@ -1,7 +1,6 @@
 package com.example.universitymarket;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -17,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,25 +25,29 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.universitymarket.fragments.ChatFragment;
-import com.example.universitymarket.fragments.RecordsFragment;
-import com.example.universitymarket.fragments.SettingsFragment;
+import com.example.universitymarket.fragments.PopupFragment;
 import com.example.universitymarket.fragments.TabFragment;
-import com.example.universitymarket.fragments.viewPostFragment;
+import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.utilities.PickMultipleVisualMedia;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DashboardActivity extends AppCompatActivity {
 
-    private String currentView, currentTabGroup = "Home";
-    private int currentTab = 0;
+    private String currentView = "Market";
+    private int currentTab = 0, actionBarSize, extBarSize;
     private View loadScreen;
     private ProgressBar loadAnimation;
     private Toolbar toolbar;
@@ -52,7 +56,10 @@ public class DashboardActivity extends AppCompatActivity {
     private MenuItem search;
     private Drawable gear;
     private ViewGroup.LayoutParams params;
+    private TaskCompletionSource<List<Uri>> urisRetrieval = new TaskCompletionSource<>();
     private TaskCompletionSource<Uri> uriRetrieval = new TaskCompletionSource<>();
+    private PickMultipleVisualMedia multipleImagePicker = new PickMultipleVisualMedia(Policy.max_images_per_post);
+    private final ActivityResultContracts.PickVisualMedia singleImagePicker = new ActivityResultContracts.PickVisualMedia();
     private final HashMap<String, ArrayList<Object>> fragMap = new HashMap<>();
     private final FragmentManager fm = getSupportFragmentManager();
     private final Bundle fragResponse = new Bundle();
@@ -61,7 +68,7 @@ public class DashboardActivity extends AppCompatActivity {
     ArrayList<Object> toolbarSubtitles;
 
     private enum tabGroup {
-        Home,
+        Market,
         Post,
         Watch,
         Chat,
@@ -111,16 +118,16 @@ public class DashboardActivity extends AppCompatActivity {
 
         toolbarTitles = new ArrayList<>(Arrays.asList(
                 new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_market_txt),
+                        getResources().getString(R.string.dash_toolbar_browse_txt),
                         getResources().getString(R.string.dash_toolbar_filter_txt)
                 )),
                 new ArrayList<>(Arrays.asList(
                         getResources().getString(R.string.dash_toolbar_compose_txt),
-                        getResources().getString(R.string.dash_toolbar_created_txt)
+                        getResources().getString(R.string.dash_toolbar_view_txt)
                 )),
                 new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_watchlist_txt),
-                        getResources().getString(R.string.dash_toolbar_analytics_txt)
+                        getResources().getString(R.string.dash_toolbar_watch_txt),
+                        getResources().getString(R.string.dash_toolbar_analyze_txt)
                 )),
                 getResources().getString(R.string.dash_toolbar_messages_txt),
                 ActiveUser.first_name + " " + ActiveUser.last_name
@@ -134,21 +141,52 @@ public class DashboardActivity extends AppCompatActivity {
                 ActiveUser.email
         ));
 
-        // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar
-        fragMap.put("Home", new ArrayList<>(Arrays.asList(new TabFragment("Home"), false, true)));
-        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment("Post"), false, true)));
-        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment("Watch"), false, true)));
-        fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false)));
-        fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment("Profile"), false, false)));
+        // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar List<PopupFragment>
+        fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment("Market"), false, true, new ArrayList<>())));
+        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment("Post"), false, true, new ArrayList<>())));
+        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment("Watch"), false, true, new ArrayList<>())));
+        fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false, new ArrayList<>())));
+        fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment("Profile"), false, false, new ArrayList<>())));
 
         fm
                 .setFragmentResultListener(
                         "requestGallery",
                         this,
                         (requestKey, result) -> {
-                            uriRetrieval = new TaskCompletionSource<>();
-                            galleryLauncher.launch(photoAlbum);
+                            int newMax = Policy.max_images_per_post - result.getInt("numPictures");
 
+                            if(newMax > 1) {
+                                multipleImagePicker = new PickMultipleVisualMedia(newMax);
+                                urisRetrieval = new TaskCompletionSource<>();
+                                multipleGalleryLauncher.launch(
+                                        new PickVisualMediaRequest.Builder()
+                                                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                                                .build()
+                                );
+                            } else {
+                                uriRetrieval = new TaskCompletionSource<>();
+                                singleGalleryLauncher.launch(
+                                        new PickVisualMediaRequest.Builder()
+                                                .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                                                .build()
+                                );
+                            }
+
+                            urisRetrieval.getTask()
+                                    .addOnSuccessListener(tasks -> Data.refineImages(this, tasks)
+                                            .addOnSuccessListener(res -> {
+                                                fragResponse.putStringArrayList("uris", new ArrayList<>(res.stream().map(Uri::toString).collect(Collectors.toList())));
+                                                fm.setFragmentResult("retrieveImages", fragResponse);
+                                            })
+                                            .addOnFailureListener(error -> {
+                                                fragResponse.putString("error", error.getMessage());
+                                                fm.setFragmentResult("retrieveImages", fragResponse);
+                                            })
+                                    )
+                                    .addOnFailureListener(error -> {
+                                        fragResponse.putString("error", error.getMessage());
+                                        fm.setFragmentResult("retrieveImages", fragResponse);
+                                    });
                             uriRetrieval.getTask()
                                     .addOnSuccessListener(task -> Data.refineImage(this, task)
                                             .addOnSuccessListener(res -> {
@@ -156,11 +194,12 @@ public class DashboardActivity extends AppCompatActivity {
                                                 fm.setFragmentResult("retrieveImage", fragResponse);
                                             })
                                             .addOnFailureListener(error -> {
-                                                fragResponse.putString("uri", "failure~" + error.getMessage());
+                                                fragResponse.putString("error", error.getMessage());
                                                 fm.setFragmentResult("retrieveImage", fragResponse);
-                                            }))
+                                            })
+                                    )
                                     .addOnFailureListener(error -> {
-                                        fragResponse.putString("uri", "failure~" + error.getMessage());
+                                        fragResponse.putString("error", error.getMessage());
                                         fm.setFragmentResult("retrieveImage", fragResponse);
                                     });
                         });
@@ -187,10 +226,9 @@ public class DashboardActivity extends AppCompatActivity {
                         this,
                         (requestKey, result) -> {
                             currentTab = result.getInt("currentTab");
-                            currentTabGroup = result.getString("currentTabGroup");
 
-                            Object title = toolbarTitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
-                            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+                            Object title = toolbarTitles.get(tabGroup.valueOf(currentView).ordinal());
+                            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentView).ordinal());
                             toolbar.setTitle(title.getClass() == ArrayList.class ? ((ArrayList<String>) title).get(currentTab) : (String) title);
                             toolbar.setSubtitle(subtitle == null ? "" : subtitle.getClass() == ArrayList.class ? ((ArrayList<String>) subtitle).get(currentTab) : (String) subtitle);
                         }
@@ -200,7 +238,7 @@ public class DashboardActivity extends AppCompatActivity {
                         "createPopup",
                         this,
                         (requestKey, result) ->
-                                createPopup(result.getString("popupTitle"), result.getString("popupFragment"), result.getString("popupArgument"))
+                                createPopup(result.getString("popupTitle"), result.getString("popupFragment"), result.getStringArray("popupFragArgs"))
                 );
     }
 
@@ -216,7 +254,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         TypedValue actionBarTV = new TypedValue();
         getTheme().resolveAttribute(R.attr.actionBarSize, actionBarTV, true);
-        int actionBarSize = Data.convertComplexToPixel(this, actionBarTV.data);
+        actionBarSize = Data.convertComplexToPixel(this, actionBarTV.data);
+        extBarSize = actionBarSize * 2;
 
         params = toolbar.getLayoutParams();
 
@@ -248,59 +287,55 @@ public class DashboardActivity extends AppCompatActivity {
             Fragment frag = (Fragment) objList.get(0);
             boolean isLoading = (boolean) objList.get(1);
             boolean miniToolbar = (boolean) objList.get(2);
+            List<PopupFragment> popups = (List<PopupFragment>) objList.get(3);
+            List<PopupFragment> otherPopups = fragMap.entrySet().stream().filter(e -> !e.getKey().equals(name)).map(val -> (List<PopupFragment>) val.getValue().get(3)).flatMap(List::stream).map(obj -> (PopupFragment) obj).collect(Collectors.toList());
 
-            params.height = miniToolbar ? actionBarSize : actionBarSize * 2;
+            params.height = miniToolbar ? actionBarSize : extBarSize;
             toolbar.setLayoutParams(params);
 
-            if(name.equals("Chat")) {
-                currentTabGroup = "Chat";
-            } else {
-                if(name.equals("Home")) {
-                    search.setVisible(true);
-                } else {
-                    settings.setVisible(name.equals("Profile"));
-                    search.setVisible(false);
-                }
-            }
+            popups.removeIf(popup -> !popup.isAdded());
+            otherPopups.forEach(popup -> fm.beginTransaction().hide(popup).commit());
+            popups.forEach(popup -> fm.beginTransaction().show(popup).commit());
 
-            Object title = toolbarTitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
-            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentTabGroup).ordinal());
+            settings.setVisible(name.equals("Profile"));
+            search.setVisible(name.equals("Market"));
+
+            currentView = name;
+
+            Object title = toolbarTitles.get(tabGroup.valueOf(currentView).ordinal());
+            Object subtitle = toolbarSubtitles.get(tabGroup.valueOf(currentView).ordinal());
             toolbar.setTitle(title.getClass() == ArrayList.class ? ((ArrayList<String>) title).get(currentTab) : (String) title);
             toolbar.setSubtitle(subtitle == null ? "" : subtitle.getClass() == ArrayList.class ? ((ArrayList<String>) subtitle).get(currentTab) : (String) subtitle);
 
-            currentView = name;
             fm
                     .beginTransaction()
                     .replace(R.id.dash_fragment_buffer, frag)
                     .commit();
 
-            ViewGroup root = findViewById(R.id.dash_popup_buffer);
-            root.removeAllViews();
             displayLoading(isLoading);
             return true;
         });
-        dash_buttons.setSelectedItemId(R.id.dash_home_button);
+        dash_buttons.setSelectedItemId(R.id.dash_market_button);
     }
 
-    private void createPopup(String title, String fragName, String argument) {
-        ViewGroup root = findViewById(R.id.dash_popup_buffer);
-        View popupView = getLayoutInflater().inflate(R.layout.layout_popup, root);
-        Toolbar popupToolbar = popupView.findViewById(R.id.popup_toolbar);
-        popupToolbar.setTitle(title);
-        popupToolbar.setNavigationOnClickListener((view) -> root.removeAllViews());
-        Fragment popupFragment;
-
-        if(fragName.equals("viewPostFragment")) {
-            popupFragment = new viewPostFragment(argument);
-        } else if(fragName.equals("RecordsFragment")) {
-            popupFragment = new RecordsFragment();
-        } else {
-            popupFragment = new SettingsFragment();
+    private void createPopup(String title, String fragName, String[] args) {
+        Fragment popupDisplay;
+        try {
+            Class<? extends Fragment> clazz = (Class<? extends Fragment>) Class.forName("com.example.universitymarket.fragments." + fragName);
+            Class<?>[] types = new Class[]{ String[].class, FragmentManager.class };
+            Constructor<? extends Fragment> cons = clazz.getConstructor(types);
+            popupDisplay = cons.newInstance(args, fm);
+        } catch(Exception e) {
+            Log.e("createPopup", e.getMessage());
+            return;
         }
+
+        PopupFragment popupWindow = new PopupFragment(title, popupDisplay);
         fm
                 .beginTransaction()
-                .replace(R.id.popup_fragment_buffer, popupFragment)
+                .add(R.id.dash_popup_buffer, popupWindow)
                 .commit();
+        ((List<PopupFragment>) fragMap.get(currentView).get(3)).add(popupWindow);
     }
 
     private void displayLoading(boolean isLoading) {
@@ -313,18 +348,23 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
-    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if(result.getResultCode() == Activity.RESULT_OK) {
-            Intent response = result.getData();
-            if(response == null) {
-                uriRetrieval.setException(new Exception("No image was selected"));
-                return;
-            }
-            uriRetrieval.setResult(response.getData());
+    private final ActivityResultLauncher<PickVisualMediaRequest> multipleGalleryLauncher =
+            registerForActivityResult(multipleImagePicker, uris -> {
+        if(uris.isEmpty()) {
+            urisRetrieval.setException(new Exception("No image was selected"));
         } else {
-            uriRetrieval.setException(new Exception("No image was selected"));
+            urisRetrieval.setResult(uris);
         }
     });
+
+    private final ActivityResultLauncher<PickVisualMediaRequest> singleGalleryLauncher =
+            registerForActivityResult(singleImagePicker, uri -> {
+                if(uri == null) {
+                    uriRetrieval.setException(new Exception("No image was selected"));
+                } else {
+                    uriRetrieval.setResult(uri);
+                }
+            });
 
     private void setMargins (View view, int left, int top, int right, int bottom) {
         if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {

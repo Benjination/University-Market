@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
@@ -97,6 +96,52 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
         submit.setOnClickListener(this);
         imageupload.setOnClickListener(this);
+
+        fm
+                .setFragmentResultListener(
+                        "retrieveImages",
+                        this,
+                        (requestKey, result) -> {
+                            String error = result.getString("error");
+                            if(error != null) {
+                                Toast.makeText(
+                                        getContext(),
+                                        error,
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            } else {
+                                for (String uri : result.getStringArrayList("uris")) {
+                                    imageURLsToBeUploaded.add(uri);
+                                    addToCarousel(Uri.parse(uri));
+                                    imagelabel.setVisibility(View.INVISIBLE);
+                                }
+                            }
+                            if (!load.getTask().isComplete())
+                                load.setResult("retrieveImages");
+                        }
+                );
+        fm
+                .setFragmentResultListener(
+                        "retrieveImage",
+                        this,
+                        (requestKey, result) -> {
+                            String error = result.getString("error");
+                            if(error != null) {
+                                Toast.makeText(
+                                        getContext(),
+                                        error,
+                                        Toast.LENGTH_SHORT
+                                ).show();
+                            } else {
+                                String uri = result.getString("uri");
+                                imageURLsToBeUploaded.add(uri);
+                                addToCarousel(Uri.parse(uri));
+                                imagelabel.setVisibility(View.INVISIBLE);
+                            }
+                            if (!load.getTask().isComplete())
+                                load.setResult("retrieveImages");
+                        }
+                );
     }
 
     private void requiredFields(TextView... views) {
@@ -181,8 +226,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         title.clearFocus();
         price.clearFocus();
         description.clearFocus();
-        imageURLsToBeUploaded = new ArrayList<>();
-        imageURLs = new ArrayList<>();
+        imageURLsToBeUploaded.clear();
+        imageURLs.clear();
         ((RadioButton) root.findViewById(genres.getCheckedRadioButtonId())).setChecked(false);
         ArrayList<View> remove = new ArrayList<>();
         for(int i = 0; i < carousel.getChildCount(); i++) {
@@ -198,31 +243,10 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     }
 
     private void retrievePhoto() {
+        dashMessage.putInt("numPictures", imageURLsToBeUploaded.size());
         fm.setFragmentResult("requestGallery", dashMessage);
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-        fm
-                .setFragmentResultListener(
-                        "retrieveImage",
-                        this,
-                        (requestKey, result) -> {
-                            String buffer = result.getString("uri");
-
-                            if(buffer.contains("failure")) {
-                                Toast.makeText(
-                                        getContext(),
-                                        buffer.split("~")[1],
-                                        Toast.LENGTH_SHORT
-                                ).show();
-                            } else {
-                                imageURLsToBeUploaded.add(buffer);
-                                addToCarousel(Uri.parse(buffer));
-                                imagelabel.setVisibility(View.INVISIBLE);
-                                fm.clearFragmentResultListener("retrieveImage");
-                            }
-                            load.setResult("image");
-                        }
-                );
     }
 
     private void addToCarousel(Uri uri) {
