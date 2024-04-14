@@ -4,7 +4,7 @@
 
     <string name="tab_browse_txt">Browse</string>
     <string name="tab_filter_txt">Filter</string>
-    <string name="tab_compose_txt">Compose</string>
+    <string name="tab_create_txt">Create</string>
     <string name="tab_view_txt">Posts</string>
     <string name="tab_watch_txt">Watch</string>
     <string name="tab_analyze_txt">Analyze</string>
@@ -19,7 +19,7 @@
     <string name="dash_toolbar_settings_txt">Settings</string>
     <string name="dash_toolbar_browse_txt">UTA Marketplace</string>
     <string name="dash_toolbar_filter_txt">Filter Options</string>
-    <string name="dash_toolbar_compose_txt">Create a Post</string>
+    <string name="dash_toolbar_create_txt">Create a Post</string>
     <string name="dash_toolbar_view_txt">My Posts</string>
     <string name="dash_toolbar_watch_txt">My Watchlist</string>
     <string name="dash_toolbar_analyze_txt">My Analytics</string>
@@ -38,6 +38,7 @@
     <string name="post_description_field_hint">Description</string>
     <string name="post_price_field_hint">Price</string>
     <string name="post_image_required_txt">at least one image is required</string>
+    <string name="post_image_addmore_button_txt">Add more images</string>
 
     <string name="settings_records_button_txt">My Receipts</string>
     <string name="settings_signout_button_txt">Sign Out</string>

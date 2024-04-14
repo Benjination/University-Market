@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.viewpager2.widget.ViewPager2;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
@@ -22,6 +23,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
+import com.example.universitymarket.adapters.CarouselAdapter;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.Post;
@@ -31,6 +33,7 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,18 +42,19 @@ import java.util.concurrent.TimeoutException;
 public class PostFragment extends Fragment implements View.OnClickListener {
 
     private View root;
-    private LayoutInflater inflater;
-    private Button submit;
+    private Button submit, addmore;
+    private FloatingActionButton removeImage;
     private ImageButton imageupload;
     private EditText title, price, description;
     private RadioGroup genres;
-    private LinearLayout carousel;
     private TextView genrelabel, imagelabel;
     private TaskCompletionSource<String> load;
     private Thread uploadImages;
     private FragmentManager fm;
+    private ViewPager2 imagepager;
+    private LinearLayout indicatorContainer, carousel;
+    private int numIndicators = 0, position = 0;
     private final HashMap<Integer, Spanned> requiredText = new HashMap<>();
-
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
     private ArrayList<String> imageURLs = new ArrayList<>();
     private final Post post = new Post();
@@ -68,7 +72,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        this.inflater = inflater;
         root = inflater.inflate(R.layout.fragment_post, container, false);
         configure(root);
         return root;
@@ -77,16 +80,22 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private void configure(View v) {
         Data.clearImageCache(requireActivity());
         submit = v.findViewById(R.id.post_submit_button);
+        addmore = v.findViewById(R.id.post_image_addmore_button);
+        removeImage = v.findViewById(R.id.post_imageremove_button);
         imageupload = v.findViewById(R.id.post_imageupload_button);
+        imagepager = v.findViewById(R.id.post_image_pager);
+        indicatorContainer = v.findViewById(R.id.post_indicator_container);
+        carousel = v.findViewById(R.id.post_image_carousel);
         title = v.findViewById(R.id.post_title_field);
         price = v.findViewById(R.id.post_price_field);
         description = v.findViewById(R.id.post_description_field);
         genres = v.findViewById(R.id.post_genre_group);
-        carousel = v.findViewById(R.id.post_images);
         genrelabel = v.findViewById(R.id.post_genre_label);
         imagelabel = v.findViewById(R.id.post_image_label);
 
         requiredFields(title, price, description, genrelabel, imagelabel);
+        imagepager.setAdapter(new CarouselAdapter());
+        imagepager.setUserInputEnabled(true);
 
         for(String genre : Policy.genres) {
             RadioButton newGenre = new RadioButton(requireContext());
@@ -96,6 +105,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
         submit.setOnClickListener(this);
         imageupload.setOnClickListener(this);
+        addmore.setOnClickListener(this);
+        removeImage.setOnClickListener(this);
 
         fm
                 .setFragmentResultListener(
@@ -110,10 +121,23 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                         Toast.LENGTH_SHORT
                                 ).show();
                             } else {
+                                if(imageupload.getVisibility() == View.VISIBLE) {
+                                    imageupload.setVisibility(View.INVISIBLE);
+                                    imagelabel.setVisibility(View.INVISIBLE);
+                                    addmore.setVisibility(View.VISIBLE);
+                                    removeImage.setVisibility(View.VISIBLE);
+                                }
                                 for (String uri : result.getStringArrayList("uris")) {
+                                    numIndicators += 1;
+                                    ImageView dot = new ImageView(v.getContext());
+                                    dot.setImageResource(R.drawable.dot_icon);
+                                    dot.setScaleX(-Data.convertComplexToPixel(requireActivity(), 3));
+                                    dot.setScaleY(-Data.convertComplexToPixel(requireActivity(), 3));
+                                    dot.setPadding(12,0,12,0);
+                                    indicatorContainer.addView(dot);
+
                                     imageURLsToBeUploaded.add(uri);
                                     addToCarousel(Uri.parse(uri));
-                                    imagelabel.setVisibility(View.INVISIBLE);
                                 }
                             }
                             if (!load.getTask().isComplete())
@@ -230,13 +254,19 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         imageURLs.clear();
         ((RadioButton) root.findViewById(genres.getCheckedRadioButtonId())).setChecked(false);
         ArrayList<View> remove = new ArrayList<>();
-        for(int i = 0; i < carousel.getChildCount(); i++) {
+        for(int i = 0; i < imageURLsToBeUploaded.size(); i++) {
             View v = carousel.getChildAt(i);
             if(!(v instanceof ImageButton))
                 remove.add(v);
         }
-        for(View v : remove)
+        for(View v : remove) {
             carousel.removeView(v);
+            indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
+        }
+        addmore.setVisibility(View.INVISIBLE);
+        removeImage.setVisibility(View.INVISIBLE);
+        imageupload.setVisibility(View.VISIBLE);
+        imagelabel.setVisibility(View.VISIBLE);
 
         setRequiredText(title, price, description);
         Data.clearImageCache(requireActivity());
@@ -291,6 +321,22 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int ID = v.getId();
         if(ID == imageupload.getId()) {
+            if(imageURLsToBeUploaded.size() < Policy.max_images_per_post)
+                retrievePhoto();
+        }
+        if(ID == removeImage.getId()) {
+            carousel.removeViewAt(position);
+            imageURLsToBeUploaded.remove(position);
+            position -= position == numIndicators - 1 ? 1 : 0;
+            indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
+            if(numIndicators == 0) {
+                addmore.setVisibility(View.INVISIBLE);
+                removeImage.setVisibility(View.INVISIBLE);
+                imageupload.setVisibility(View.VISIBLE);
+                imagelabel.setVisibility(View.VISIBLE);
+            }
+        }
+        if(ID == addmore.getId()) {
             if(imageURLsToBeUploaded.size() < Policy.max_images_per_post)
                 retrievePhoto();
         }

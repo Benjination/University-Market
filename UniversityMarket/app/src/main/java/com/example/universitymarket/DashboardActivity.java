@@ -122,7 +122,7 @@ public class DashboardActivity extends AppCompatActivity {
                         getResources().getString(R.string.dash_toolbar_filter_txt)
                 )),
                 new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_compose_txt),
+                        getResources().getString(R.string.dash_toolbar_create_txt),
                         getResources().getString(R.string.dash_toolbar_view_txt)
                 )),
                 new ArrayList<>(Arrays.asList(
@@ -326,7 +326,7 @@ public class DashboardActivity extends AppCompatActivity {
             Constructor<? extends Fragment> cons = clazz.getConstructor(types);
             popupDisplay = cons.newInstance(args, fm);
         } catch(Exception e) {
-            Log.e("createPopup", e.getMessage());
+            Log.e("createPopup", e.toString());
             return;
         }
 

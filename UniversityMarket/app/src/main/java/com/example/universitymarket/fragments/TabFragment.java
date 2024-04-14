@@ -66,7 +66,7 @@ public class TabFragment extends Fragment {
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_filter_txt);
         } else if(context.equals("Post")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
-            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_compose_txt);
+            ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_create_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_view_txt);
         } else if(context.equals("Watch")) {
@@ -83,7 +83,7 @@ public class TabFragment extends Fragment {
 
         TabAdapter adapter = new TabAdapter(requireActivity(), getParentFragmentManager(), context);
         pager.setAdapter(adapter);
-        pager.setUserInputEnabled(true);
+        pager.setUserInputEnabled(false);
 
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
