@@ -79,7 +79,6 @@ public class RecordsFragment extends Fragment {
                     userIds.add(transaction.getSellerEmail());
                 });
 
-                Log.e("huh","");
                 Network.getPosts(requireActivity(), postIds, new Callback<List<Post>>() {
                     @Override
                     public void onSuccess(List<Post> result) {
@@ -89,6 +88,8 @@ public class RecordsFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getPosts", error.getMessage());
+                        unavailable.setVisibility(View.VISIBLE);
+                        load.setResult("getPosts");
                     }
                 });
 
@@ -101,6 +102,8 @@ public class RecordsFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getUsers", error.getMessage());
+                        unavailable.setVisibility(View.VISIBLE);
+                        load.setResult("getUsers");
                     }
                 });
 
@@ -126,6 +129,7 @@ public class RecordsFragment extends Fragment {
 
             @Override
             public void onFailure(Exception error) {
+                Log.e("getTransactions", error.getMessage());
                 unavailable.setVisibility(View.VISIBLE);
                 load.setResult("getTransactions");
             }

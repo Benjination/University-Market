@@ -2,6 +2,8 @@ package com.example.universitymarket.utilities;
 
 import android.widget.Toast;
 import com.example.universitymarket.objects.User;
+import com.example.universitymarket.objects.Chat;
+import com.example.universitymarket.objects.Message;
 import com.example.universitymarket.objects.Transaction;
 import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.globals.actives.ActiveUser;
@@ -377,6 +379,210 @@ public abstract class Network {
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void setChat(@NonNull Activity cur_act, @NonNull Chat chatOBJ, boolean clear, @Nullable Callback<Chat> response) {
+        if(response == null && chatOBJ.getId() == null)
+            return;
+        else if(response != null && chatOBJ.getId() == null) {
+            response.onFailure(new NullPointerException("Chat ID does not exist in chat object " + chatOBJ));
+            return;
+        }
+        Task<HashMap<String, Object>> echo = setDoc(cur_act,"chats", chatOBJ.getId(), clear, chatOBJ);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                Chat result = new Chat(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setChats(@NonNull Activity cur_act, @NonNull Chat[] chatOBJ, boolean clear, @Nullable Callback<List<Chat>> response) {
+        List<Chat> responses = new ArrayList<>();
+        for(int i = 0; i < chatOBJ.length; i++) {
+            if(response == null && chatOBJ[i].getId() == null)
+                continue;
+            else if(response != null && chatOBJ[i].getId() == null) {
+                response.onFailure(new NullPointerException("Chat ID does not exist in chat object " + chatOBJ[i]));
+                continue;
+            }
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"chats", chatOBJ[i].getId(), clear, chatOBJ[i]);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == chatOBJ.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Chat result = new Chat(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Chat result = new Chat(task);
+                        responses.add(result);
+                    });
+                }
+            }
+        }
+    }
+
+    public static void getChat(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Chat> response) {
+        getDoc(cur_act,"chats", docID)
+                .addOnSuccessListener(task -> {
+                    Chat result = new Chat(task);
+                    response.onSuccess(result);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getChats(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Chat>> response) {
+        List<Chat> list = new ArrayList<>();
+        if(docID.size() == 0)
+            response.onFailure(new NullPointerException("No documents are available"));
+        for(int i = 0; i < docID.size(); i++) {
+            Task<HashMap<String, Object>> echo = getDoc(cur_act,"chats", docID.get(i));
+            echo.addOnFailureListener(response::onFailure);
+            if(i == docID.size() - 1) {
+                echo.addOnSuccessListener(task -> {
+                    Chat result = new Chat(task);
+                    list.add(result);
+                    response.onSuccess(list);
+                });
+            } else {
+                echo.addOnSuccessListener(task -> {
+                    Chat result = new Chat(task);
+                    list.add(result);
+                });
+            }
+        }
+    }
+
+    public static void getChats(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Chat>> response) {
+        List<Chat> list = new ArrayList<>();
+        getColl(cur_act,"chats", filter, Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Chat result = new Chat(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getChats(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Chat>> response) {
+        List<Chat> list = new ArrayList<>();
+        getColl(cur_act,"chats", null, (char) (Math.max(pageNo, 0)))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Chat result = new Chat(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void setMessage(@NonNull Activity cur_act, @NonNull Message messageOBJ, boolean clear, @Nullable Callback<Message> response) {
+        if(response == null && messageOBJ.getId() == null)
+            return;
+        else if(response != null && messageOBJ.getId() == null) {
+            response.onFailure(new NullPointerException("Message ID does not exist in message object " + messageOBJ));
+            return;
+        }
+        Task<HashMap<String, Object>> echo = setDoc(cur_act,"messages", messageOBJ.getId(), clear, messageOBJ);
+        if(response != null) {
+            echo.addOnSuccessListener(task -> {
+                Message result = new Message(task);
+                response.onSuccess(result);
+            });
+            echo.addOnFailureListener(response::onFailure);
+        }
+    }
+
+    public static void setMessages(@NonNull Activity cur_act, @NonNull Message[] messageOBJ, boolean clear, @Nullable Callback<List<Message>> response) {
+        List<Message> responses = new ArrayList<>();
+        for(int i = 0; i < messageOBJ.length; i++) {
+            if(response == null && messageOBJ[i].getId() == null)
+                continue;
+            else if(response != null && messageOBJ[i].getId() == null) {
+                response.onFailure(new NullPointerException("Message ID does not exist in message object " + messageOBJ[i]));
+                continue;
+            }
+            Task<HashMap<String, Object>> echo = setDoc(cur_act,"messages", messageOBJ[i].getId(), clear, messageOBJ[i]);
+            if(response != null) {
+                echo.addOnFailureListener(response::onFailure);
+                if(i == messageOBJ.length - 1) {
+                    echo.addOnSuccessListener(task -> {
+                        Message result = new Message(task);
+                        responses.add(result);
+                        response.onSuccess(responses);
+                    });
+                } else {
+                    echo.addOnSuccessListener(task -> {
+                        Message result = new Message(task);
+                        responses.add(result);
+                    });
+                }
+            }
+        }
+    }
+
+    public static void getMessage(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Message> response) {
+        getDoc(cur_act,"messages", docID)
+                .addOnSuccessListener(task -> {
+                    Message result = new Message(task);
+                    response.onSuccess(result);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getMessages(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Message>> response) {
+        List<Message> list = new ArrayList<>();
+        if(docID.size() == 0)
+            response.onFailure(new NullPointerException("No documents are available"));
+        for(int i = 0; i < docID.size(); i++) {
+            Task<HashMap<String, Object>> echo = getDoc(cur_act,"messages", docID.get(i));
+            echo.addOnFailureListener(response::onFailure);
+            if(i == docID.size() - 1) {
+                echo.addOnSuccessListener(task -> {
+                    Message result = new Message(task);
+                    list.add(result);
+                    response.onSuccess(list);
+                });
+            } else {
+                echo.addOnSuccessListener(task -> {
+                    Message result = new Message(task);
+                    list.add(result);
+                });
+            }
+        }
+    }
+
+    public static void getMessages(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Message>> response) {
+        List<Message> list = new ArrayList<>();
+        getColl(cur_act,"messages", filter, Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Message result = new Message(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getMessages(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Message>> response) {
+        List<Message> list = new ArrayList<>();
+        getColl(cur_act,"messages", null, (char) (Math.max(pageNo, 0)))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Message result = new Message(hash);
                         list.add(result);
                     }
                     response.onSuccess(list);
