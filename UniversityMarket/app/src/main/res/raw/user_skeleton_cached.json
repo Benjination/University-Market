@@ -9,6 +9,7 @@
   "interactions": {
     "post_ids": [""],
     "watch_ids": [""],
-    "transact_ids": [""]
+    "transact_ids": [""],
+    "chat_ids": [""]
   }
 }
