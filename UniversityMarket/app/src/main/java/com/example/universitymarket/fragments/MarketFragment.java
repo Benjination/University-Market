@@ -88,7 +88,7 @@ public class MarketFragment extends Fragment {
 
                 Bundle popupArgs = new Bundle();
                 popupArgs.putString("popupTitle", selectedPost.getItemTitle());
-                popupArgs.putString("popupFragment", "viewPostFragment");
+                popupArgs.putString("popupFragment", viewPostFragment.class.getName());
                 popupArgs.putStringArray("popupFragArgs", new String[]{ selectedPost.getId() });
                 getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
             }

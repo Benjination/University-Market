@@ -5,11 +5,13 @@
     "first_name": "",
     "last_name": "",
     "date_created": "",
-    "description": ""
+    "description": "",
+    "rating": 3.0
   },
   "interactions": {
     "post_ids": [""],
     "watch_ids": [""],
-    "transact_ids": [""]
+    "transact_ids": [""],
+    "chat_ids": [""]
   }
 }

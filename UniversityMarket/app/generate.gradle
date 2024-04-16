@@ -217,8 +217,8 @@ String[] generate(def map, def class_name, def file) {
 
     println(
             "__________________________________________________\n" +
-            "\tGenerating class from " + file.name + "\n" +
-            "=================================================="
+                    "\tGenerating class from " + file.name + "\n" +
+                    "=================================================="
     )
     for(int pass = 0; pass < 3; pass++) {
         boolean ubh = false
@@ -273,7 +273,7 @@ String[] generate(def map, def class_name, def file) {
                         provHierarchy.get(prov).add(provColl)
                         declarations = declarations.concat(
                                 tab + "private " + type + " " + name + " = " +
-                                (type.contains("<") ? "new " + type.split("<.*>")[0] + "<>()" : "null") + ";\n"
+                                        (type.contains("<") ? "new " + type.split("<.*>")[0] + "<>()" : "null") + ";\n"
                         )
                         methods = methods.concat(
                                 "\n\n" + tab + "public " + type + " get" +
@@ -298,12 +298,12 @@ String[] generate(def map, def class_name, def file) {
                             }
                         }
                         if(
-                            type == "Integer" ||
-                            type == "Float" ||
-                            type == "Double" ||
-                            type == "BigInteger" ||
-                            type == "BigDecimal" ||
-                            type == "Long"
+                        type == "Integer" ||
+                                type == "Float" ||
+                                type == "Double" ||
+                                type == "BigInteger" ||
+                                type == "BigDecimal" ||
+                                type == "Long"
                         ) {
                             if(type == "Integer") {
                                 constructor = constructor.concat(
@@ -316,7 +316,10 @@ String[] generate(def map, def class_name, def file) {
                             }
                         } else {
                             constructor = constructor.concat(
-                                    tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : null;\n"
+                                    tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : "
+                            )
+                            constructor = constructor.concat(
+                                    type.contains("<") ? "new " + type.split("<")[0] + "<>();\n" : "null;\n"
                             )
                         }
 
@@ -337,7 +340,7 @@ String[] generate(def map, def class_name, def file) {
                             List<String> provNested = provHash.keySet().asList()
                             methods = methods.concat(
                                     "\n\n" + tab + "public void set" + mname +
-                                    "(" + provFields.get(name).get(0) + ") {\n"
+                                            "(" + provFields.get(name).get(0) + ") {\n"
                             )
                             for(provKey in provNested) {
                                 if(provKey != name) {
@@ -355,13 +358,13 @@ String[] generate(def map, def class_name, def file) {
                             }
                             methods = methods.concat(
                                     tab + tab + "formatSuper();\n" +
-                                    tab + "}"
+                                            tab + "}"
                             )
                         } else {
                             methods = methods.concat(
                                     "\n\n" + tab + "public void set" + mname + "(" + type + " " + name + ") {\n" +
-                                    tab + tab + "this." + name + " = " + name + ";\n" + tab + tab + "formatSuper();\n" +
-                                    tab + "}"
+                                            tab + tab + "this." + name + " = " + name + ";\n" + tab + tab + "formatSuper();\n" +
+                                            tab + "}"
                             )
                         }
 
@@ -388,7 +391,7 @@ String[] generate(def map, def class_name, def file) {
     List<String> provNested = provHash.keySet().asList()
     constructor = constructor.concat(
             "\n\n" + tab + "public " + class_name +
-            "(" + provFields.get("super").get(0) + ") {\n"
+                    "(" + provFields.get("super").get(0) + ") {\n"
     )
     for(provKey in provNested) {
         if(provKey != "super") {
@@ -411,13 +414,13 @@ String[] generate(def map, def class_name, def file) {
     if(!cache) {
         constructor = constructor.concat(
                 "\n\n" + tab + "public " + class_name + "() {\n" +
-                tab + tab + "formatSuper();\n" + tab + "}"
+                        tab + tab + "formatSuper();\n" + tab + "}"
         )
     } else {
         constructor = constructor.concat(
                 "\n\n" + tab + "public " + class_name + "(String " + idName +") {\n" +
-                tab + tab + "this." + idName + " = " + idName + ";\n" +
-                tab + tab + "formatSuper();\n" + tab + "}"
+                        tab + tab + "this." + idName + " = " + idName + ";\n" +
+                        tab + tab + "formatSuper();\n" + tab + "}"
         )
     }
 
@@ -430,7 +433,7 @@ String[] generate(def map, def class_name, def file) {
             if(z == 0) {
                 methods = methods.concat(
                         tab + tab + provKeys.get(i) +
-                        (provKeys.get(i) != "super" ? " = new HashMap<>" : ".clear") + "();\n"
+                                (provKeys.get(i) != "super" ? " = new HashMap<>" : ".clear") + "();\n"
                 )
             }
             methods = methods.concat(
@@ -454,147 +457,147 @@ String[] generate(def map, def class_name, def file) {
     if(cache) {
         setters = setters.concat(
                 "\n    public static void set" + class_name + "FromCache" +
-                "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
-                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear, null);\n" +
-                "        if(response != null) {\n" +
-                "            echo.addOnSuccessListener(task -> {\n" +
-                "                " + class_name + " result = new " + class_name + "(task);\n" +
-                "                response.onSuccess(result);\n" +
-                "            });\n" +
-                "            echo.addOnFailureListener(response::onFailure);\n" +
-                "        }\n" +
-                "    }\n\n" +
+                        "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
+                        "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear, null);\n" +
+                        "        if(response != null) {\n" +
+                        "            echo.addOnSuccessListener(task -> {\n" +
+                        "                " + class_name + " result = new " + class_name + "(task);\n" +
+                        "                response.onSuccess(result);\n" +
+                        "            });\n" +
+                        "            echo.addOnFailureListener(response::onFailure);\n" +
+                        "        }\n" +
+                        "    }\n\n" +
                 \
                 "    public static void set" + class_name + "FromCache" +
-                "(@NonNull Activity cur_act, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
-                "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear, null);\n" +
-                "        if(response != null) {\n" +
-                "            echo.addOnSuccessListener(task -> {\n" +
-                "                " + class_name + " result = new " + class_name + "(task);\n" +
-                "                response.onSuccess(result);\n" +
-                "            });\n" +
-                "            echo.addOnFailureListener(response::onFailure);\n" +
-                "        }\n" +
-                "    }\n"
+                        "(@NonNull Activity cur_act, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
+                        "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear, null);\n" +
+                        "        if(response != null) {\n" +
+                        "            echo.addOnSuccessListener(task -> {\n" +
+                        "                " + class_name + " result = new " + class_name + "(task);\n" +
+                        "                response.onSuccess(result);\n" +
+                        "            });\n" +
+                        "            echo.addOnFailureListener(response::onFailure);\n" +
+                        "        }\n" +
+                        "    }\n"
         )
         getters = getters.concat(
                 "\n    public static void sync" +  class_name  + "Cache(@NonNull Activity cur_act) {\n" +
-                "        getDoc(cur_act, " + coll_name + ", Active" +  class_name  + "." + idName + ")\n" +
-                "                .addOnSuccessListener(task -> {\n" +
-                "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                "                    Data.setActive" +  class_name  + "(cur_act, result);\n" +
-                "                })\n" +
-                "                .addOnFailureListener(e -> Toast.makeText(\n" +
-                "                        cur_act,\n" +
-                "                        e.getMessage(),\n" +
-                "                        Toast.LENGTH_SHORT\n" +
-                "                ).show());\n" +
-                "    }\n"
+                        "        getDoc(cur_act, " + coll_name + ", Active" +  class_name  + "." + idName + ")\n" +
+                        "                .addOnSuccessListener(task -> {\n" +
+                        "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
+                        "                    Data.setActive" +  class_name  + "(cur_act, result);\n" +
+                        "                })\n" +
+                        "                .addOnFailureListener(e -> Toast.makeText(\n" +
+                        "                        cur_act,\n" +
+                        "                        e.getMessage(),\n" +
+                        "                        Toast.LENGTH_SHORT\n" +
+                        "                ).show());\n" +
+                        "    }\n"
         )
     }
     setters = setters.concat(
             "\n    public static void set" + class_name + "(@NonNull Activity cur_act, @NonNull " + class_name + " " + obj_name + ", boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
-            "        if(response == null && " + obj_name + ".get" + idMethod + "() == null)\n" +
-            "            return;\n" +
-            "        else if(response != null && " + obj_name + ".get" + idMethod + "() == null) {\n" +
-            "            response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "));\n" +
-            "            return;\n" +
-            "        }\n" +
-            "        Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + ".get" + idMethod + "(), clear, " + obj_name + ");\n" +
-            "        if(response != null) {\n" +
-            "            echo.addOnSuccessListener(task -> {\n" +
-            "                " + class_name + " result = new " + class_name + "(task);\n" +
-            "                response.onSuccess(result);\n" +
-            "            });\n" +
-            "            echo.addOnFailureListener(response::onFailure);\n" +
-            "        }\n" +
-            "    }\n\n" +
+                    "        if(response == null && " + obj_name + ".get" + idMethod + "() == null)\n" +
+                    "            return;\n" +
+                    "        else if(response != null && " + obj_name + ".get" + idMethod + "() == null) {\n" +
+                    "            response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "));\n" +
+                    "            return;\n" +
+                    "        }\n" +
+                    "        Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + ".get" + idMethod + "(), clear, " + obj_name + ");\n" +
+                    "        if(response != null) {\n" +
+                    "            echo.addOnSuccessListener(task -> {\n" +
+                    "                " + class_name + " result = new " + class_name + "(task);\n" +
+                    "                response.onSuccess(result);\n" +
+                    "            });\n" +
+                    "            echo.addOnFailureListener(response::onFailure);\n" +
+                    "        }\n" +
+                    "    }\n\n" +
             \
             "    public static void set" + class_name + "s(@NonNull Activity cur_act, @NonNull " + class_name + "[] " + obj_name + ", boolean clear, @Nullable Callback<List<" + class_name + ">> response) {\n" +
-            "        List<" + class_name + "> responses = new ArrayList<>();\n" +
-            "        for(int i = 0; i < " + obj_name + ".length; i++) {\n" +
-            "            if(response == null && " + obj_name + "[i].get" + idMethod + "() == null)\n" +
-            "                continue;\n" +
-            "            else if(response != null && " + obj_name + "[i].get" + idMethod + "() == null) {\n" +
-            "                response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "[i]));\n" +
-            "                continue;\n" +
-            "            }\n" +
-            "            Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + "[i].get" + idMethod + "(), clear, " + obj_name + "[i]);\n" +
-            "            if(response != null) {\n" +
-            "                echo.addOnFailureListener(response::onFailure);\n" +
-            "                if(i == " + obj_name + ".length - 1) {\n" +
-            "                    echo.addOnSuccessListener(task -> {\n" +
-            "                        " + class_name + " result = new " + class_name + "(task);\n" +
-            "                        responses.add(result);\n" +
-            "                        response.onSuccess(responses);\n" +
-            "                    });\n" +
-            "                } else {\n" +
-            "                    echo.addOnSuccessListener(task -> {\n" +
-            "                        " + class_name + " result = new " + class_name + "(task);\n" +
-            "                        responses.add(result);\n" +
-            "                    });\n" +
-            "                }\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n"
+                    "        List<" + class_name + "> responses = new ArrayList<>();\n" +
+                    "        for(int i = 0; i < " + obj_name + ".length; i++) {\n" +
+                    "            if(response == null && " + obj_name + "[i].get" + idMethod + "() == null)\n" +
+                    "                continue;\n" +
+                    "            else if(response != null && " + obj_name + "[i].get" + idMethod + "() == null) {\n" +
+                    "                response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "[i]));\n" +
+                    "                continue;\n" +
+                    "            }\n" +
+                    "            Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + "[i].get" + idMethod + "(), clear, " + obj_name + "[i]);\n" +
+                    "            if(response != null) {\n" +
+                    "                echo.addOnFailureListener(response::onFailure);\n" +
+                    "                if(i == " + obj_name + ".length - 1) {\n" +
+                    "                    echo.addOnSuccessListener(task -> {\n" +
+                    "                        " + class_name + " result = new " + class_name + "(task);\n" +
+                    "                        responses.add(result);\n" +
+                    "                        response.onSuccess(responses);\n" +
+                    "                    });\n" +
+                    "                } else {\n" +
+                    "                    echo.addOnSuccessListener(task -> {\n" +
+                    "                        " + class_name + " result = new " + class_name + "(task);\n" +
+                    "                        responses.add(result);\n" +
+                    "                    });\n" +
+                    "                }\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "    }\n"
     )
     getters = getters.concat(
             "\n    public static void get" +  class_name  + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<" +  class_name  + "> response) {\n" +
-            "        getDoc(cur_act," +  coll_name  + ", docID)\n" +
-            "                .addOnSuccessListener(task -> {\n" +
-            "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-            "                    response.onSuccess(result);\n" +
-            "                })\n" +
-            "                .addOnFailureListener(response::onFailure);\n" +
-            "    }\n\n" +
+                    "        getDoc(cur_act," +  coll_name  + ", docID)\n" +
+                    "                .addOnSuccessListener(task -> {\n" +
+                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
+                    "                    response.onSuccess(result);\n" +
+                    "                })\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
+                    "    }\n\n" +
             \
             "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
-            "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-            "        if(docID.size() == 0)\n" +
-            "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
-            "        for(int i = 0; i < docID.size(); i++) {\n" +
-            "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID.get(i));\n" +
-            "            echo.addOnFailureListener(response::onFailure);\n" +
-            "            if(i == docID.size() - 1) {\n" +
-            "                echo.addOnSuccessListener(task -> {\n" +
-            "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-            "                    list.add(result);\n" +
-            "                    response.onSuccess(list);\n" +
-            "                });\n" +
-            "            } else {\n" +
-            "                echo.addOnSuccessListener(task -> {\n" +
-            "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-            "                    list.add(result);\n" +
-            "                });\n" +
-            "            }\n" +
-            "        }\n" +
-            "    }\n\n" +
+                    "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
+                    "        if(docID.size() == 0)\n" +
+                    "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
+                    "        for(int i = 0; i < docID.size(); i++) {\n" +
+                    "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID.get(i));\n" +
+                    "            echo.addOnFailureListener(response::onFailure);\n" +
+                    "            if(i == docID.size() - 1) {\n" +
+                    "                echo.addOnSuccessListener(task -> {\n" +
+                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
+                    "                    list.add(result);\n" +
+                    "                    response.onSuccess(list);\n" +
+                    "                });\n" +
+                    "            } else {\n" +
+                    "                echo.addOnSuccessListener(task -> {\n" +
+                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
+                    "                    list.add(result);\n" +
+                    "                });\n" +
+                    "            }\n" +
+                    "        }\n" +
+                    "    }\n\n" +
             \
             "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
-            "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-            "        getColl(cur_act," +  coll_name  + ", filter, Math.max(pageNo, 0))\n" +
-            "                .addOnSuccessListener(task -> {\n" +
-            "                    for (HashMap<String, Object> hash : task) {\n" +
-            "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
-            "                        list.add(result);\n" +
-            "                    }\n" +
-            "                    response.onSuccess(list);\n" +
-            "                })\n" +
-            "                .addOnFailureListener(response::onFailure);\n" +
-            "    }\n\n" +
+                    "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
+                    "        getColl(cur_act," +  coll_name  + ", filter, Math.max(pageNo, 0))\n" +
+                    "                .addOnSuccessListener(task -> {\n" +
+                    "                    for (HashMap<String, Object> hash : task) {\n" +
+                    "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
+                    "                        list.add(result);\n" +
+                    "                    }\n" +
+                    "                    response.onSuccess(list);\n" +
+                    "                })\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
+                    "    }\n\n" +
             \
             "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
-            "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-            "        getColl(cur_act," +  coll_name  + ", null, (char) (Math.max(pageNo, 0)))\n" +
-            "                .addOnSuccessListener(task -> {\n" +
-            "                    for (HashMap<String, Object> hash : task) {\n" +
-            "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
-            "                        list.add(result);\n" +
-            "                    }\n" +
-            "                    response.onSuccess(list);\n" +
-            "                })\n" +
-            "                .addOnFailureListener(response::onFailure);\n" +
-            "    }\n"
+                    "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
+                    "        getColl(cur_act," +  coll_name  + ", null, (char) (Math.max(pageNo, 0)))\n" +
+                    "                .addOnSuccessListener(task -> {\n" +
+                    "                    for (HashMap<String, Object> hash : task) {\n" +
+                    "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
+                    "                        list.add(result);\n" +
+                    "                    }\n" +
+                    "                    response.onSuccess(list);\n" +
+                    "                })\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
+                    "    }\n"
     )
     response[1] = setters + getters
 
@@ -607,7 +610,7 @@ String[] generate(def map, def class_name, def file) {
     packag = "package com.example.universitymarket.globals.actives;\n"
     imports = imports.concat(
             "import android.app.Application;\n" +
-            "import com.example.universitymarket.objects." + class_name + ";\n"
+                    "import com.example.universitymarket.objects." + class_name + ";\n"
     )
     declarations = declarations.replace("private", "public static")
     body = declarations
@@ -629,7 +632,7 @@ String[] generate(def map, def class_name, def file) {
         String type = buff[0], name = buff[1]
         details = details.concat(
                 "        Active" + class_name + "." + name + " = " + obj_name +
-                ".get" + methodNameMap.get(name) + "();\n"
+                        ".get" + methodNameMap.get(name) + "();\n"
         )
     }
     provOrdered = ""
@@ -640,7 +643,7 @@ String[] generate(def map, def class_name, def file) {
     }
     details = details.concat(
             "\n" + tab + tab + "Log.d(\"setActive" + class_name + "\", \"Success = \" + " +
-            "setCache(cur_act, \"Active" + class_name + "\", " + obj_name + ", false));\n"
+                    "setCache(cur_act, \"Active" + class_name + "\", " + obj_name + ", false));\n"
     )
     String method = \
             "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +

@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.example.universitymarket.fragments.ChatFragment;
 import com.example.universitymarket.fragments.PopupFragment;
+import com.example.universitymarket.fragments.SettingsFragment;
 import com.example.universitymarket.fragments.TabFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
@@ -246,7 +247,8 @@ public class DashboardActivity extends AppCompatActivity {
                         this,
                         (requestKey, result) -> {
                             String newSubtitle = result.getString("newSubtitle");
-                            String callingFragment = result.getString("callingFragment");
+                            String[] callingFragmentExt = result.getString("callingFragment").split("\\.");
+                            String callingFragment = callingFragmentExt[callingFragmentExt.length - 1];
                             if(fragMap.entrySet().stream().filter(string -> string.getValue().get(0).equals(callingFragment)).map(Map.Entry::getKey).findFirst().orElse(currentView).equals(currentView))
                                 toolbar.setSubtitle(newSubtitle);
                             else
@@ -284,7 +286,7 @@ public class DashboardActivity extends AppCompatActivity {
         search = menu.findItem(R.id.dash_toolbar_search);
         settings = menu.findItem(R.id.dash_toolbar_settings);
         settings.setOnMenuItemClickListener((menuItem) -> {
-            createPopup("Settings", "SettingsFragment", null);
+            createPopup("Settings", SettingsFragment.class.getName(), null);
             return false;
         });
 
@@ -334,7 +336,7 @@ public class DashboardActivity extends AppCompatActivity {
     private void createPopup(String title, String fragName, String[] args) {
         Fragment popupDisplay;
         try {
-            Class<? extends Fragment> clazz = (Class<? extends Fragment>) Class.forName("com.example.universitymarket.fragments." + fragName);
+            Class<? extends Fragment> clazz = (Class<? extends Fragment>) Class.forName(fragName);
             Class<?>[] types = new Class[]{ String[].class, FragmentManager.class };
             Constructor<? extends Fragment> cons = clazz.getConstructor(types);
             popupDisplay = cons.newInstance(args, fm);
@@ -363,12 +365,12 @@ public class DashboardActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<PickVisualMediaRequest> multipleGalleryLauncher =
             registerForActivityResult(multipleImagePicker, uris -> {
-        if(uris.isEmpty()) {
-            urisRetrieval.setException(new Exception("No image was selected"));
-        } else {
-            urisRetrieval.setResult(uris);
-        }
-    });
+                if(uris.isEmpty()) {
+                    urisRetrieval.setException(new Exception("No image was selected"));
+                } else {
+                    urisRetrieval.setResult(uris);
+                }
+            });
 
     private final ActivityResultLauncher<PickVisualMediaRequest> singleGalleryLauncher =
             registerForActivityResult(singleImagePicker, uri -> {
