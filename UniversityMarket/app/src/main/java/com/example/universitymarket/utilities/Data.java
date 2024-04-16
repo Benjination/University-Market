@@ -315,7 +315,7 @@ public abstract class Data {
     public static HashMap<String, Object> jsonToPOJO(@NonNull String json) {
         HashMap<String, Object> result = new HashMap<>();
         try {
-            result = (HashMap<String, Object>) new ObjectMapper().readValue(json.toString(), HashMap.class);
+            result = (HashMap<String, Object>) new ObjectMapper().readValue(json, HashMap.class);
         } catch (Exception e) {
             Log.e("jsonToPOJO", e.getMessage());
         }
@@ -360,7 +360,9 @@ public abstract class Data {
         ActiveUser.id = userOBJ.getId();
         ActiveUser.interactions = userOBJ.getInteractions();
         ActiveUser.date_created = userOBJ.getDateCreated();
+        ActiveUser.rating = userOBJ.getRating();
         ActiveUser.last_name = userOBJ.getLastName();
+        ActiveUser.description = userOBJ.getDescription();
         ActiveUser.first_name = userOBJ.getFirstName();
         ActiveUser.email = userOBJ.getEmail();
         ActiveUser.chat_ids = userOBJ.getChatIds();
@@ -372,6 +374,6 @@ public abstract class Data {
     }
 
     public static User activeUserToPOJO() {
-        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.chat_ids, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
+        return new User(ActiveUser.date_created, ActiveUser.rating, ActiveUser.last_name, ActiveUser.description, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.chat_ids, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
     }
 }

@@ -99,8 +99,6 @@ public class ChatFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getUsers", error.getMessage());
-                        unavailable.setVisibility(View.VISIBLE);
-                        load.setResult("getUsers");
                     }
                 });
 
@@ -113,8 +111,6 @@ public class ChatFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getMessages", error.getMessage());
-                        unavailable.setVisibility(View.VISIBLE);
-                        load.setResult("getMessages");
                     }
                 });
 
@@ -124,6 +120,7 @@ public class ChatFragment extends Fragment {
                     load.setResult("getMessages and getUsers");
                     recycler.setAdapter(adapter);
                     recycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+                    callback();
                 });
                 retrieve.start();
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -145,6 +142,16 @@ public class ChatFragment extends Fragment {
                 load.setResult("getTransactions");
             }
         });
+    }
+
+    private void callback() {
+        int numberUnreadConversations = (int) previews.stream().filter(message -> message.getReadEmails().contains(ActiveUser.email)).count();
+        if(numberUnreadConversations == 0)
+            dashMessage.putString("newSubtitle", "You're all caught up!");
+        else
+            dashMessage.putString("newSubtitle", "You have " + numberUnreadConversations + " unread conversations");
+        dashMessage.putString("callingFragment", this.getClass().getName());
+        fm.setFragmentResult("updateSubtitle", dashMessage);
     }
 
     private void loadPage(Task<String> task) {

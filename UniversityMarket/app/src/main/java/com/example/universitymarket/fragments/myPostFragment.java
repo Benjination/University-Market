@@ -52,7 +52,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     public void onItemClicked(Post post) {
         Bundle popupArgs = new Bundle();
         popupArgs.putString("popupTitle", post.getItemTitle());
-        popupArgs.putString("popupFragment", "viewPostFragment");
+        popupArgs.putString("popupFragment", viewPostFragment.class.getName());
         popupArgs.putStringArray("popupFragArgs", new String[]{ post.getId() });
         fm.setFragmentResult("createPopup", popupArgs);
     }

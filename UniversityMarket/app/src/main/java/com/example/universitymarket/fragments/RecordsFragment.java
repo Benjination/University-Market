@@ -88,8 +88,6 @@ public class RecordsFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getPosts", error.getMessage());
-                        unavailable.setVisibility(View.VISIBLE);
-                        load.setResult("getPosts");
                     }
                 });
 
@@ -102,8 +100,6 @@ public class RecordsFragment extends Fragment {
                     @Override
                     public void onFailure(Exception error) {
                         Log.e("getUsers", error.getMessage());
-                        unavailable.setVisibility(View.VISIBLE);
-                        load.setResult("getUsers");
                     }
                 });
 

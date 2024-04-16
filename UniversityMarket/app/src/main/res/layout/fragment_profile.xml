@@ -23,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/profile_rating_label"
+        android:isIndicator="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="?attr/listPreferredItemPaddingStart"
@@ -49,6 +50,7 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
         android:backgroundTint="?colorSecondary"
+        android:enabled="false"
         android:text="@string/profile_save_button_txt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/profile_rating_bar" />

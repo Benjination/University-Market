@@ -129,7 +129,7 @@ public class DashboardActivity extends AppCompatActivity {
                         getResources().getString(R.string.dash_toolbar_watch_txt),
                         getResources().getString(R.string.dash_toolbar_analyze_txt)
                 )),
-                getResources().getString(R.string.dash_toolbar_messages_txt),
+                getResources().getString(R.string.dash_toolbar_chat_txt),
                 ActiveUser.first_name + " " + ActiveUser.last_name
         ));
 
@@ -137,8 +137,8 @@ public class DashboardActivity extends AppCompatActivity {
                 null,
                 null,
                 null,
-                null,
-                ActiveUser.email
+                getResources().getString(R.string.load_txt),
+                getResources().getString(R.string.load_txt)
         ));
 
         // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar List<PopupFragment>
@@ -239,6 +239,19 @@ public class DashboardActivity extends AppCompatActivity {
                         this,
                         (requestKey, result) ->
                                 createPopup(result.getString("popupTitle"), result.getString("popupFragment"), result.getStringArray("popupFragArgs"))
+                );
+        fm
+                .setFragmentResultListener(
+                        "updateSubtitle",
+                        this,
+                        (requestKey, result) -> {
+                            String newSubtitle = result.getString("newSubtitle");
+                            String callingFragment = result.getString("callingFragment");
+                            if(fragMap.entrySet().stream().filter(string -> string.getValue().get(0).equals(callingFragment)).map(Map.Entry::getKey).findFirst().orElse(currentView).equals(currentView))
+                                toolbar.setSubtitle(newSubtitle);
+                            else
+                                Log.d("updateSubtitle", "Call ignored, current view changed");
+                        }
                 );
     }
 
