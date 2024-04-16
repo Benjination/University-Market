@@ -62,8 +62,8 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             super(itemView);
             title = itemView.findViewById(R.id.record_title_text);
             price = itemView.findViewById(R.id.record_price_text);
-            date = itemView.findViewById(R.id.record_seller_text);
-            seller = itemView.findViewById(R.id.record_date_text);
+            date = itemView.findViewById(R.id.record_date_text);
+            seller = itemView.findViewById(R.id.record_seller_text);
         }
     }
 }

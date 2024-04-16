@@ -10,8 +10,6 @@
     <string name="tab_analyze_txt">Analyze</string>
     <string name="tab_portfolio_txt">Portfolio</string>
 
-    <string name="chat_unavailable_txt">You have not yet started a conversation</string>
-
     <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
     <string name="dash_watch_button_txt">Watch</string>

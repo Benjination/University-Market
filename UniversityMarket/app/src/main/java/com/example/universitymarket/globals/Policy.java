@@ -41,9 +41,7 @@ public interface Policy {
     String[] json_filenames = { 
             "transaction_skeleton.json",
             "user_skeleton_cached.json",
-            "chat_skeleton.json",
-            "post_skeleton.json",
-            "message_skeleton.json"
+            "post_skeleton.json"
     };
 
 }

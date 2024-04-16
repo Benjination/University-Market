@@ -62,6 +62,7 @@
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:layout_marginTop="?attr/listPreferredItemPaddingStart"
         android:layout_marginEnd="?listPreferredItemPaddingEnd"
+        android:layout_marginBottom="?attr/actionBarSize"
         android:ems="10"
         android:gravity="start|top"
         android:hint="@string/profile_description_hint"
@@ -73,10 +74,9 @@
 
     <TextView
         android:id="@+id/profile_created_text"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="?attr/listPreferredItemPaddingStart"
-        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
