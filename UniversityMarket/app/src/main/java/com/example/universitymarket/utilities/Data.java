@@ -360,7 +360,6 @@ public abstract class Data {
         ActiveUser.id = userOBJ.getId();
         ActiveUser.interactions = userOBJ.getInteractions();
         ActiveUser.date_created = userOBJ.getDateCreated();
-        ActiveUser.rating = userOBJ.getRating();
         ActiveUser.last_name = userOBJ.getLastName();
         ActiveUser.description = userOBJ.getDescription();
         ActiveUser.first_name = userOBJ.getFirstName();
@@ -373,6 +372,6 @@ public abstract class Data {
     }
 
     public static User activeUserToPOJO() {
-        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
+        return new User(ActiveUser.date_created, ActiveUser.last_name, ActiveUser.description, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
     }
 }

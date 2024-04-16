@@ -122,6 +122,8 @@ public class viewPostFragment extends Fragment {
                 // Load the image
                 if (!result.getImageUrls().isEmpty()) {
                     Picasso.get().load(result.getImageUrls().get(0)).into((ImageView) postImageSwitcher.getCurrentView());
+                } else {
+                    Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb").into((ImageView) postImageSwitcher.getCurrentView());
                 }
             }
 

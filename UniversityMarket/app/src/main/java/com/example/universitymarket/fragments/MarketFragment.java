@@ -88,7 +88,7 @@ public class MarketFragment extends Fragment {
 
                 Bundle popupArgs = new Bundle();
                 popupArgs.putString("popupTitle", selectedPost.getItemTitle());
-                popupArgs.putString("popupFragment", viewPostFragment.class.getName());
+                popupArgs.putString("popupFragment", "viewPostFragment");
                 popupArgs.putStringArray("popupFragArgs", new String[]{ selectedPost.getId() });
                 getParentFragmentManager().setFragmentResult("createPopup", popupArgs);
             }
@@ -107,7 +107,7 @@ public class MarketFragment extends Fragment {
                 //check if posts are in postsArrayList
                 for(Post p : postsArrayList){
                     Log.d("current post:" , p.getItemTitle());
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().get(0)));
+                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().size() > 0 ? p.getImageUrls().get(0) : "https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb"));
                     Log.d("added " + p.getItemTitle() , "success");
                 }
                 PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
