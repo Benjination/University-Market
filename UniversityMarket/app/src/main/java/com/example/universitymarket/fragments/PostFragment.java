@@ -141,7 +141,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 }
                             }
                             if (!load.getTask().isComplete())
-                                load.setResult("retrieveImages");
+                                load.setResult("image");
                         }
                 );
         fm
@@ -163,7 +163,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 imagelabel.setVisibility(View.INVISIBLE);
                             }
                             if (!load.getTask().isComplete())
-                                load.setResult("retrieveImages");
+                                load.setResult("image");
                         }
                 );
     }
@@ -172,7 +172,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         for(TextView v : views) {
             String base = v.getHint() != null ? v.getHint().toString() : v.getText().toString();
             Spanned hint = Html.fromHtml(
-                   "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
+                    "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
                     Html.FROM_HTML_MODE_LEGACY
             );
             requiredText.put(v.getId(), hint);
@@ -194,18 +194,24 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         dashMessage.putBoolean("isLoading", true);
         fm.setFragmentResult("setLoading", dashMessage);
 
-        task.addOnCompleteListener(res -> {
-            String val = res.getResult();
-            if(val.equals("post"))
-                resetPage();
-            dashMessage.putBoolean("isLoading", false);
-            fm.setFragmentResult("setLoading", dashMessage);
-        });
+        task
+                .addOnSuccessListener(res -> {
+                    if (res.equals("post"))
+                        resetPage();
+                    dashMessage.putBoolean("isLoading", false);
+                    fm.setFragmentResult("setLoading", dashMessage);
+                })
+                .addOnFailureListener(error -> {
+                    Log.e("loadPage", error.getMessage());
+                    dashMessage.putBoolean("isLoading", false);
+                    fm.setFragmentResult("setLoading", dashMessage);
+                });
     }
 
     private void resetPage() {
         //is called after image-less post object was successfully
         //created and every image was able to be uploaded
+        post.setImageUrls(imageURLs);
         ActiveUser.post_ids.add(post.getId());
         Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
             @Override
@@ -220,6 +226,25 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 "Posted to marketplace",
                                 Toast.LENGTH_LONG
                         ).show();
+
+                        title.getText().clear();
+                        price.getText().clear();
+                        description.getText().clear();
+                        title.clearFocus();
+                        price.clearFocus();
+                        description.clearFocus();
+                        imageURLsToBeUploaded.clear();
+                        imageURLs.clear();
+                        ((RadioButton) root.findViewById(genres.getCheckedRadioButtonId())).setChecked(false);
+                        carousel.removeAllViews();
+                        indicatorContainer.removeAllViews();
+                        addmore.setVisibility(View.INVISIBLE);
+                        removeImage.setVisibility(View.INVISIBLE);
+                        imageupload.setVisibility(View.VISIBLE);
+                        imagelabel.setVisibility(View.VISIBLE);
+
+                        setRequiredText(title, price, description);
+                        Data.clearImageCache(requireActivity());
                     }
 
                     @Override
@@ -243,33 +268,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 ).show();
             }
         });
-
-        title.getText().clear();
-        price.getText().clear();
-        description.getText().clear();
-        title.clearFocus();
-        price.clearFocus();
-        description.clearFocus();
-        imageURLsToBeUploaded.clear();
-        imageURLs.clear();
-        ((RadioButton) root.findViewById(genres.getCheckedRadioButtonId())).setChecked(false);
-        ArrayList<View> remove = new ArrayList<>();
-        for(int i = 0; i < imageURLsToBeUploaded.size(); i++) {
-            View v = carousel.getChildAt(i);
-            if(!(v instanceof ImageButton))
-                remove.add(v);
-        }
-        for(View v : remove) {
-            carousel.removeView(v);
-            indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
-        }
-        addmore.setVisibility(View.INVISIBLE);
-        removeImage.setVisibility(View.INVISIBLE);
-        imageupload.setVisibility(View.VISIBLE);
-        imagelabel.setVisibility(View.VISIBLE);
-
-        setRequiredText(title, price, description);
-        Data.clearImageCache(requireActivity());
     }
 
     private void retrievePhoto() {
@@ -358,9 +356,6 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 return;
             }
 
-            Log.e("price", price.getText().toString().length() + "");
-            Log.e("title", title.getText().toString().length() + "");
-            Log.e("desc", description.getText().toString().length() + "");
             post.setId(Data.generateID("pst"));
             post.setAbout(
                     1,

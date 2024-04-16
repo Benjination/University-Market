@@ -316,7 +316,10 @@ String[] generate(def map, def class_name, def file) {
                             }
                         } else {
                             constructor = constructor.concat(
-                                    tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : null;\n"
+                                    tab + tab + name + " = " + prov + "Keys.contains(\"" + name + "\") ? (" + type + ") " + prov + ".get(\"" + name + "\") : "
+                            )
+                            constructor = constructor.concat(
+                                    type.contains("<") ? "new " + type.split("<")[0] + "<>();\n" : "null;\n"
                             )
                         }
 
