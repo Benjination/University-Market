@@ -132,19 +132,23 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/post_imageupload_button" />
 
-            <EditText
-                android:id="@+id/post_title_field"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autofillHints="@string/post_title_field_hint"
-                android:ems="10"
-                android:hint="@string/post_title_field_hint"
-                android:inputType="textPersonName"
-                android:minHeight="48dp"
-                app:layout_constraintStart_toStartOf="parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/post_title_layout"
+                android:layout_width="200dp"
+                android:layout_height="?attr/listPreferredItemHeightSmall"
+                app:boxBackgroundColor="?colorTertiaryContainer"
+                app:boxBackgroundMode="filled"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/post_image_addmore_button"
-                />
+                android:hint="@string/post_title_field_hint" >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/post_title_field"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <Space
                 android:id="@+id/post_space_inbetween"
@@ -156,50 +160,65 @@
 
             <TextView
                 android:id="@+id/post_genre_label"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                android:background="?colorTertiaryContainer"
+                android:foregroundTint="@color/mtrl_filled_background_color"
+                android:foregroundTintMode="screen"
+                android:paddingStart="?attr/listPreferredItemPaddingStart"
+                android:paddingTop="?android:expandableListPreferredChildIndicatorLeft"
+                android:paddingEnd="?attr/listPreferredItemPaddingEnd"
+                android:requiresFadingEdge="vertical"
                 android:text="@string/post_genre_label_txt"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/post_title_field"
-                android:layout_marginTop="?android:expandableListPreferredChildPaddingLeft"
-                android:layout_marginStart="3dp"
-                />
+                app:layout_constraintTop_toBottomOf="@id/post_title_layout" />
 
             <RadioGroup
                 android:id="@+id/post_genre_group"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/post_genre_label"
+                android:background="?colorTertiaryContainer"
                 app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
-                />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_genre_label" />
 
-            <EditText
-                android:id="@+id/post_price_field"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/post_price_layout"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/post_price_field_hint"
-                android:inputType="numberDecimal"
-                android:minHeight="48dp"
+                android:layout_height="?attr/listPreferredItemHeightSmall"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                app:boxBackgroundColor="?colorTertiaryContainer"
+                app:boxBackgroundMode="filled"
+                app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/post_genre_group"
-                app:layout_constraintEnd_toStartOf="@id/post_space_inbetween"
-                android:layout_marginTop="?attr/listPreferredItemPaddingStart"/>
+                android:hint="@string/post_price_field_hint" >
 
-            <EditText
-                android:id="@+id/post_description_field"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/post_price_field"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/post_description_layout"
                 android:layout_width="0dp"
                 android:layout_height="200dp"
-                android:ems="10"
-                android:hint="@string/post_description_field_hint"
-                android:gravity="start|top"
-                android:inputType="textLongMessage|textMultiLine"
-                app:layout_constraintTop_toBottomOf="@id/post_title_field"
+                android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+                app:boxBackgroundColor="?colorTertiaryContainer"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/post_space_inbetween"
-                android:layout_marginTop="?attr/listPreferredItemPaddingStart"/>
+                app:layout_constraintTop_toBottomOf="@id/post_title_layout"
+                android:hint="@string/post_description_field_hint" >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/post_description_field"
+                    android:layout_width="match_parent"
+                    android:gravity="start|top"
+                    android:layout_height="match_parent" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

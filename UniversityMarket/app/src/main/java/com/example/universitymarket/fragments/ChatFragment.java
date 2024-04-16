@@ -143,6 +143,11 @@ public class ChatFragment extends Fragment {
                 dashMessage.putString("newSubtitle", "Unavailable");
                 dashMessage.putString("callingFragment", this.getClass().getName());
                 fm.setFragmentResult("updateSubtitle", dashMessage);
+
+                dashMessage.putString("popupTitle", "Johnny Hamcheck");
+                dashMessage.putString("popupFragment", MessageFragment.class.getName());
+                dashMessage.putStringArray("popupFragArgs", null);
+                fm.setFragmentResult("createPopup", dashMessage);
             }
         });
     }

@@ -56,8 +56,8 @@ public class TabFragment extends Fragment {
         requireActivity().getTheme().resolveAttribute(R.attr.colorPrimary, colorPrimary, true);
         requireActivity().getTheme().resolveAttribute(R.attr.colorOnTertiary, colorOnTertiary, true);
 
-        View left = inflater.inflate(R.layout.layout_homepage_tab, container, false);
-        View right = inflater.inflate(R.layout.layout_homepage_tab, container, false);
+        View left = inflater.inflate(R.layout.layout_tab_item, container, false);
+        View right = inflater.inflate(R.layout.layout_tab_item, container, false);
 
         if(context.equals("Market")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.cart_icon);

@@ -13,6 +13,7 @@
         <!-- Tertiary brand color. -->
         <item name="colorTertiary">@color/white</item>
         <item name="colorOnTertiary">#7B7B7B</item>
+        <item name="colorTertiaryContainer">#E0E0E0</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?colorPrimaryDark</item>
         <!-- Customize your theme here. -->

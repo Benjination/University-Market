@@ -13,11 +13,13 @@ import com.example.universitymarket.R;
 
 public class MessageFragment extends Fragment {
 
+    private final String[] args;
     private LayoutInflater inflater;
     private ViewGroup container;
     private final FragmentManager fm;
 
-    public MessageFragment(FragmentManager fm) {
+    public MessageFragment(String[] args, FragmentManager fm) {
+        this.args = args;
         this.fm = fm;
     }
 
@@ -31,6 +33,6 @@ public class MessageFragment extends Fragment {
                              Bundle savedInstanceState) {
         this.inflater = inflater;
         this.container = container;
-        return inflater.inflate(R.layout.fragment_filter, container, false);
+        return inflater.inflate(R.layout.fragment_message, container, false);
     }
 }

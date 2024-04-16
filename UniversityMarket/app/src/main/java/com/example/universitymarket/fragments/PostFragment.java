@@ -34,9 +34,12 @@ import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 public class PostFragment extends Fragment implements View.OnClickListener {
@@ -48,6 +51,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private EditText title, price, description;
     private RadioGroup genres;
     private TextView genrelabel, imagelabel;
+    private TextInputLayout titleLayout, priceLayout, descriptionLayout;
     private TaskCompletionSource<String> load;
     private Thread uploadImages;
     private FragmentManager fm;
@@ -92,8 +96,11 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         genres = v.findViewById(R.id.post_genre_group);
         genrelabel = v.findViewById(R.id.post_genre_label);
         imagelabel = v.findViewById(R.id.post_image_label);
+        titleLayout = v.findViewById(R.id.post_title_layout);
+        priceLayout = v.findViewById(R.id.post_price_layout);
+        descriptionLayout = v.findViewById(R.id.post_description_layout);
 
-        requiredFields(title, price, description, genrelabel, imagelabel);
+        requiredFields(titleLayout, priceLayout, descriptionLayout, genrelabel, imagelabel);
         imagepager.setAdapter(new CarouselAdapter());
         imagepager.setUserInputEnabled(true);
 
@@ -168,9 +175,15 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 );
     }
 
-    private void requiredFields(TextView... views) {
-        for(TextView v : views) {
-            String base = v.getHint() != null ? v.getHint().toString() : v.getText().toString();
+    private void requiredFields(View... views) {
+        for(View v : views) {
+            String base;
+            if(v.getClass() == TextInputLayout.class) {
+                base = ((TextInputLayout) v).getHint() != null ? ((TextInputLayout) v).getHint().toString() : Objects.requireNonNull(((TextInputLayout) v).getEditText()).getText().toString();
+            } else {
+                base = ((TextView) v).getHint() != null ? ((TextView) v).getHint().toString() : ((TextView) v).getText().toString();
+            }
+
             Spanned hint = Html.fromHtml(
                     "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
                     Html.FROM_HTML_MODE_LEGACY
@@ -180,13 +193,20 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         setRequiredText(views);
     }
 
-    private void setRequiredText(TextView... views) {
+    private void setRequiredText(View... views) {
         imagelabel.setVisibility(View.VISIBLE);
-        for(TextView v : views) {
-            if(v.getHint() != null)
-                v.setHint(requiredText.get(v.getId()));
-            else
-                v.setText(requiredText.get(v.getId()));
+        for(View v : views) {
+            if(v.getClass() == TextInputLayout.class) {
+                if (((TextInputLayout) v).getHint() != null)
+                    ((TextInputLayout) v).setHint(requiredText.get(v.getId()));
+                else
+                    Objects.requireNonNull(((TextInputLayout) v).getEditText()).setText(requiredText.get(v.getId()));
+            } else {
+                if (((TextView) v).getHint() != null)
+                    ((TextView) v).setHint(requiredText.get(v.getId()));
+                else
+                    ((TextView) v).setText(requiredText.get(v.getId()));
+            }
         }
     }
 
