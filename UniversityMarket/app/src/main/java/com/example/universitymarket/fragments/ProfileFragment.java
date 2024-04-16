@@ -18,7 +18,6 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
