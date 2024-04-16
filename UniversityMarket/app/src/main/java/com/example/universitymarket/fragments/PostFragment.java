@@ -172,7 +172,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         for(TextView v : views) {
             String base = v.getHint() != null ? v.getHint().toString() : v.getText().toString();
             Spanned hint = Html.fromHtml(
-                   "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
+                    "<string style=\"color:grey;\">" + base + " <span style=\"color:red;\">*</span></string>",
                     Html.FROM_HTML_MODE_LEGACY
             );
             requiredText.put(v.getId(), hint);
