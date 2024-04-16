@@ -12,6 +12,7 @@ import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
+import com.example.universitymarket.globals.actives.ActiveUser;
 
 public class TabAdapter extends FragmentStateAdapter {
 
@@ -35,7 +36,7 @@ public class TabAdapter extends FragmentStateAdapter {
             } else if(context.equals("Watch")) {
                 return new WatchFragment(fm);
             } else {
-                return new ProfileFragment(fm);
+                return new ProfileFragment(fm, ActiveUser.email);
             }
         } else {
             if(context.equals("Market")) {

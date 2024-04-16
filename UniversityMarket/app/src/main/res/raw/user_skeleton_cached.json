@@ -4,12 +4,12 @@
     "email": "",
     "first_name": "",
     "last_name": "",
-    "date_created": ""
+    "date_created": "",
+    "description": ""
   },
   "interactions": {
     "post_ids": [""],
     "watch_ids": [""],
-    "transact_ids": [""],
-    "chat_ids": [""]
+    "transact_ids": [""]
   }
 }

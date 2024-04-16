@@ -67,7 +67,7 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
         if(v.getId() == R.id.settings_records_button) {
             Bundle popupArgs = new Bundle();
             popupArgs.putString("popupTitle", "Records");
-            popupArgs.putString("popupFragment", "RecordsFragment");
+            popupArgs.putString("popupFragment", RecordsFragment.class.getName());
             popupArgs.putStringArray("popupFragArgs", null);
             fm.setFragmentResult("createPopup", popupArgs);
         } else if(v.getId() == R.id.settings_signout_button) {

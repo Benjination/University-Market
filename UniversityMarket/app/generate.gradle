@@ -612,7 +612,7 @@ String[] generate(def map, def class_name, def file) {
     declarations = declarations.replace("private", "public static")
     body = declarations
     methods = \
-            "\n    public " + class_name + " toPOJO() {\n" +
+            "\n    public static " + class_name + " toPOJO() {\n" +
             "        return new " + class_name + "(" + provOrdered + ");\n    }"
     definition = \
             "public class Active" + class_name + " extends Application {\n" +

@@ -10,8 +10,6 @@
     <string name="tab_analyze_txt">Analyze</string>
     <string name="tab_portfolio_txt">Portfolio</string>
 
-    <string name="chat_unavailable_txt">You have not yet started a conversation</string>
-
     <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
     <string name="dash_watch_button_txt">Watch</string>
@@ -25,7 +23,7 @@
     <string name="dash_toolbar_view_txt">My Posts</string>
     <string name="dash_toolbar_watch_txt">My Watchlist</string>
     <string name="dash_toolbar_analyze_txt">My Analytics</string>
-    <string name="dash_toolbar_messages_txt">My Messages</string>
+    <string name="dash_toolbar_chat_txt">My Conversations</string>
 
     <string name="test_upload_button_txt">Upload Test</string>
     <string name="test_clear_button_txt">Clear Test</string>
@@ -52,6 +50,7 @@
 
     <string name="back_to_marketplace">Back to Market</string>
     <string name="refresh">Refresh</string>
+    <string name="load_txt">Loading…</string>
 
     <string name="hello_blank_fragment">Hello world</string>
     <string name="enter_your_email">Enter Your Email</string>

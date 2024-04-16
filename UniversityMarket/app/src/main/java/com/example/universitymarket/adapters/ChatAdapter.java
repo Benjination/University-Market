@@ -5,6 +5,7 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -55,6 +56,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         holder.senders.setText(name);
         holder.deliverdate.setText(delivered);
         holder.preview.setText(message);
+        if(!pair.second.getReadEmails().contains(ActiveUser.email))
+            holder.unreadIndicator.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -66,12 +69,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         private final TextView senders;
         private final TextView deliverdate;
         private final TextView preview;
+        private final ImageView unreadIndicator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             senders = itemView.findViewById(R.id.chat_sender_text);
             deliverdate = itemView.findViewById(R.id.chat_deliverdate_text);
             preview = itemView.findViewById(R.id.chat_preview_text);
+            unreadIndicator = itemView.findViewById(R.id.chat_indicator_dot);
         }
     }
 }
