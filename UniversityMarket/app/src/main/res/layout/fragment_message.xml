@@ -12,11 +12,12 @@
         android:layout_height="0dp"
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@id/message_input_box"
-        />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/layout_message_item" />
 
     <EditText
         android:id="@+id/message_input_box"
@@ -24,20 +25,38 @@
         android:layout_height="?attr/actionBarSize"
         android:ems="10"
         android:hint="@string/message_input_box_hint"
-        android:inputType="textShortMessage|text"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/message_offer_button"
         app:layout_constraintEnd_toStartOf="@id/message_send_button"
-        app:layout_constraintStart_toStartOf="parent" />
+        tools:layout_editor_absoluteX="82dp" />
 
-    <Button
+    <ImageButton
         android:id="@+id/message_send_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="?attr/actionBarSize"
+        android:layout_height="?attr/actionBarSize"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:backgroundTint="?colorPrimary"
+        android:contentDescription="@string/message_send_button_desc"
+        android:src="@drawable/send_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/message_send_button_txt" />
+        app:layout_constraintTop_toBottomOf="@id/message_recycler_view"
+        app:tint="?colorOnPrimary" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/message_offer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="?attr/listPreferredItemPaddingStart"
+        android:clickable="true"
+        android:contentDescription="@string/message_offer_button_desc"
+        android:src="@drawable/post_icon"
+        app:elevation="0dp"
+        app:fabSize="mini"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/message_recycler_view" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

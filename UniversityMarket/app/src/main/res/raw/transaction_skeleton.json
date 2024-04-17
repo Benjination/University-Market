@@ -1,7 +1,7 @@
 {
   "id": "",
   "about": {
-    "final_amount": "",
+    "final_amount": 0.0,
     "buyer_email": "",
     "seller_email": "",
     "closing_date": "",
@@ -15,7 +15,7 @@
     "description": "",
     "image_contexts": [""],
     "genre": "",
-    "serial_number": 1000000000,
+    "serial_number": "",
     "descriptors": [{}]
   },
   "payments": [{}]

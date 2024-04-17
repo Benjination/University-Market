@@ -384,7 +384,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     selected.getText().toString(),
                     ActiveUser.email,
                     imageURLs,
-                    price.getText().toString(),
+                    Float.parseFloat(price.getText().toString()),
                     new ArrayList<>(),
                     title.getText().toString(),
                     description.getText().toString()

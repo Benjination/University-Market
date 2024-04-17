@@ -13,7 +13,10 @@
     <string name="chat_unavailable_txt">You have not yet started a conversation</string>
 
     <string name="message_input_box_hint">Type a message</string>
-    <string name="message_send_button_txt">Send</string>
+    <string name="message_send_button_desc">Send</string>
+    <string name="message_offer_button_desc">Send offer</string>
+
+    <string name="offer_posts_label_txt">Select a post</string>
 
     <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
