@@ -88,7 +88,7 @@
         android:id="@+id/message_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="March 15, 2024 12:00AM"
+        android:text="Mar 15, 2024 12:00AM"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/message_card_item" />
 

@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 public class PostFragment extends Fragment implements View.OnClickListener {
 
@@ -58,6 +60,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     private ViewPager2 imagepager;
     private LinearLayout indicatorContainer, carousel;
     private int numIndicators = 0, position = 0;
+    private final Pattern priceFormat = Pattern.compile("^\\d*(\\.\\d\\d)?$");
     private final HashMap<Integer, Spanned> requiredText = new HashMap<>();
     private ArrayList<String> imageURLsToBeUploaded = new ArrayList<>();
     private ArrayList<String> imageURLs = new ArrayList<>();
@@ -359,6 +362,18 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 retrievePhoto();
         }
         if(ID == submit.getId()) {
+            String priceText = price.getText().toString();
+            if(!priceFormat.matcher(priceText).matches()) {
+                Toast.makeText(
+                        getContext(),
+                        "Please specify the price as an integer or decimal to the hundredth's place",
+                        Toast.LENGTH_LONG
+                ).show();
+                return;
+            } else if(!priceText.contains(".")){
+                priceText = priceText + ".00";
+            }
+
             RadioButton selected = genres.findViewById(genres.getCheckedRadioButtonId());
             if(Data.isAnyObjectNull(selected, price, title, description) ||
                     Data.isAnyStringEmpty(
@@ -384,7 +399,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     selected.getText().toString(),
                     ActiveUser.email,
                     imageURLs,
-                    Float.parseFloat(price.getText().toString()),
+                    priceText,
                     new ArrayList<>(),
                     title.getText().toString(),
                     description.getText().toString()

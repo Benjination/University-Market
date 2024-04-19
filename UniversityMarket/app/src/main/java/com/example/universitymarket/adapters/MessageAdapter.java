@@ -42,8 +42,8 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     private Transaction transaction;
     private final Context context;
-    private final List<Message> messages;
-    private final Chat chat;
+    private List<Message> messages;
+    private Chat chat;
     // List<Object> contains: User sender, @Nullable Post associatedPost, @Nullable Boolean activeUserHasBought
     private final Map<Message, List<Object>> messageMap;
 
