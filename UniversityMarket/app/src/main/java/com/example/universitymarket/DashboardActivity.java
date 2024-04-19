@@ -155,10 +155,12 @@ public class DashboardActivity extends AppCompatActivity {
                         this,
                         (requestKey, result) -> {
                             int newMax = Policy.max_images_per_post - result.getInt("numPictures");
+                            fragResponse.clear();
 
+                            Log.e("newMax", newMax + "");
                             if(newMax > 1) {
-                                multipleImagePicker = new PickMultipleVisualMedia(newMax);
                                 urisRetrieval = new TaskCompletionSource<>();
+                                multipleImagePicker.updateMaxItems(newMax);
                                 multipleGalleryLauncher.launch(
                                         new PickVisualMediaRequest.Builder()
                                                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)

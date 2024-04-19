@@ -4,6 +4,7 @@
     android:id="@+id/chat_card_item"
     android:layout_width="match_parent"
     android:layout_height="?listPreferredItemHeightLarge"
+    android:layout_marginTop="?android:expandableListPreferredChildIndicatorLeft"
     app:cardBackgroundColor="?colorTertiary"
     app:cardCornerRadius="5dp"
     app:cardElevation="5dp"
@@ -33,12 +34,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:layout_marginRight="?android:listPreferredItemPaddingRight"
+            android:layout_marginRight="?android:expandableListPreferredChildIndicatorLeft"
             android:text="11/27/2013"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="?colorOnTertiary"
             android:textStyle="bold"
-            app:layout_constraintRight_toLeftOf="@id/chat_arrow_icon"
+            app:layout_constraintRight_toLeftOf="@id/chat_indicator_dot"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -72,10 +73,10 @@
             android:id="@+id/chat_indicator_dot"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginTop="?attr/dropDownListViewStyle"
-            android:layout_marginRight="?attr/listPreferredItemPaddingRight"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="?android:listPreferredItemPaddingRight"
             android:visibility="invisible"
-            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/chat_arrow_icon"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/dot_filled_icon"
             app:tint="?colorPrimaryVariant" />

@@ -7,10 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
@@ -23,7 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class ProfileFragment extends Fragment {
+public class ProfileFragment extends Fragment implements View.OnClickListener {
 
     private View root;
     private TextView created;
@@ -49,6 +51,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        requireActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         root = inflater.inflate(R.layout.fragment_profile, container, false);
         configure(root);
         return root;
@@ -59,6 +62,8 @@ public class ProfileFragment extends Fragment {
         description = v.findViewById(R.id.profile_description_field);
         saveButton = v.findViewById(R.id.profile_save_button);
         ratingBar = v.findViewById(R.id.profile_rating_bar);
+
+        saveButton.setOnClickListener(this);
 
         if(ActiveUser.email.equals(userEmail)) {
             user = ActiveUser.toPOJO();
@@ -114,5 +119,33 @@ public class ProfileFragment extends Fragment {
             dashMessage.putBoolean("isLoading", false);
             fm.setFragmentResult("setLoading", dashMessage);
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.profile_save_button) {
+            user.setDescription(description.getText().toString());
+
+            Network.setUser(requireActivity(), user, false, new Callback<User>() {
+                @Override
+                public void onSuccess(User result) {
+                    Toast.makeText(
+                            getContext(),
+                            "Profile description updated",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Toast.makeText(
+                            getContext(),
+                            "Profile description could not be updated",
+                            Toast.LENGTH_LONG
+                    ).show();
+                }
+            });
+
+        }
     }
 }

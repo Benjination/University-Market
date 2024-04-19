@@ -27,7 +27,8 @@ import java.util.List;
 
 public class MarketFragment extends Fragment {
 
-    FragmentManager fm;
+    private FragmentManager fm;
+    private GridView postsGV;  // Declare GridView as a class member
 
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
@@ -41,39 +42,31 @@ public class MarketFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
+        postsGV = view.findViewById(R.id.idGVposts); // Find the GridView in your layout
+        Button refreshButton = view.findViewById(R.id.refreshBtn);//find refresh button
 
-        // Find the GridView in your layout
-        GridView postsGV = view.findViewById(R.id.idGVposts);
-
-        //find refresh button
-        Button refreshButton = view.findViewById(R.id.refreshBtn);
-
-        // Set an OnClickListener for the button
-        refreshButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getAllPosts(v);
-            }
-        });
-
-
-        //get all posts
-        getAllPosts(view);
-
-        // Set maximum length for post name
-        int maxLength = 20; // Change this value as needed
-
-        for (PostModel postModel : postModelArrayList) {
-            String originalTitle = postModel.getPost_name();
-            if (originalTitle.length() > maxLength) {
-                // Truncate the post name if it's too long
-                String truncatedTitle = originalTitle.substring(0, maxLength) + "...";
-                postModel.setPost_name(truncatedTitle);
-            }
-        }
-        // Create the adapter and set it to the GridView
+        // Create the adapter and set it to the GridView with current posts
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
         postsGV.setAdapter(adapter1);
+
+
+        // Set an OnClickListener for the button
+        refreshButton.setOnClickListener(v -> getAllPosts());
+
+        getAllPosts();//initial fetch of posts in DB
+//        // Set maximum length for post name
+//        int maxLength = 20; // Change this value as needed
+//
+//        for (PostModel postModel : postModelArrayList) {
+//            String originalTitle = postModel.getPost_name();
+//            if (originalTitle.length() > maxLength) {
+//                // Truncate the post name if it's too long
+//                String truncatedTitle = originalTitle.substring(0, maxLength) + "...";
+//                postModel.setPost_name(truncatedTitle);
+//            }
+//        }
+
+
         postsGridViewlistener(postsGV);
 
         return view;
@@ -95,24 +88,25 @@ public class MarketFragment extends Fragment {
         });
     }
 
-    private void getAllPosts(View view){
-        //get all posts
+    private void getAllPosts(){
         Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
-                postsArrayList.addAll(result);
-                // Optionally notify your adapter or update UI here
-                Log.d("GETTING FIREBASE POSTS", "SUCCESS");
+                postsArrayList.clear();
+                postModelArrayList.clear();
 
-                //check if posts are in postsArrayList
+                postsArrayList.addAll(result);
+
+                //put all post into post model form
                 for(Post p : postsArrayList){
                     Log.d("current post:" , p.getItemTitle());
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().size() > 0 ? p.getImageUrls().get(0) : "https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb"));
+                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().get(0)));
                     Log.d("added " + p.getItemTitle() , "success");
                 }
-                PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
-                GridView postsGV = view.findViewById(R.id.idGVposts);
-                postsGV.setAdapter(adapter1);
+                if(postsGV != null){
+                    PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
+                    adapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Exception error) {
@@ -120,5 +114,4 @@ public class MarketFragment extends Fragment {
             }
         });
     }
-
 }

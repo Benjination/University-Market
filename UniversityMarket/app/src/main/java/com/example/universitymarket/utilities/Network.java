@@ -240,7 +240,19 @@ public abstract class Network {
         }
     }
 
+    public static void removeImages(@NonNull List<String> imageUrls, @Nullable Callback<Boolean> response) {
+        final FirebaseStorage storage = FirebaseStorage.getInstance();
 
+        for(String url : imageUrls) {
+            StorageReference reference = storage.getReferenceFromUrl(url);
+            Task<Void> deletion = reference.delete();
+
+            if(response != null) {
+                deletion.addOnSuccessListener(task -> response.onSuccess(true));
+                deletion.addOnFailureListener(response::onFailure);
+            }
+        }
+    }
 
 /**
  * <b>

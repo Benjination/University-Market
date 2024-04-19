@@ -39,10 +39,11 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         Pair<User, Post> pair = transactionMap.get(transactions.get(position));
         if(pair == null)
             return;
+        String price = transaction.getFinalAmount().toString();
 
         String name = pair.first.getFirstName() + " " + pair.first.getLastName();
         holder.title.setText(pair.second.getItemTitle());
-        holder.price.setText(transaction.getFinalAmount());
+        holder.price.setText(price);
         holder.date.setText(transaction.getClosingDate());
         holder.seller.setText(name);
     }
