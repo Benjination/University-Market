@@ -17,6 +17,7 @@
     <string name="message_offer_button_desc">Send offer</string>
 
     <string name="offer_posts_label_txt">Select a post</string>
+    <string name="offer_close_button_txt">Close</string>
 
     <string name="dash_market_button_txt">Market</string>
     <string name="dash_post_button_txt">Post</string>
@@ -47,6 +48,9 @@
     <string name="post_price_field_hint">Price</string>
     <string name="post_image_required_txt">at least one image is required</string>
     <string name="post_image_addmore_button_txt">Add more images</string>
+
+    <string name="viewpost_watchlist_add_button_txt">Add to watchlist</string>
+    <string name="viewpost_create_conversation_button_txt">Contact seller</string>
 
     <string name="settings_records_button_txt">My Receipts</string>
     <string name="settings_signout_button_txt">Sign Out</string>

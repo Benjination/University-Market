@@ -17,13 +17,15 @@ import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Callback;
+import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProfileFragment extends Fragment implements View.OnClickListener {
 
@@ -67,6 +69,9 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
 
         if(ActiveUser.email.equals(userEmail)) {
             user = ActiveUser.toPOJO();
+            dashMessage.putString("newSubtitle", user.getId());
+            dashMessage.putString("callingFragment", ProfileFragment.class.getName());
+            fm.setFragmentResult("updateSubtitle", dashMessage);
             callback();
         } else {
             ratingBar.setIsIndicator(false);
@@ -74,12 +79,27 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             description.setEnabled(false);
             load = new TaskCompletionSource<>();
             loadPage(load.getTask());
+
             Network.getUser(requireActivity(), userEmail, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
                     user = result;
                     callback();
                     load.setResult("getUser");
+
+                    ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                        Network.getUser(requireActivity(), userEmail, new Callback<User>() {
+                            @Override
+                            public void onSuccess(User current) {
+                                current.setRatings((ArrayList<HashMap>) Stream.concat(current.getRatings().stream().filter(cur -> !cur.containsKey(ActiveUser.email)), Stream.of(new HashMap<>(Collections.singletonMap(ActiveUser.email, ratingBar.getRating())))).collect(Collectors.toList()));
+                            }
+
+                            @Override
+                            public void onFailure(Exception error) {
+                                Log.e("getUser", error.getMessage());
+                            }
+                        });
+                    });
                 }
 
                 @Override
@@ -91,23 +111,12 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
     }
 
     private void callback() {
-        SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
-        try {
-            Date parsed = parser.parse(user.getDateCreated());
-            if(parsed != null) {
-                String createdText = "Joined on " + new SimpleDateFormat("MMM dd, yyyy", Locale.US).format(parsed);
-                created.setText(createdText);
-            }
-        } catch(ParseException e) {
-            Log.e("callback", e.getMessage());
-        }
+        String createdText = "Joined on " + Data.formatDate(Data.parseDate(user.getDateCreated()),"MMM dd, yyyy");
+        created.setText(createdText);
 
         saveButton.setEnabled(true);
-        ratingBar.setRating(user.getRating());
+        ratingBar.setRating((float) user.getRatingsMap().values().stream().map(val -> (Float) val).collect(Collectors.toList()).stream().mapToDouble(Float::doubleValue).average().orElse(3.0));
         description.setText(user.getDescription());
-        dashMessage.putString("newSubtitle", user.getId());
-        dashMessage.putString("callingFragment", ProfileFragment.class.getName());
-        fm.setFragmentResult("updateSubtitle", dashMessage);
     }
 
     private void loadPage(Task<String> task) {
@@ -145,7 +154,6 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     ).show();
                 }
             });
-
         }
     }
 }

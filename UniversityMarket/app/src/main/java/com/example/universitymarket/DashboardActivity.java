@@ -143,11 +143,11 @@ public class DashboardActivity extends AppCompatActivity {
         ));
 
         // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar List<PopupFragment>
-        fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment("Market"), false, true, new ArrayList<>())));
-        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment("Post"), false, true, new ArrayList<>())));
-        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment("Watch"), false, true, new ArrayList<>())));
+        fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Market" }, fm), false, true, new ArrayList<>())));
+        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Post", ActiveUser.email }, fm), false, true, new ArrayList<>())));
+        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Watch" }, fm), false, true, new ArrayList<>())));
         fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false, new ArrayList<>())));
-        fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment("Profile"), false, false, new ArrayList<>())));
+        fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Profile", ActiveUser.email }, fm), false, false, new ArrayList<>())));
 
         fm
                 .setFragmentResultListener(
@@ -241,7 +241,7 @@ public class DashboardActivity extends AppCompatActivity {
                         "createPopup",
                         this,
                         (requestKey, result) ->
-                                createPopup(result.getString("popupTitle"), result.getString("popupFragment"), result.getStringArray("popupFragArgs"))
+                                createPopup(result.getString("popupTitle"), result.getString("popupSubtitle"), result.getString("popupFragment"), result.getStringArray("popupFragArgs"))
                 );
         fm
                 .setFragmentResultListener(
@@ -288,7 +288,7 @@ public class DashboardActivity extends AppCompatActivity {
         search = menu.findItem(R.id.dash_toolbar_search);
         settings = menu.findItem(R.id.dash_toolbar_settings);
         settings.setOnMenuItemClickListener((menuItem) -> {
-            createPopup("Settings", SettingsFragment.class.getName(), null);
+            createPopup("Settings", null, SettingsFragment.class.getName(), null);
             return false;
         });
 
@@ -335,7 +335,7 @@ public class DashboardActivity extends AppCompatActivity {
         dash_buttons.setSelectedItemId(R.id.dash_market_button);
     }
 
-    private void createPopup(String title, String fragName, String[] args) {
+    private void createPopup(String title, String subtitle, String fragName, String[] args) {
         Fragment popupDisplay;
         try {
             Class<? extends Fragment> clazz = (Class<? extends Fragment>) Class.forName(fragName);
@@ -347,7 +347,7 @@ public class DashboardActivity extends AppCompatActivity {
             return;
         }
 
-        PopupFragment popupWindow = new PopupFragment(title, popupDisplay);
+        PopupFragment popupWindow = new PopupFragment(title, subtitle, popupDisplay);
         fm
                 .beginTransaction()
                 .add(R.id.dash_popup_buffer, popupWindow)

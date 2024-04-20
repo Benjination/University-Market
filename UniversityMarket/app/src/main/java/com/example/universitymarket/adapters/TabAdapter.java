@@ -17,36 +17,36 @@ import com.example.universitymarket.globals.actives.ActiveUser;
 public class TabAdapter extends FragmentStateAdapter {
 
     FragmentManager fm;
-    String context;
+    String[] args;
 
-    public TabAdapter(@NonNull FragmentActivity fragment, @NonNull FragmentManager fm, @NonNull String context) {
+    public TabAdapter(@NonNull FragmentActivity fragment, @NonNull FragmentManager fm, @NonNull String[] args) {
         super(fragment);
         this.fm = fm;
-        this.context = context;
+        this.args = args;
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
         if(position == 0) {
-            if(context.equals("Market")) {
+            if(args[0].equals("Market")) {
                 return new MarketFragment(fm);
-            } else if(context.equals("Post")) {
+            } else if(args[0].equals("Post")) {
                 return new PostFragment(fm);
-            } else if(context.equals("Watch")) {
+            } else if(args[0].equals("Watch")) {
                 return new WatchFragment(fm);
             } else {
-                return new ProfileFragment(fm, ActiveUser.email);
+                return new ProfileFragment(fm, args[1]);
             }
         } else {
-            if(context.equals("Market")) {
+            if(args[0].equals("Market")) {
                 return new FilterFragment(fm);
-            } else if(context.equals("Post")) {
-                return new myPostFragment(fm);
-            } else if(context.equals("Watch")) {
+            } else if(args[0].equals("Post")) {
+                return new myPostFragment(fm, args[1]);
+            } else if(args[0].equals("Watch")) {
                 return new AnalyticsFragment(fm);
             } else {
-                return new myPostFragment(fm);
+                return new myPostFragment(fm, args[1]);
             }
         }
     }

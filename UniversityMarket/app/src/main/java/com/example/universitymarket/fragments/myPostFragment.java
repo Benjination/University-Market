@@ -31,9 +31,11 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     private TaskCompletionSource<String> load;
     private myPostAdapter adapter;
     private FragmentManager fm;
+    private final String userEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostFragment(FragmentManager fm) {
+    public myPostFragment(FragmentManager fm, String userEmail) {
+        this.userEmail = userEmail;
         this.fm = fm;
     }
 
@@ -80,27 +82,56 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
 
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-        Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
-            @Override
-            public void onSuccess(List<Post> result) {
-                adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this);
-                load.setResult("getMyPosts");
-                recyclerView.setAdapter(adapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
-                        LinearLayoutManager.VERTICAL, false));
-            }
+        if(userEmail.equals(ActiveUser.email)) {
+            Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
+                @Override
+                public void onSuccess(List<Post> result) {
+                    adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, true);
+                    load.setResult("getMyPosts");
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
+                            LinearLayoutManager.VERTICAL, false));
+                }
 
-            @Override
-            public void onFailure(Exception error) {
-                Log.e("getMyPosts", error.getMessage());
-                Toast.makeText(
-                        getContext(),
-                        error.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show();
-                load.setResult("getMyPosts");
-            }
-        });
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("getMyPosts", error.getMessage());
+                    Toast.makeText(
+                            getContext(),
+                            error.getMessage(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    load.setResult("getMyPosts");
+                }
+            });
+        } else {
+            Network.getUser(requireActivity(), userEmail, new Callback<User>() {
+                @Override
+                public void onSuccess(User result) {
+                    Network.getPosts(requireActivity(), result.getPostIds(), new Callback<List<Post>>() {
+                        @Override
+                        public void onSuccess(List<Post> result) {
+                            adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, false);
+                            load.setResult("getMyPosts");
+                            recyclerView.setAdapter(adapter);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
+                                    LinearLayoutManager.VERTICAL, false));
+                        }
+
+                        @Override
+                        public void onFailure(Exception error) {
+                            Log.e("getPosts", error.getMessage());
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("getUser", error.getMessage());
+                    load.setResult("getMyPosts");
+                }
+            });
+        }
     }
 
     private void loadPage(Task<String> task) {

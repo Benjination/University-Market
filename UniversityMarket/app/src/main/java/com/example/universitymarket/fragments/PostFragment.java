@@ -38,6 +38,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -394,7 +395,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
             post.setId(Data.generateID("pst"));
             post.setAbout(
                     1,
-                    Data.getDate(),
+                    new Date().toString(),
                     new ArrayList<>(),
                     selected.getText().toString(),
                     ActiveUser.email,

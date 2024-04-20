@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements ChatAdapter.onClickListener {
 
     private LayoutInflater inflater;
     private TextView unavailable;
@@ -79,7 +79,8 @@ public class ChatFragment extends Fragment {
 
                 chats.forEach(chat -> {
                     participantsOrdered.add(chat.getParticipantEmails());
-                    msgIds.add(chat.getMessageIds().get(chat.getMessageIds().size() - 1));
+                    if(!chat.getMessageIds().isEmpty())
+                        msgIds.add(chat.getMessageIds().get(chat.getMessageIds().size() - 1));
                 });
                 List<String> allUsers = participantsOrdered.stream().flatMap(List::stream).distinct().collect(Collectors.toList());
 
@@ -115,8 +116,8 @@ public class ChatFragment extends Fragment {
                 });
 
                 retrieve = new Thread(() -> {
-                    while(participants.size() != chats.size() && previews.size() != chats.size());
-                    adapter = new ChatAdapter(requireContext(), chats, participants, previews);
+                    while((participants == null || chats == null || previews == null) || participants.size() != chats.size() && previews.size() != chats.size());
+                    adapter = new ChatAdapter(requireContext(), ChatFragment.this, chats, participants, previews);
                     load.setResult("getMessages and getUsers");
                     recycler.setAdapter(adapter);
                     recycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
@@ -124,12 +125,10 @@ public class ChatFragment extends Fragment {
                 });
                 retrieve.start();
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if(participants.size() != chats.size() && previews.size() != chats.size()) {
+                    if((participants == null || chats == null || previews == null) || participants.size() != chats.size() && previews.size() != chats.size()) {
                         load.setResult("getPosts and getUsers");
                         retrieve.interrupt();
-                        Log.e("retrieve", String.format(
-                                        "chats: %d, usrs: %d, msgs: %d",
-                                        chats.size(), participants.size(), previews.size()),
+                        Log.e("retrieve", "timeout",
                                 new TimeoutException("Message and User retrieval timeout"));
                     }
                 }, Policy.max_seconds_before_timeout * 1000);
@@ -143,11 +142,6 @@ public class ChatFragment extends Fragment {
                 dashMessage.putString("newSubtitle", "Unavailable");
                 dashMessage.putString("callingFragment", this.getClass().getName());
                 fm.setFragmentResult("updateSubtitle", dashMessage);
-
-                dashMessage.putString("popupTitle", "Johnny Hamcheck");
-                dashMessage.putString("popupFragment", MessageFragment.class.getName());
-                dashMessage.putStringArray("popupFragArgs", null);
-                fm.setFragmentResult("createPopup", dashMessage);
             }
         });
     }
@@ -170,5 +164,13 @@ public class ChatFragment extends Fragment {
             dashMessage.putBoolean("isLoading", false);
             fm.setFragmentResult("setLoading", dashMessage);
         });
+    }
+
+    @Override
+    public void onClick(Chat chat) {
+        dashMessage.putString("popupTitle", "Johnny Hamcheck");
+        dashMessage.putString("popupFragment", MessageFragment.class.getName());
+        dashMessage.putStringArray("popupFragArgs", new String[]{ chat.getId() });
+        fm.setFragmentResult("createPopup", dashMessage);
     }
 }

@@ -6,7 +6,7 @@
     "last_name": "",
     "date_created": "",
     "description": "",
-    "rating": 3.0
+    "ratings": [{}]
   },
   "interactions": {
     "post_ids": [""],

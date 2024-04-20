@@ -20,16 +20,25 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder> {
     private final List<Post> myposts;
+    private final boolean isActiveUser;
     private OnItemClickListener itemClickListener;
     private OnItemBtnClickListener itemBtnClickListener;
 
+
     public myPostAdapter(Context context, List<Post> posts,
-                         OnItemClickListener item, OnItemBtnClickListener itemBtn) {
+                         OnItemClickListener item, OnItemBtnClickListener itemBtn,
+                         boolean isActiveUser) {
         myposts = posts;
+        this.isActiveUser = isActiveUser;
         this.itemClickListener = item;
         this.itemBtnClickListener = itemBtn;
     }
@@ -45,7 +54,7 @@ public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull myPostAdapter.ViewHolder holder, int position) {
         Post post = myposts.get(position);
-        holder.bind(post, itemClickListener, itemBtnClickListener);
+        holder.bind(post, itemClickListener, itemBtnClickListener, isActiveUser);
     }
 
     @Override
@@ -78,11 +87,14 @@ public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder
         }
 
         public void bind(final Post post, final OnItemClickListener clickListener,
-                         final OnItemBtnClickListener clickBtnListener) {
+                         final OnItemBtnClickListener clickBtnListener,
+                         boolean isActiveUser) {
             title.setText(post.getItemTitle());
             price.setText("$"+post.getListPrice());
-            date.setText(post.getDateCreated());
+            date.setText(Data.formatDate(Data.parseDate(post.getDateCreated()), "MMM dd, yyyy"));
             genre.setText(post.getGenre());
+            if(!isActiveUser)
+                trash.setVisibility(View.INVISIBLE);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

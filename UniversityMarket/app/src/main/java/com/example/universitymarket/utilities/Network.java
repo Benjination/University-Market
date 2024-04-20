@@ -23,10 +23,13 @@ import androidx.annotation.Nullable;
 import com.example.universitymarket.globals.Policy;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
+import android.util.Pair;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -46,14 +49,11 @@ public abstract class Network {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
         final HashMap<String, Object> pojo;
-        List<String> collNames = new ArrayList<>();
-        for(String s : Policy.json_filenames)
-            collNames.add(s.split("_")[0] + "s");
         String illReqObj = "Cached data for '" + docID + "' not found";
         String illFormat = "'" + docID + "' from '" + collID + "' is not in skeleton format!";
         String illColl = collID + " is not among the existing collections + ( ";
         String illTime = "Connection timeout";
-        for(String s : collNames)
+        for(String s : Policy.collection_names)
             illColl = illColl.concat(s + " ");
         illColl = illColl.concat(")");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -61,7 +61,7 @@ public abstract class Network {
                 source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
-        if(collNames.contains(collID)) {
+        if(Policy.collection_names.contains(collID)) {
             final DocumentReference reference = db.collection(collID).document(docID);
             if(!clear) {
                 if(obj != null) {
@@ -124,7 +124,7 @@ public abstract class Network {
                 source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
-        if(collNames.contains(collID)) {
+        if(Policy.collection_names.contains(collID)) {
             Task<DocumentSnapshot> reference = db.collection(collID).document(docID).get();
             int resID = cur_act.getResources().getIdentifier(collMap.get(collID),"raw", cur_act.getPackageName());
             HashMap<String, Object> pojo = Data.resToPOJO(cur_act, resID);
@@ -138,8 +138,9 @@ public abstract class Network {
 
                         Map<String, Object> rawdata = task.getData();
                         Data.mergeHash(pojo, rawdata);
-                        if(!source.getTask().isComplete())
-                        source.setResult((HashMap<String, Object>) rawdata);
+                        if(!source.getTask().isComplete()) {
+                            source.setResult((HashMap<String, Object>) rawdata);
+                        }
                     })
                     .addOnFailureListener(e -> {
                         if(!source.getTask().isComplete())
@@ -157,14 +158,11 @@ public abstract class Network {
     private static Task<List<HashMap<String, Object>>> getColl(@NonNull Activity cur_act, @NonNull String collID, @Nullable Filter filter, int pageNo) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<List<HashMap<String, Object>>> source = new TaskCompletionSource<>();
-        List<String> collNames = new ArrayList<>();
-        for(String s : Policy.json_filenames)
-            collNames.add(s.split("_")[0] + "s");
         String illNullData = "Collection '" + collID + "' does not exist";
         String illColl = collID + " is not among the existing collections + ( ";
         String illPageNo = "Page number must be 1 or greater";
         String illTime = "Connection timeout";
-        for(String s : collNames)
+        for(String s : Policy.collection_names)
             illColl = illColl.concat(s + " ");
         illColl = illColl.concat(")");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -172,7 +170,7 @@ public abstract class Network {
                 source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
-        if(collNames.contains(collID)) {
+        if(Policy.collection_names.contains(collID)) {
             Query query = db.collection(collID);
             query = filter != null ? query.where(filter) : query;
             if(pageNo >= 0) {
@@ -222,6 +220,24 @@ public abstract class Network {
         }
 
         return source.getTask();
+    }
+
+    @NonNull
+    public static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final DocumentReference ref = db.collection(collID).document(docID);
+
+        Task<DocumentSnapshot> snapshot = ref.get();
+        return new Pair<>(ref, snapshot);
+    }
+
+    @NonNull
+    public static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull Activity cur_act, @NonNull String collID) {
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+        final CollectionReference ref = db.collection(collID);
+
+        Task<QuerySnapshot> snapshot = ref.get();
+        return new Pair<>(ref, snapshot);
     }
 
     public static void uploadImage(@NonNull Uri uri, @NonNull String directory, @NonNull String filename, @Nullable Callback<Uri> response) {
@@ -398,6 +414,51 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
+    public static void listenToUser(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<User> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "users", docID);
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
+                        return;
+                    }
+
+                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();
+                    if(before < after) {
+                        response.onAdded(new User((HashMap<String, Object>) snapshot.getData()));
+                    } else if(before > after) {
+                        response.onRemoved(new User((HashMap<String, Object>) snapshot.getData()));
+                    } else {
+                        response.onModified(new User((HashMap<String, Object>) snapshot.getData()));
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToUsers(@NonNull Activity cur_act, @NonNull Listener<User> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "users");
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
+                        return;
+                    }
+
+                    for(DocumentChange dc : snapshot.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                response.onAdded(new User((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case MODIFIED:
+                                response.onModified(new User((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case REMOVED:
+                                response.onRemoved(new User((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                        }
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
     public static void setChat(@NonNull Activity cur_act, @NonNull Chat chatOBJ, boolean clear, @Nullable Callback<Chat> response) {
         if(response == null && chatOBJ.getId() == null)
             return;
@@ -497,6 +558,51 @@ public abstract class Network {
                     }
                     response.onSuccess(list);
                 })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToChat(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Chat> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "chats", docID);
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
+                        return;
+                    }
+
+                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();
+                    if(before < after) {
+                        response.onAdded(new Chat((HashMap<String, Object>) snapshot.getData()));
+                    } else if(before > after) {
+                        response.onRemoved(new Chat((HashMap<String, Object>) snapshot.getData()));
+                    } else {
+                        response.onModified(new Chat((HashMap<String, Object>) snapshot.getData()));
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToChats(@NonNull Activity cur_act, @NonNull Listener<Chat> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "chats");
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
+                        return;
+                    }
+
+                    for(DocumentChange dc : snapshot.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                response.onAdded(new Chat((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case MODIFIED:
+                                response.onModified(new Chat((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case REMOVED:
+                                response.onRemoved(new Chat((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                        }
+                    }
+                }))
                 .addOnFailureListener(response::onFailure);
     }
 
@@ -602,6 +708,51 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
+    public static void listenToMessage(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Message> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "messages", docID);
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
+                        return;
+                    }
+
+                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();
+                    if(before < after) {
+                        response.onAdded(new Message((HashMap<String, Object>) snapshot.getData()));
+                    } else if(before > after) {
+                        response.onRemoved(new Message((HashMap<String, Object>) snapshot.getData()));
+                    } else {
+                        response.onModified(new Message((HashMap<String, Object>) snapshot.getData()));
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToMessages(@NonNull Activity cur_act, @NonNull Listener<Message> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "messages");
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
+                        return;
+                    }
+
+                    for(DocumentChange dc : snapshot.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                response.onAdded(new Message((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case MODIFIED:
+                                response.onModified(new Message((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case REMOVED:
+                                response.onRemoved(new Message((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                        }
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
     public static void setTransaction(@NonNull Activity cur_act, @NonNull Transaction transactionOBJ, boolean clear, @Nullable Callback<Transaction> response) {
         if(response == null && transactionOBJ.getId() == null)
             return;
@@ -704,6 +855,51 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
+    public static void listenToTransaction(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Transaction> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "transactions", docID);
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
+                        return;
+                    }
+
+                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();
+                    if(before < after) {
+                        response.onAdded(new Transaction((HashMap<String, Object>) snapshot.getData()));
+                    } else if(before > after) {
+                        response.onRemoved(new Transaction((HashMap<String, Object>) snapshot.getData()));
+                    } else {
+                        response.onModified(new Transaction((HashMap<String, Object>) snapshot.getData()));
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToTransactions(@NonNull Activity cur_act, @NonNull Listener<Transaction> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "transactions");
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
+                        return;
+                    }
+
+                    for(DocumentChange dc : snapshot.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                response.onAdded(new Transaction((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case MODIFIED:
+                                response.onModified(new Transaction((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case REMOVED:
+                                response.onRemoved(new Transaction((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                        }
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
     public static void setPost(@NonNull Activity cur_act, @NonNull Post postOBJ, boolean clear, @Nullable Callback<Post> response) {
         if(response == null && postOBJ.getId() == null)
             return;
@@ -803,6 +999,51 @@ public abstract class Network {
                     }
                     response.onSuccess(list);
                 })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToPost(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Post> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "posts", docID);
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
+                        return;
+                    }
+
+                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();
+                    if(before < after) {
+                        response.onAdded(new Post((HashMap<String, Object>) snapshot.getData()));
+                    } else if(before > after) {
+                        response.onRemoved(new Post((HashMap<String, Object>) snapshot.getData()));
+                    } else {
+                        response.onModified(new Post((HashMap<String, Object>) snapshot.getData()));
+                    }
+                }))
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void listenToPosts(@NonNull Activity cur_act, @NonNull Listener<Post> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "posts");
+        pair.second
+                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
+                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
+                        return;
+                    }
+
+                    for(DocumentChange dc : snapshot.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                response.onAdded(new Post((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case MODIFIED:
+                                response.onModified(new Post((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                            case REMOVED:
+                                response.onRemoved(new Post((HashMap<String, Object>) dc.getDocument().getData()));
+                                break;
+                        }
+                    }
+                }))
                 .addOnFailureListener(response::onFailure);
     }
 
