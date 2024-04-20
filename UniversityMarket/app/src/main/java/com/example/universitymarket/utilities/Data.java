@@ -35,13 +35,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public abstract class Data {
@@ -333,6 +332,28 @@ public abstract class Data {
         return result;
     }
 
+    public static TemporalAccessor parseDate(String date) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss zzz yyyy");
+
+        if(dtf != null) {
+            try {
+                return dtf.parse(date);
+            } catch(Exception e) {
+                Log.e("parseDate", e.getMessage());
+            }
+        }
+        return null;
+    }
+
+    public static String formatDate(@NonNull TemporalAccessor parsed, @NonNull String pattern) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
+
+        if(dtf != null) {
+            return dtf.format(parsed);
+        }
+        return null;
+    }
+
     @NonNull
     public static String getDate() {
         return DateTimeFormatter.ofPattern("ddMMMyyyy").format(LocalDateTime.now());
@@ -360,7 +381,7 @@ public abstract class Data {
         ActiveUser.id = userOBJ.getId();
         ActiveUser.interactions = userOBJ.getInteractions();
         ActiveUser.date_created = userOBJ.getDateCreated();
-        ActiveUser.rating = userOBJ.getRating();
+        ActiveUser.ratings = userOBJ.getRatings();
         ActiveUser.last_name = userOBJ.getLastName();
         ActiveUser.description = userOBJ.getDescription();
         ActiveUser.first_name = userOBJ.getFirstName();
@@ -374,6 +395,6 @@ public abstract class Data {
     }
 
     public static User activeUserToPOJO() {
-        return new User(ActiveUser.date_created, ActiveUser.rating, ActiveUser.last_name, ActiveUser.description, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.chat_ids, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
+        return new User(ActiveUser.date_created, ActiveUser.ratings, ActiveUser.last_name, ActiveUser.description, ActiveUser.first_name, ActiveUser.email, ActiveUser.id, ActiveUser.chat_ids, ActiveUser.watch_ids, ActiveUser.transact_ids, ActiveUser.post_ids );
     }
 }

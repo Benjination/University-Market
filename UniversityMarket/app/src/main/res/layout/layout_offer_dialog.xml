@@ -14,16 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/offer_close_indicator"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/offer_close_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="?attr/listPreferredItemPaddingStart"
+            android:layout_marginRight="?attr/listPreferredItemPaddingRight"
+            android:clickable="true"
+            android:contentDescription="@string/offer_close_button_txt"
+            app:fabSize="mini"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginRight="?attr/listPreferredItemPaddingRight"
-            android:layout_marginTop="?attr/listPreferredItemPaddingStart"
-            app:srcCompat="@drawable/close_icon"
-            app:tint="?colorOnTertiary" />
+            app:srcCompat="@drawable/close_icon" />
 
         <TextView
             android:id="@+id/offer_posts_label"
@@ -68,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
             android:layout_marginTop="?attr/listPreferredItemPaddingStart"
-            android:text="# watchlists"
+            android:text="@string/load_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/offer_posts_scrollview" />
@@ -78,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
-            android:text="days remaining"
+            android:text="@string/load_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/offer_post_in_watchlists" />
@@ -88,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="?attr/listPreferredItemHeightLarge"
             android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
-            android:text="list price"
+            android:text="@string/load_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/offer_post_days_remaining" />

@@ -8,7 +8,6 @@
   },
   "offer": {
     "offer_post_id": "",
-    "offer_status": "none",
-    "offer_duration_days": 0
+    "offer_taken": false
   }
 }

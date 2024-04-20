@@ -22,12 +22,13 @@ public class TabFragment extends Fragment {
     private View root;
     private LayoutInflater inflater;
     private ViewGroup container;
-    private FragmentManager fm;
-    private final String context;
+    private final FragmentManager fm;
+    private final String[] args;
     private final Bundle dashMessage = new Bundle();
 
-    public TabFragment(String context) {
-        this.context = context;
+    public TabFragment(String[] args, FragmentManager fm) {
+        this.args = args;
+        this.fm = fm;
     }
 
     @Override
@@ -46,8 +47,6 @@ public class TabFragment extends Fragment {
     }
 
     private void configure(View view) {
-        fm = getParentFragmentManager();
-
         TabLayout tabs = view.findViewById(R.id.home_tabs);
         ViewPager2 pager = view.findViewById(R.id.home_pager);
 
@@ -59,17 +58,17 @@ public class TabFragment extends Fragment {
         View left = inflater.inflate(R.layout.layout_tab_item, container, false);
         View right = inflater.inflate(R.layout.layout_tab_item, container, false);
 
-        if(context.equals("Market")) {
+        if(args[0].equals("Market")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.cart_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_browse_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.filter_icon);
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_filter_txt);
-        } else if(context.equals("Post")) {
+        } else if(args[0].equals("Post")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.post_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_create_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.record_icon);
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_view_txt);
-        } else if(context.equals("Watch")) {
+        } else if(args[0].equals("Watch")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.clock_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_watch_txt);
             ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.chart_icon);
@@ -81,7 +80,7 @@ public class TabFragment extends Fragment {
             ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_view_txt);
         }
 
-        TabAdapter adapter = new TabAdapter(requireActivity(), getParentFragmentManager(), context);
+        TabAdapter adapter = new TabAdapter(requireActivity(), fm, args);
         pager.setAdapter(adapter);
         pager.setUserInputEnabled(false);
 
@@ -96,7 +95,7 @@ public class TabFragment extends Fragment {
                 ((ImageView) custView.findViewById(R.id.tab_icon)).setColorFilter(colorPrimary.data);
                 ((TextView) custView.findViewById(R.id.tab_text)).setTextColor(colorPrimary.data);
                 dashMessage.putInt("currentTab", position);
-                dashMessage.putString("currentTabGroup", context);
+                dashMessage.putString("currentTabGroup", args[0]);
                 fm.setFragmentResult("tabSwitch", dashMessage);
             }
 

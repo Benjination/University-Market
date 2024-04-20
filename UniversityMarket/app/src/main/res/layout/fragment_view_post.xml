@@ -14,29 +14,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_below="@+id/back_to_market">
+            android:layout_marginRight="10dp">
 
-            <HorizontalScrollView
-                android:id="@+id/post_image_carousel"
+        <HorizontalScrollView
+            android:id="@+id/post_image_carousel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            tools:ignore="SpeakableTextPresentCheck">
+
+            <LinearLayout
+                android:id="@+id/post_images"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp">
+                android:layout_height="match_parent">
 
-                <LinearLayout
-                    android:id="@+id/post_images"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                <ImageSwitcher
+                    android:id="@+id/post_image_switcher"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:scaleType="centerInside" />
 
-                    <ImageSwitcher
-                        android:id="@+id/post_image_switcher"
-                        android:layout_width="200dp"
-                        android:layout_height="200dp"
-                        android:scaleType="centerInside" />
-
-                </LinearLayout>
-            </HorizontalScrollView>
+            </LinearLayout>
+        </HorizontalScrollView>
 
             <TextView
                 android:id="@+id/post_title_field"
@@ -51,11 +51,30 @@
                 android:text="$price - title of post"
                 android:textSize="22sp" />
 
-            <LinearLayout
+        <Button
+            android:id="@+id/viewpost_author_button"
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/viewpost_rating_indicator"
+            android:layout_centerHorizontal="true"
+            android:text="From Johnny Hamcheck"
+            android:textColor="?colorOnTertiary" />
+
+        <RatingBar
+            android:id="@+id/viewpost_rating_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_title_field"
+            android:layout_centerHorizontal="true"
+            android:isIndicator="true"
+            android:contentDescription="@string/profile_rating_label" />
+
+        <LinearLayout
                 android:id="@+id/post_description_and_contact_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/post_title_field"
+                android:layout_below="@id/viewpost_author_button"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
@@ -63,7 +82,15 @@
                     android:id="@+id/addwl"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Add to Watchlist" />
+                    android:text="@string/viewpost_watchlist_add_button_txt" />
+
+                <Button
+                    android:id="@+id/viewpost_create_conversation_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:text="@string/viewpost_create_conversation_button_txt"
+                    android:visibility="visible" />
 
                 <TextView
                     android:id="@+id/post_description_field"
@@ -74,23 +101,7 @@
                     android:textSize="20sp"
                     android:layout_marginTop="20dp" />
 
-                <Space
-                    android:id="@+id/post_space_inbetween"
-                    android:layout_width="50dp"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/post_title_field"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="20dp" />
-
-                <TextView
-                    android:id="@+id/seller_contact_field"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:ems="10"
-                    android:text="seller contact information"
-                    android:textSize="20sp" />
-
-            </LinearLayout>
+        </LinearLayout>
 
         </RelativeLayout>
 

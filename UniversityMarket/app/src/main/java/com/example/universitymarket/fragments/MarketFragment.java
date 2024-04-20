@@ -5,7 +5,6 @@ import android.os.Bundle;
 //import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,12 +16,15 @@ import android.widget.GridView;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.PostGVAdapter;
+import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.utilities.PostModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class MarketFragment extends Fragment {
@@ -100,7 +102,8 @@ public class MarketFragment extends Fragment {
                 //put all post into post model form
                 for(Post p : postsArrayList){
                     Log.d("current post:" , p.getItemTitle());
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), p.getImageUrls().get(0)));
+                    List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
+                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
                     Log.d("added " + p.getItemTitle() , "success");
                 }
                 if(postsGV != null){

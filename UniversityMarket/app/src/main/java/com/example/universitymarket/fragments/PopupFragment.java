@@ -18,10 +18,12 @@ public class PopupFragment extends Fragment {
     private FragmentManager parentFM;
     private FragmentManager childFM;
     private final String title;
+    private final String subtitle;
     private final Fragment display;
 
-    public PopupFragment(String title, Fragment display) {
+    public PopupFragment(String title, String subtitle, Fragment display) {
         this.title = title;
+        this.subtitle = subtitle;
         this.display = display;
     }
 
@@ -46,6 +48,8 @@ public class PopupFragment extends Fragment {
     private void configure(View v) {
         toolbar = v.findViewById(R.id.popup_toolbar);
         toolbar.setTitle(title);
+        if(subtitle != null)
+            toolbar.setSubtitle(subtitle);
 
         toolbar.setNavigationOnClickListener((view) -> parentFM
                 .beginTransaction()

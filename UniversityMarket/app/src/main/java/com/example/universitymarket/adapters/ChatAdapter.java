@@ -24,13 +24,19 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     private final Context context;
     private final List<Chat> chats;
+    private final onClickListener clickListener;
     private final HashMap<Chat, Pair<List<User>, Message>> previewMap = new HashMap<>();
 
-    public ChatAdapter(Context context, List<Chat> chats, List<List<User>> participants, List<Message> previews) {
+    public ChatAdapter(Context context, onClickListener clickListener, List<Chat> chats, List<List<User>> participants, List<Message> previews) {
         this.context = context;
+        this.clickListener = clickListener;
         this.chats = chats;
 
         IntStream.range(0, chats.size()).forEach(i -> previewMap.put(chats.get(i), new Pair<>(participants.get(i), previews.get(i))));
+    }
+
+    public interface onClickListener {
+        void onClick(Chat chat);
     }
 
     @NonNull
@@ -46,6 +52,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         Pair<List<User>, Message> pair = previewMap.get(chat);
         if(pair == null)
             return;
+
+        holder.itemView.setOnClickListener(l -> {
+            clickListener.onClick(chat);
+        });
 
         List<User> otherParticipants = pair.first.stream().filter(e -> !ActiveUser.email.equals(e.getId())).collect(Collectors.toList());
         Message preview = pair.second;
@@ -77,6 +87,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             deliverdate = itemView.findViewById(R.id.chat_deliverdate_text);
             preview = itemView.findViewById(R.id.chat_preview_text);
             unreadIndicator = itemView.findViewById(R.id.chat_indicator_dot);
+
         }
     }
 }

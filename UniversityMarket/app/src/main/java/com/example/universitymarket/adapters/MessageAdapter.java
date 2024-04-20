@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.universitymarket.R;
+import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.Chat;
 import com.example.universitymarket.objects.Message;
@@ -29,30 +30,34 @@ import com.example.universitymarket.utilities.Network;
 import com.squareup.picasso.Picasso;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
 
     private Transaction transaction;
-    private final Context context;
     private List<Message> messages;
-    private Chat chat;
-    // List<Object> contains: User sender, @Nullable Post associatedPost, @Nullable Boolean activeUserHasBought
-    private final Map<Message, List<Object>> messageMap;
+    private final Context context;
+    private final Chat chat;
 
-    public MessageAdapter(Context context, Chat chat, List<Message> messages, List<User> senders, List<Post> posts, List<Boolean> facts) {
+    public MessageAdapter(Context context, Chat chat, List<Message> messages) {
         this.context = context;
         this.chat = chat;
         this.messages = messages;
+    }
 
-        messageMap = IntStream.range(0, messages.size()).boxed().collect(Collectors.toMap(messages::get, i -> Arrays.asList(senders.get(i), posts.get(i), facts.get(i))));
+    public void removeMessage(Message message) {
+        messages.remove(message);
+    }
+
+    public void addMessage(Message message) {
+        messages.add(message);
     }
 
     @NonNull
@@ -65,127 +70,128 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
         Message message = messages.get(position);
-        List<Object> objList = messageMap.get(message);
-        if(objList == null || objList.isEmpty() || objList.get(0) == null)
-            return;
+        String senderEmail = message.getSenderEmail();
 
-        User sender = (User) objList.get(0);
-        if(objList.get(1) == null) {
-            if(objList.get(2) == null)
+        if(message.getOfferPostId() == null) {
+            if(message.getOfferTaken())
                 return;
-            // The associated message is an offer message
 
-            Post associatedPost = (Post) objList.get(1);
-            boolean activeUserHasBought = (boolean) objList.get(2);
-            holder.regularContent.setVisibility(View.INVISIBLE);
-            Picasso
-                    .get()
-                    .load(associatedPost.getImageUrls().isEmpty() ? "https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb" : associatedPost.getImageUrls().get(0))
-                    .resize(Data.convertDpToPixel((Activity) context, 100), Data.convertDpToPixel((Activity) context, 100))
-                    .into(holder.offerImage);
-            holder.offerTitle.setText(associatedPost.getItemTitle());
-
-            if(activeUserHasBought) {
-                holder.offerButton.setEnabled(true);
-                holder.offerButton.setOnClickListener(l -> {
-                    transaction = new Transaction(
-                            associatedPost.getDescriptors(),
-                            associatedPost.getId(),
-                            associatedPost.getGenre(),
-                            false,
-                            associatedPost.getItemDescription(),
-                            associatedPost.getId() + associatedPost.getQuantity(),
-                            associatedPost.getImageContexts(),
-                            associatedPost.getItemTitle(),
-                            chat.getId(),
-                            null,
-                            ActiveUser.email,
-                            new Date().toString(),
-                            sender.getEmail(),
-                            associatedPost.getListPrice(),
-                            "closed",
-                            Data.generateID("tsct")
-                    );
-
-                    Network.setTransaction((Activity) context, transaction, false, new Callback<Transaction>() {
-                        @Override
-                        public void onSuccess(Transaction result) {
-                            transaction = result;
-                            ActiveUser.transact_ids.add(transaction.getId());
-
-                            Network.setUser((Activity) context, ActiveUser.toPOJO(), false, new Callback<User>() {
+            Network.getPost((Activity) context, message.getOfferPostId(), new Callback<Post>() {
+                @Override
+                public void onSuccess(Post post) {
+                    holder.regularContent.setVisibility(View.INVISIBLE);
+                    Picasso
+                            .get()
+                            .load(post.getImageUrls().isEmpty() ? Policy.invalid_image.get(0) : post.getImageUrls().get(0))
+                            .resize(Data.convertDpToPixel((Activity) context, 100), Data.convertDpToPixel((Activity) context, 100))
+                            .into(holder.offerImage, new com.squareup.picasso.Callback() {
                                 @Override
-                                public void onSuccess(User result) {}
+                                public void onSuccess() {}
 
                                 @Override
-                                public void onFailure(Exception error) {
-                                    Log.e("setUser", error.getMessage());
-                                    Toast.makeText(
-                                            context,
-                                            "Unable to add to ActiveUser's transaction record",
-                                            Toast.LENGTH_SHORT
-                                    ).show();
+                                public void onError(Exception ignored) {
+                                    Picasso.get().load(Policy.invalid_image.get(0)).resize(Data.convertDpToPixel((Activity) context, 100), Data.convertDpToPixel((Activity) context, 100)).into(holder.offerImage);
                                 }
                             });
+                    holder.offerTitle.setText(post.getItemTitle());
+                    holder.offerButton.setOnClickListener(l -> {
+                        transaction = new Transaction(
+                                post.getDescriptors(),
+                                post.getId(),
+                                post.getGenre(),
+                                false,
+                                post.getItemDescription(),
+                                post.getId() + post.getQuantity(),
+                                post.getImageContexts(),
+                                post.getItemTitle(),
+                                chat.getId(),
+                                null,
+                                ActiveUser.email,
+                                new Date().toString(),
+                                senderEmail,
+                                post.getListPrice(),
+                                "closed",
+                                Data.generateID("tsct")
+                        );
 
-                            // We are getting user here to update the sender. Since we can't update individual fields,
-                            // we must be sure we are updating their user state from the latest snapshot as possible
-                            Network.getUser((Activity) context, sender.getId(), new Callback<User>() {
-                                @Override
-                                public void onSuccess(User result) {
-                                    // And now we update their transaction record as fast as possible
-                                    ArrayList<String> sellersTransactIds = result.getTransactIds();
-                                    sellersTransactIds.add(transaction.getId());
-                                    result.setTransactIds(sellersTransactIds);
+                        Network.setTransaction((Activity) context, transaction, false, new Callback<Transaction>() {
+                            @Override
+                            public void onSuccess(Transaction ignored) {
+                                ActiveUser.transact_ids.add(transaction.getId());
+                                message.setOfferTaken(true);
+                                holder.offerButton.setEnabled(false);
 
-                                    Network.setUser((Activity) context, result, false, new Callback<User>() {
-                                        @Override
-                                        public void onSuccess(User result) {}
+                                Network.setMessage((Activity) context, message, false, new Callback<Message>() {
+                                    @Override
+                                    public void onSuccess(Message ignored) {}
 
-                                        @Override
-                                        public void onFailure(Exception error) {
-                                            Log.e("setUser", error.getMessage());
-                                            Toast.makeText(
-                                                    context,
-                                                    "Unable to add to transaction record for " + sender.getEmail(),
-                                                    Toast.LENGTH_SHORT
-                                            ).show();
-                                        }
-                                    });
-                                }
+                                    @Override
+                                    public void onFailure(Exception error) {
+                                        Log.e("setMessage", error.getMessage());
+                                    }
+                                });
 
-                                @Override
-                                public void onFailure(Exception error) {
-                                    Log.e("getUser", error.getMessage());
-                                    Toast.makeText(
-                                            context,
-                                            "Unable to retrieve and update user " + sender.getEmail(),
-                                            Toast.LENGTH_SHORT
-                                    ).show();
-                                }
-                            });
+                                Network.setUser((Activity) context, ActiveUser.toPOJO(), false, new Callback<User>() {
+                                    @Override
+                                    public void onSuccess(User ignored) {}
 
-                        }
+                                    @Override
+                                    public void onFailure(Exception error) {
+                                        Log.e("setUser", error.getMessage());
+                                    }
+                                });
 
-                        @Override
-                        public void onFailure(Exception error) {
-                            Log.e("setTransaction", error.getMessage());
-                            Toast.makeText(
-                                    context,
-                                    "Unable to commit the offer, try again later",
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
+                                Network.getUser((Activity) context, senderEmail, new Callback<User>() {
+                                    @Override
+                                    public void onSuccess(User user) {
+                                        user.setTransactIds((ArrayList<String>) Stream.concat(user.getTransactIds().stream(), Stream.of(transaction.getId())).collect(Collectors.toList()));
+
+                                        Network.setUser((Activity) context, user, false, new Callback<User>() {
+                                            @Override
+                                            public void onSuccess(User ignored) {}
+
+                                            @Override
+                                            public void onFailure(Exception error) {
+                                                Log.e("setUser", error.getMessage());
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception error) {
+                                        Log.e("getUser", error.getMessage());
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception error) {
+                                Log.e("setTransaction", error.getMessage());
+                                Toast.makeText(
+                                        context,
+                                        "Unable to commit the offer, try again later",
+                                        Toast.LENGTH_LONG
+                                ).show();
+                            }
+                        });
                     });
-                });
-            }
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    Log.e("getPost", error.getMessage());
+                    Toast.makeText(
+                            context,
+                            "Please check your network connection",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
             holder.offerImage.setVisibility(View.VISIBLE);
             holder.offerTitle.setVisibility(View.VISIBLE);
             holder.offerButton.setVisibility(View.VISIBLE);
         } else {
-            // Otherwise it's a regular one
-
-            if(sender.getEmail().equals(ActiveUser.email)) {
+            if(senderEmail.equals(ActiveUser.email)) {
                 // It's our message, shift it right and recolor
                 ConstraintSet newConstraints = new ConstraintSet();
                 newConstraints.clone(context, R.id.message_constraint);
@@ -200,15 +206,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
             holder.regularContent.setText(message.getContents());
         }
-        try {
-            SimpleDateFormat parser = new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
-            Date parsed = parser.parse(message.getTimestamp());
-            if(parsed != null) {
-                holder.messageTimestamp.setText(new SimpleDateFormat("MMM dd, yyyy HH:mm a", Locale.US).format(parsed));
-            }
-        } catch(ParseException e) {
-            Log.e("onBindViewHolder", e.getMessage());
-        }
+
+        TemporalAccessor parsed = Data.parseDate(message.getTimestamp());
+        if(parsed != null)
+            holder.messageTimestamp.setText(Data.formatDate(parsed, "MMM dd, yyyy HH:mm a"));
     }
 
     @Override

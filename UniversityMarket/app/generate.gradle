@@ -454,6 +454,7 @@ String[] generate(def map, def class_name, def file) {
     String obj_name = class_name.toLowerCase() + "OBJ"
     String setters = ""
     String getters = ""
+    String listeners = ""
     if(cache) {
         setters = setters.concat(
                 "\n    public static void set" + class_name + "FromCache" +
@@ -599,7 +600,53 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n"
     )
-    response[1] = setters + getters
+    listeners = listeners.concat(
+            "\n    public static void listenTo" + class_name + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<" + class_name + "> response) {\n" +
+                    "        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, " + coll_name + ", docID);\n" +
+                    "        pair.second\n" +
+                    "                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {\n" +
+                    "                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {\n" +
+                    "                        return;\n" +
+                    "                    }\n" +
+                    "\n" +
+                    "                    int before = task.getData().entrySet().size(), after = snapshot.getData().entrySet().size();\n" +
+                    "                    if(before < after) {\n" +
+                    "                        response.onAdded(new " + class_name + "((HashMap<String, Object>) snapshot.getData()));\n" +
+                    "                    } else if(before > after) {\n" +
+                    "                        response.onRemoved(new " + class_name + "((HashMap<String, Object>) snapshot.getData()));\n" +
+                    "                    } else {\n" +
+                    "                        response.onModified(new " + class_name + "((HashMap<String, Object>) snapshot.getData()));\n" +
+                    "                    }\n" +
+                    "                }))\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
+                    "    }\n\n" +
+            \
+            "    public static void listenTo" + class_name + "s(@NonNull Activity cur_act, @NonNull Listener<" + class_name + "> response) {\n" +
+                    "        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, " + coll_name + ");\n" +
+                    "        pair.second\n" +
+                    "                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {\n" +
+                    "                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {\n" +
+                    "                        return;\n" +
+                    "                    }\n" +
+                    "\n" +
+                    "                    for(DocumentChange dc : snapshot.getDocumentChanges()) {\n" +
+                    "                        switch (dc.getType()) {\n" +
+                    "                            case ADDED:\n" +
+                    "                                response.onAdded(new " + class_name + "((HashMap<String, Object>) dc.getDocument().getData()));\n" +
+                    "                                break;\n" +
+                    "                            case MODIFIED:\n" +
+                    "                                response.onModified(new " + class_name + "((HashMap<String, Object>) dc.getDocument().getData()));\n" +
+                    "                                break;\n" +
+                    "                            case REMOVED:\n" +
+                    "                                response.onRemoved(new " + class_name + "((HashMap<String, Object>) dc.getDocument().getData()));\n" +
+                    "                                break;\n" +
+                    "                        }\n" +
+                    "                    }\n" +
+                    "                }))\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
+                    "    }\n"
+    )
+    response[1] = setters + getters + listeners
 
     String provOrdered = ""
     temp = provFields.get("super").get(0).split("[^,]* ")
@@ -630,10 +677,12 @@ String[] generate(def map, def class_name, def file) {
         line = line.replace("HashMap<String, ", "HashMap<String,")
         def buff = line.split("( )")
         String type = buff[0], name = buff[1]
-        details = details.concat(
-                "        Active" + class_name + "." + name + " = " + obj_name +
-                        ".get" + methodNameMap.get(name) + "();\n"
-        )
+        if(methodNameMap.get(name) != null) {
+            details = details.concat(
+                    "        Active" + class_name + "." + name + " = " + obj_name +
+                            ".get" + methodNameMap.get(name) + "();\n"
+            )
+        }
     }
     provOrdered = ""
     temp = provFields.get("super").get(0).split("[^,]* ")
@@ -682,6 +731,7 @@ static void update(String nString, String dString, def active_names, def obj_nam
         pString = pString.concat("            \"" + fn + "\",\n")
     }
     pString = pString.substring(0, pString.length() - 2).concat("\n    };\n")
+    pString = pString.concat("\n    List<String> collection_names = Arrays.stream(json_filenames).map(string -> string.split(\"_\")[0] + \"s\").collect(Collectors.toList());")
 
     for(int i = 0; i < 3; i++) {
         String header = ""

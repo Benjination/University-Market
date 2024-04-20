@@ -11,7 +11,9 @@ import android.widget.TextView;
 //import androidx.annotation.Nullable;
 
 import com.example.universitymarket.R;
+import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.utilities.PostModel;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -37,7 +39,15 @@ public class PostGVAdapter extends ArrayAdapter<PostModel> {
         ImageView postIMG = listitemView.findViewById(R.id.postIMG);
 
         postTitle.setText(postModel.getPost_name());
-        Picasso.get().load(postModel.getImageURL()).into(postIMG);
+        Picasso.get().load(postModel.getImageURL()).into(postIMG, new Callback() {
+            @Override
+            public void onSuccess() {}
+
+            @Override
+            public void onError(Exception ignored) {
+                Picasso.get().load(Policy.invalid_image.get(0)).into(postIMG);
+            }
+        });
         return listitemView;
     }
 }
