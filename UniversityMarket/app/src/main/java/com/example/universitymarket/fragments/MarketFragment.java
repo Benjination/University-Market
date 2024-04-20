@@ -5,6 +5,7 @@ import android.os.Bundle;
 //import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ public class MarketFragment extends Fragment {
 
     private FragmentManager fm;
     private GridView postsGV;  // Declare GridView as a class member
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
@@ -45,15 +47,20 @@ public class MarketFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
         postsGV = view.findViewById(R.id.idGVposts); // Find the GridView in your layout
-        Button refreshButton = view.findViewById(R.id.refreshBtn);//find refresh button
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
 
         // Create the adapter and set it to the GridView with current posts
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
         postsGV.setAdapter(adapter1);
 
 
-        // Set an OnClickListener for the button
-        refreshButton.setOnClickListener(v -> getAllPosts());
+        // Set an refresh listener
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getAllPosts();
+            }
+        });
 
         getAllPosts();//initial fetch of posts in DB
 //        // Set maximum length for post name
@@ -109,10 +116,12 @@ public class MarketFragment extends Fragment {
                 if(postsGV != null){
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
                     adapter.notifyDataSetChanged();
+                    swipeRefreshLayout.setRefreshing(false);//stop refreshing animation
                 }
             }
             @Override
             public void onFailure(Exception error) {
+                swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
                 Log.e("Error loading posts", error.getMessage());
             }
         });

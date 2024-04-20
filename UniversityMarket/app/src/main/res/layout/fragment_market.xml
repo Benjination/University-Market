@@ -5,6 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".fragments.MarketFragment">
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <GridView
         android:id="@+id/idGVposts"
         android:layout_width="match_parent"
@@ -15,12 +19,6 @@
         android:numColumns="2"
         android:verticalSpacing="6dp"/>
 
-    <Button
-        android:id="@+id/refreshBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/refresh"
-        android:layout_gravity="center|bottom"
-        android:layout_margin="16dp" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </FrameLayout>
