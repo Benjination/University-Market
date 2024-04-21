@@ -1,5 +1,7 @@
 package com.example.universitymarket.globals;
 
+import android.widget.RadioButton;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +17,7 @@ public interface Policy {
     int max_stars = 5;
     int post_lifetime = 30;
 
+
     List<String> invalid_image = Collections.singletonList("https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb");
 
     String[] genres = {
@@ -22,6 +25,26 @@ public interface Policy {
             "Technology",
             "Supplies",
             "Miscellaneous"
+    };
+
+    String[] genre_filters = {
+            "Textbooks",
+            "Technology",
+            "Supplies",
+            "Miscellaneous",
+            "None"
+    };
+
+    String[] price_filters = {
+            "Low to High",
+            "High to Low",
+            "None"
+    };
+
+    String[] upload_date_filters = {
+            "Newest to Oldest",
+            "Oldest to Newest",
+            "None"
     };
 
     String[] prices = {
