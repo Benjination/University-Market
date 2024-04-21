@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.example.universitymarket.objects.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.WatchViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public class viewPostFragment extends Fragment {
 
     private final String[] args;
     private final FragmentManager fm;
+    private WatchViewModel watchViewModel;
     private final String postId;
     private String chatId;
     private View viewSinglePost;
@@ -61,6 +64,7 @@ public class viewPostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
+        watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
@@ -73,28 +77,15 @@ public class viewPostFragment extends Fragment {
 
             if(ActiveUser.watch_ids.contains(this.postId))
             {
-                ActiveUser.watch_ids.remove(String.valueOf(this.postId));
+                watchViewModel.removeWatchPost(this.postId);
                 addWL.setText("Add to Watchlist");
                 System.out.println(ActiveUser.watch_ids);
             }
             else {
-                ActiveUser.watch_ids.add(String.valueOf(this.postId));
+                watchViewModel.addWatchPost(this.postId);
                 addWL.setText("Remove from Watchlist");
                 System.out.println(ActiveUser.watch_ids);
             }
-
-            Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
-                @Override
-                public void onSuccess(User result) {
-                    Toast.makeText(requireActivity(), "Updated",
-                            Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure(Exception error) {
-                    Log.e("setUser", error.getMessage());
-                }
-            });
         });
 
         // Configure the view post fragment

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.utilities.Data;
 
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> 
         public void bind(final Post post, final OnItemClickListener clickListener) {
             title.setText(post.getItemTitle());
             price.setText("$"+post.getListPrice());
-            date.setText(post.getDateCreated());
+            date.setText(Data.formatDate(Data.parseDate(post.getDateCreated()), "MMM dd, yyyy"));
             seller.setText(post.getAuthorEmail());
 
             itemView.setOnClickListener(new View.OnClickListener() {
