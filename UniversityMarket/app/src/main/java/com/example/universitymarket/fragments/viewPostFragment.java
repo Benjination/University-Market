@@ -83,7 +83,7 @@ public class viewPostFragment extends Fragment {
                 System.out.println(ActiveUser.watch_ids);
             }
 
-            Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+            Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
                     Toast.makeText(requireActivity(), "Updated",
@@ -122,18 +122,18 @@ public class viewPostFragment extends Fragment {
                     chatId
             );
 
-            Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
+            Network.setChat(chat, false, new Callback<Chat>() {
                 @Override
                 public void onSuccess(Chat newChat) {
                     ActiveUser.chat_ids.add(chatId);
 
-                    Network.setUser(requireActivity(), ActiveUser.toPOJO(), false, null);
-                    Network.getUser(requireActivity(), authorEmail, new Callback<User>() {
+                    Network.setUser(ActiveUser.toPOJO(), false, null);
+                    Network.getUser(authorEmail, new Callback<User>() {
                         @Override
                         public void onSuccess(User author) {
                             author.setChatIds((ArrayList<String>) Stream.concat(author.getChatIds().stream(), Stream.of(chatId)).collect(Collectors.toList()));
 
-                            Network.setUser(requireActivity(), author, false, null);
+                            Network.setUser(author, false, null);
                         }
 
                         @Override
@@ -155,7 +155,7 @@ public class viewPostFragment extends Fragment {
 
     private void fetchPostAndPopulate(String postID, View view) {
         // Example fetch operation
-        Network.getPost(requireActivity(), postID, new Callback<Post>() {
+        Network.getPost(postID, new Callback<Post>() {
             @Override
             public void onSuccess(Post result) {
                 //populate views
@@ -185,7 +185,7 @@ public class viewPostFragment extends Fragment {
                 }
 
                 // Get the uploader's rating and setup author button
-                Network.getUser(requireActivity(), result.getAuthorEmail(), new Callback<User>() {
+                Network.getUser(result.getAuthorEmail(), new Callback<User>() {
                     @Override
                     public void onSuccess(User user) {
                         String firstLast = user.getFirstName() + " " + user.getLastName();
@@ -212,7 +212,7 @@ public class viewPostFragment extends Fragment {
                 // Check if a chat has been opened
                 if(!result.getAuthorEmail().equals(ActiveUser.email)) {
                     createConvo.setEnabled(true);
-                    Network.getChats(requireActivity(), ActiveUser.chat_ids, new Callback<List<Chat>>() {
+                    Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
                         @Override
                         public void onSuccess(List<Chat> chats) {
                             for (Chat chat : chats) {

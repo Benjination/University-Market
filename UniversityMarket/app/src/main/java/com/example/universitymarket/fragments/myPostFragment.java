@@ -61,11 +61,11 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
 
     @Override
     public void onItemBtnClicked(Post post) {
-        Network.setPost(requireActivity(), post, true, new Callback<Post>() {
+        Network.setPost(post, true, new Callback<Post>() {
             @Override
             public void onSuccess(Post result) {
                 ActiveUser.post_ids.remove(String.valueOf(post.getId()));
-                Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
                     @Override
                     public void onSuccess(User result) { Toast.makeText(requireActivity(), "Deleted", Toast.LENGTH_SHORT).show(); }
                     @Override
@@ -83,7 +83,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
         if(userEmail.equals(ActiveUser.email)) {
-            Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
+            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
                 @Override
                 public void onSuccess(List<Post> result) {
                     adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, true);
@@ -105,10 +105,10 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
                 }
             });
         } else {
-            Network.getUser(requireActivity(), userEmail, new Callback<User>() {
+            Network.getUser(userEmail, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
-                    Network.getPosts(requireActivity(), result.getPostIds(), new Callback<List<Post>>() {
+                    Network.getPosts(result.getPostIds(), new Callback<List<Post>>() {
                         @Override
                         public void onSuccess(List<Post> result) {
                             adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, false);

@@ -98,7 +98,7 @@ public class MarketFragment extends Fragment {
     }
 
     private void getAllPosts(){
-        Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
+        Network.getPosts(1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 postsArrayList.clear();

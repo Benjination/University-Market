@@ -76,7 +76,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             if(message.getOfferTaken())
                 return;
 
-            Network.getPost((Activity) context, message.getOfferPostId(), new Callback<Post>() {
+            Network.getPost(message.getOfferPostId(), new Callback<Post>() {
                 @Override
                 public void onSuccess(Post post) {
                     holder.regularContent.setVisibility(View.INVISIBLE);
@@ -114,14 +114,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                 Data.generateID("tsct")
                         );
 
-                        Network.setTransaction((Activity) context, transaction, false, new Callback<Transaction>() {
+                        Network.setTransaction(transaction, false, new Callback<Transaction>() {
                             @Override
                             public void onSuccess(Transaction ignored) {
                                 ActiveUser.transact_ids.add(transaction.getId());
                                 message.setOfferTaken(true);
                                 holder.offerButton.setEnabled(false);
 
-                                Network.setMessage((Activity) context, message, false, new Callback<Message>() {
+                                Network.setMessage(message, false, new Callback<Message>() {
                                     @Override
                                     public void onSuccess(Message ignored) {}
 
@@ -131,7 +131,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                     }
                                 });
 
-                                Network.setUser((Activity) context, ActiveUser.toPOJO(), false, new Callback<User>() {
+                                Network.setUser(ActiveUser.toPOJO(), false, new Callback<User>() {
                                     @Override
                                     public void onSuccess(User ignored) {}
 
@@ -141,12 +141,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                     }
                                 });
 
-                                Network.getUser((Activity) context, senderEmail, new Callback<User>() {
+                                Network.getUser(senderEmail, new Callback<User>() {
                                     @Override
                                     public void onSuccess(User user) {
                                         user.setTransactIds((ArrayList<String>) Stream.concat(user.getTransactIds().stream(), Stream.of(transaction.getId())).collect(Collectors.toList()));
 
-                                        Network.setUser((Activity) context, user, false, new Callback<User>() {
+                                        Network.setUser(user, false, new Callback<User>() {
                                             @Override
                                             public void onSuccess(User ignored) {}
 
