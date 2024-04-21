@@ -235,6 +235,7 @@ public abstract class Data {
     }
 
     public static HashMap<String, Object> getCachedToPOJO(@NonNull Activity cur_act, @NonNull String name) {
+        Log.e("checking", "cache");
         return fileToPOJO(getCachedFile(cur_act, name));
     }
 

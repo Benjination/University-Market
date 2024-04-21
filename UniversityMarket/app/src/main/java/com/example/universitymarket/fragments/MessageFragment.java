@@ -84,19 +84,19 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
         sendButton.setEnabled(false);
         offerButton.setEnabled(false);
 
-        Network.getChat(requireActivity(), args[0], new Callback<Chat>() {
+        Network.getChat(args[0], new Callback<Chat>() {
             @Override
             public void onSuccess(Chat result) {
                 chat = result;
 
-                Network.getMessages(requireActivity(), chat.getMessageIds(), new Callback<List<Message>>() {
+                Network.getMessages(chat.getMessageIds(), new Callback<List<Message>>() {
                     @Override
                     public void onSuccess(List<Message> msgs) {
                         messages = msgs;
                         adapter = new MessageAdapter(requireContext(), chat, messages);
                         recycler.setAdapter(adapter);
 
-                        Network.listenToChat(requireActivity(), chat.getId(), new Listener<Chat>() {
+                        Network.listenToChat(chat.getId(), new Listener<Chat>() {
                             @Override
                             public void onAdded(Chat ignored) {}
 
@@ -108,7 +108,7 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                                 if(before < after) {
                                     List<String> msgIdsChanged = indexing.map(i -> modified.getMessageIds().get(i)).collect(Collectors.toList());
                                     chat = modified;
-                                    Network.getMessages(requireActivity(), msgIdsChanged, new Callback<List<Message>>() {
+                                    Network.getMessages(msgIdsChanged, new Callback<List<Message>>() {
                                         @Override
                                         public void onSuccess(List<Message> nmsgs) {
                                             messages = nmsgs;
@@ -175,13 +175,13 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                     msgID
             );
 
-            Network.setMessage(requireActivity(), msg, false, new Callback<Message>() {
+            Network.setMessage(msg, false, new Callback<Message>() {
                 @Override
                 public void onSuccess(Message message) {
                     inputBox.getText().clear();
                     chat.setMessageIds((ArrayList<String>) Stream.concat(chat.getMessageIds().stream(), Stream.of(message.getId())).collect(Collectors.toList()));
 
-                    Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
+                    Network.setChat(chat, false, new Callback<Chat>() {
                         @Override
                         public void onSuccess(Chat ignored) {
                             adapter.addMessage(message);
@@ -219,7 +219,7 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
 
             closeOffer.setOnClickListener(l -> postChooser.dismiss());
 
-            Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
+            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
                 @Override
                 public void onSuccess(List<Post> result) {
                     offerPosts = result;
@@ -265,12 +265,12 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                                 msgID
                         );
 
-                        Network.setMessage(requireActivity(), msg, false, new Callback<Message>() {
+                        Network.setMessage(msg, false, new Callback<Message>() {
                             @Override
                             public void onSuccess(Message message) {
                                 chat.setMessageIds((ArrayList<String>) Stream.concat(chat.getMessageIds().stream(), Stream.of(message.getId())).collect(Collectors.toList()));
 
-                                Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
+                                Network.setChat(chat, false, new Callback<Chat>() {
                                     @Override
                                     public void onSuccess(Chat ignored) {
                                         postChooser.dismiss();

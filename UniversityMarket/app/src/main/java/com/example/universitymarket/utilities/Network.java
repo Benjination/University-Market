@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
 public abstract class Network {
 
     @NonNull
-    private static Task<HashMap<String, Object>> setDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID, boolean clear, @Nullable HashMap<String, Object> obj) {
+    private static Task<HashMap<String, Object>> setDoc(@NonNull String collID, @NonNull String docID, boolean clear, @NonNull HashMap<String, Object> obj) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
         final HashMap<String, Object> pojo;
@@ -64,19 +64,7 @@ public abstract class Network {
         if(Policy.collection_names.contains(collID)) {
             final DocumentReference reference = db.collection(collID).document(docID);
             if(!clear) {
-                if(obj != null) {
-                    pojo = obj;
-                } else {
-                    HashMap<String, Object> buffer = Data.getCachedToPOJO(cur_act, docID);
-                    if(buffer != null) {
-                        pojo = buffer;
-                    } else {
-                        if(!source.getTask().isComplete())
-                            source.setException(new IllegalArgumentException(illReqObj));
-                        return source.getTask();
-                    }
-                }
-
+                pojo = obj;
                 reference.set(pojo)
                         .addOnSuccessListener(task -> {
                             if(!source.getTask().isComplete() && Data.isAnyObjectNull(pojo.values().toArray())) {
@@ -103,7 +91,7 @@ public abstract class Network {
     }
 
     @NonNull
-    private static Task<HashMap<String, Object>> getDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID) {
+    private static Task<HashMap<String, Object>> getDoc(@NonNull String collID, @NonNull String docID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<HashMap<String, Object>> source = new TaskCompletionSource<>();
         HashMap<String, String> collMap = new HashMap<>();
@@ -126,8 +114,6 @@ public abstract class Network {
 
         if(Policy.collection_names.contains(collID)) {
             Task<DocumentSnapshot> reference = db.collection(collID).document(docID).get();
-            int resID = cur_act.getResources().getIdentifier(collMap.get(collID),"raw", cur_act.getPackageName());
-            HashMap<String, Object> pojo = Data.resToPOJO(cur_act, resID);
 
             reference
                     .addOnSuccessListener(task -> {
@@ -137,7 +123,6 @@ public abstract class Network {
                         }
 
                         Map<String, Object> rawdata = task.getData();
-                        Data.mergeHash(pojo, rawdata);
                         if(!source.getTask().isComplete()) {
                             source.setResult((HashMap<String, Object>) rawdata);
                         }
@@ -155,7 +140,7 @@ public abstract class Network {
     }
 
     @NonNull
-    private static Task<List<HashMap<String, Object>>> getColl(@NonNull Activity cur_act, @NonNull String collID, @Nullable Filter filter, int pageNo) {
+    private static Task<List<HashMap<String, Object>>> getColl(@NonNull String collID, @Nullable Filter filter, int pageNo) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<List<HashMap<String, Object>>> source = new TaskCompletionSource<>();
         String illNullData = "Collection '" + collID + "' does not exist";
@@ -195,7 +180,7 @@ public abstract class Network {
 
                         for (int i = 0; i < docs.size(); i++) {
                             DocumentSnapshot thisDoc = docs.get(i);
-                            Task<HashMap<String, Object>> echo = getDoc(cur_act, collID, thisDoc.getId());
+                            Task<HashMap<String, Object>> echo = getDoc(collID, thisDoc.getId());
                             echo.addOnFailureListener(err ->
                                     Log.e("getColl", thisDoc.getId() + " doc is invalid: " + err)
                             );
@@ -223,7 +208,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull Activity cur_act, @NonNull String collID, @NonNull String docID) {
+    public static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull String collID, @NonNull String docID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final DocumentReference ref = db.collection(collID).document(docID);
 
@@ -232,7 +217,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull Activity cur_act, @NonNull String collID) {
+    public static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull String collID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final CollectionReference ref = db.collection(collID);
 
@@ -277,36 +262,14 @@ public abstract class Network {
  * DO NOT REMOVE THIS BLOCK 
 */
 
-    public static void setUserFromCache(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable Callback<User> response) {
-        Task<HashMap<String, Object>> echo = setDoc(cur_act, "users", docID, clear, null);
-        if(response != null) {
-            echo.addOnSuccessListener(task -> {
-                User result = new User(task);
-                response.onSuccess(result);
-            });
-            echo.addOnFailureListener(response::onFailure);
-        }
-    }
-
-    public static void setUserFromCache(@NonNull Activity cur_act, boolean clear, @Nullable Callback<User> response) {
-        Task<HashMap<String, Object>> echo = setDoc(cur_act, "users", ActiveUser.id, clear, null);
-        if(response != null) {
-            echo.addOnSuccessListener(task -> {
-                User result = new User(task);
-                response.onSuccess(result);
-            });
-            echo.addOnFailureListener(response::onFailure);
-        }
-    }
-
-    public static void setUser(@NonNull Activity cur_act, @NonNull User userOBJ, boolean clear, @Nullable Callback<User> response) {
+    public static void setUser(@NonNull User userOBJ, boolean clear, @Nullable Callback<User> response) {
         if(response == null && userOBJ.getId() == null)
             return;
         else if(response != null && userOBJ.getId() == null) {
             response.onFailure(new NullPointerException("User ID does not exist in user object " + userOBJ));
             return;
         }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"users", userOBJ.getId(), clear, userOBJ);
+        Task<HashMap<String, Object>> echo = setDoc("users", userOBJ.getId(), clear, userOBJ);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
                 User result = new User(task);
@@ -316,7 +279,7 @@ public abstract class Network {
         }
     }
 
-    public static void setUsers(@NonNull Activity cur_act, @NonNull User[] userOBJ, boolean clear, @Nullable Callback<List<User>> response) {
+    public static void setUsers(@NonNull User[] userOBJ, boolean clear, @Nullable Callback<List<User>> response) {
         List<User> responses = new ArrayList<>();
         for(int i = 0; i < userOBJ.length; i++) {
             if(response == null && userOBJ[i].getId() == null)
@@ -325,7 +288,7 @@ public abstract class Network {
                 response.onFailure(new NullPointerException("User ID does not exist in user object " + userOBJ[i]));
                 continue;
             }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"users", userOBJ[i].getId(), clear, userOBJ[i]);
+            Task<HashMap<String, Object>> echo = setDoc("users", userOBJ[i].getId(), clear, userOBJ[i]);
             if(response != null) {
                 echo.addOnFailureListener(response::onFailure);
                 if(i == userOBJ.length - 1) {
@@ -344,21 +307,8 @@ public abstract class Network {
         }
     }
 
-    public static void syncUserCache(@NonNull Activity cur_act) {
-        getDoc(cur_act, "users", ActiveUser.id)
-                .addOnSuccessListener(task -> {
-                    User result = new User(task);
-                    Data.setActiveUser(cur_act, result);
-                })
-                .addOnFailureListener(e -> Toast.makeText(
-                        cur_act,
-                        e.getMessage(),
-                        Toast.LENGTH_SHORT
-                ).show());
-    }
-
-    public static void getUser(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<User> response) {
-        getDoc(cur_act,"users", docID)
+    public static void getUser(@NonNull String docID, @NonNull Callback<User> response) {
+        getDoc("users", docID)
                 .addOnSuccessListener(task -> {
                     User result = new User(task);
                     response.onSuccess(result);
@@ -366,12 +316,12 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@NonNull List<String> docID, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
         if(docID.size() == 0)
             response.onFailure(new NullPointerException("No documents are available"));
         for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"users", docID.get(i));
+            Task<HashMap<String, Object>> echo = getDoc("users", docID.get(i));
             echo.addOnFailureListener(response::onFailure);
             if(i == docID.size() - 1) {
                 echo.addOnSuccessListener(task -> {
@@ -388,9 +338,9 @@ public abstract class Network {
         }
     }
 
-    public static void getUsers(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@NonNull Filter filter, int pageNo, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        getColl(cur_act,"users", filter, Math.max(pageNo, 0))
+        getColl("users", filter, Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -401,9 +351,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<User>> response) {
+    public static void getUsers(int pageNo, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        getColl(cur_act,"users", null, (char) (Math.max(pageNo, 0)))
+        getColl("users", null, (char) (Math.max(pageNo, 0)))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -414,8 +364,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToUser(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<User> response) {
-        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "users", docID);
+    public static void listenToUser(@NonNull String docID, @NonNull Listener<User> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc("users", docID);
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
@@ -434,8 +384,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToUsers(@NonNull Activity cur_act, @NonNull Listener<User> response) {
-        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "users");
+    public static void listenToUsers(@NonNull Listener<User> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl("users");
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
@@ -459,14 +409,14 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void setChat(@NonNull Activity cur_act, @NonNull Chat chatOBJ, boolean clear, @Nullable Callback<Chat> response) {
+    public static void setChat(@NonNull Chat chatOBJ, boolean clear, @Nullable Callback<Chat> response) {
         if(response == null && chatOBJ.getId() == null)
             return;
         else if(response != null && chatOBJ.getId() == null) {
             response.onFailure(new NullPointerException("Chat ID does not exist in chat object " + chatOBJ));
             return;
         }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"chats", chatOBJ.getId(), clear, chatOBJ);
+        Task<HashMap<String, Object>> echo = setDoc("chats", chatOBJ.getId(), clear, chatOBJ);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
                 Chat result = new Chat(task);
@@ -476,7 +426,7 @@ public abstract class Network {
         }
     }
 
-    public static void setChats(@NonNull Activity cur_act, @NonNull Chat[] chatOBJ, boolean clear, @Nullable Callback<List<Chat>> response) {
+    public static void setChats(@NonNull Chat[] chatOBJ, boolean clear, @Nullable Callback<List<Chat>> response) {
         List<Chat> responses = new ArrayList<>();
         for(int i = 0; i < chatOBJ.length; i++) {
             if(response == null && chatOBJ[i].getId() == null)
@@ -485,7 +435,7 @@ public abstract class Network {
                 response.onFailure(new NullPointerException("Chat ID does not exist in chat object " + chatOBJ[i]));
                 continue;
             }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"chats", chatOBJ[i].getId(), clear, chatOBJ[i]);
+            Task<HashMap<String, Object>> echo = setDoc("chats", chatOBJ[i].getId(), clear, chatOBJ[i]);
             if(response != null) {
                 echo.addOnFailureListener(response::onFailure);
                 if(i == chatOBJ.length - 1) {
@@ -504,8 +454,8 @@ public abstract class Network {
         }
     }
 
-    public static void getChat(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Chat> response) {
-        getDoc(cur_act,"chats", docID)
+    public static void getChat(@NonNull String docID, @NonNull Callback<Chat> response) {
+        getDoc("chats", docID)
                 .addOnSuccessListener(task -> {
                     Chat result = new Chat(task);
                     response.onSuccess(result);
@@ -513,12 +463,12 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@NonNull List<String> docID, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
         if(docID.size() == 0)
             response.onFailure(new NullPointerException("No documents are available"));
         for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"chats", docID.get(i));
+            Task<HashMap<String, Object>> echo = getDoc("chats", docID.get(i));
             echo.addOnFailureListener(response::onFailure);
             if(i == docID.size() - 1) {
                 echo.addOnSuccessListener(task -> {
@@ -535,9 +485,9 @@ public abstract class Network {
         }
     }
 
-    public static void getChats(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        getColl(cur_act,"chats", filter, Math.max(pageNo, 0))
+        getColl("chats", filter, Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -548,9 +498,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(int pageNo, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        getColl(cur_act,"chats", null, (char) (Math.max(pageNo, 0)))
+        getColl("chats", null, (char) (Math.max(pageNo, 0)))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -561,8 +511,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToChat(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Chat> response) {
-        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "chats", docID);
+    public static void listenToChat(@NonNull String docID, @NonNull Listener<Chat> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc("chats", docID);
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
@@ -581,8 +531,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToChats(@NonNull Activity cur_act, @NonNull Listener<Chat> response) {
-        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "chats");
+    public static void listenToChats(@NonNull Listener<Chat> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl("chats");
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
@@ -606,14 +556,14 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void setMessage(@NonNull Activity cur_act, @NonNull Message messageOBJ, boolean clear, @Nullable Callback<Message> response) {
+    public static void setMessage(@NonNull Message messageOBJ, boolean clear, @Nullable Callback<Message> response) {
         if(response == null && messageOBJ.getId() == null)
             return;
         else if(response != null && messageOBJ.getId() == null) {
             response.onFailure(new NullPointerException("Message ID does not exist in message object " + messageOBJ));
             return;
         }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"messages", messageOBJ.getId(), clear, messageOBJ);
+        Task<HashMap<String, Object>> echo = setDoc("messages", messageOBJ.getId(), clear, messageOBJ);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
                 Message result = new Message(task);
@@ -623,7 +573,7 @@ public abstract class Network {
         }
     }
 
-    public static void setMessages(@NonNull Activity cur_act, @NonNull Message[] messageOBJ, boolean clear, @Nullable Callback<List<Message>> response) {
+    public static void setMessages(@NonNull Message[] messageOBJ, boolean clear, @Nullable Callback<List<Message>> response) {
         List<Message> responses = new ArrayList<>();
         for(int i = 0; i < messageOBJ.length; i++) {
             if(response == null && messageOBJ[i].getId() == null)
@@ -632,7 +582,7 @@ public abstract class Network {
                 response.onFailure(new NullPointerException("Message ID does not exist in message object " + messageOBJ[i]));
                 continue;
             }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"messages", messageOBJ[i].getId(), clear, messageOBJ[i]);
+            Task<HashMap<String, Object>> echo = setDoc("messages", messageOBJ[i].getId(), clear, messageOBJ[i]);
             if(response != null) {
                 echo.addOnFailureListener(response::onFailure);
                 if(i == messageOBJ.length - 1) {
@@ -651,8 +601,8 @@ public abstract class Network {
         }
     }
 
-    public static void getMessage(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Message> response) {
-        getDoc(cur_act,"messages", docID)
+    public static void getMessage(@NonNull String docID, @NonNull Callback<Message> response) {
+        getDoc("messages", docID)
                 .addOnSuccessListener(task -> {
                     Message result = new Message(task);
                     response.onSuccess(result);
@@ -660,12 +610,12 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@NonNull List<String> docID, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
         if(docID.size() == 0)
             response.onFailure(new NullPointerException("No documents are available"));
         for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"messages", docID.get(i));
+            Task<HashMap<String, Object>> echo = getDoc("messages", docID.get(i));
             echo.addOnFailureListener(response::onFailure);
             if(i == docID.size() - 1) {
                 echo.addOnSuccessListener(task -> {
@@ -682,9 +632,9 @@ public abstract class Network {
         }
     }
 
-    public static void getMessages(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        getColl(cur_act,"messages", filter, Math.max(pageNo, 0))
+        getColl("messages", filter, Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -695,9 +645,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(int pageNo, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        getColl(cur_act,"messages", null, (char) (Math.max(pageNo, 0)))
+        getColl("messages", null, (char) (Math.max(pageNo, 0)))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -708,8 +658,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToMessage(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Message> response) {
-        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "messages", docID);
+    public static void listenToMessage(@NonNull String docID, @NonNull Listener<Message> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc("messages", docID);
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
@@ -728,8 +678,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToMessages(@NonNull Activity cur_act, @NonNull Listener<Message> response) {
-        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "messages");
+    public static void listenToMessages(@NonNull Listener<Message> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl("messages");
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
@@ -753,14 +703,14 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void setTransaction(@NonNull Activity cur_act, @NonNull Transaction transactionOBJ, boolean clear, @Nullable Callback<Transaction> response) {
+    public static void setTransaction(@NonNull Transaction transactionOBJ, boolean clear, @Nullable Callback<Transaction> response) {
         if(response == null && transactionOBJ.getId() == null)
             return;
         else if(response != null && transactionOBJ.getId() == null) {
             response.onFailure(new NullPointerException("Transaction ID does not exist in transaction object " + transactionOBJ));
             return;
         }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"transactions", transactionOBJ.getId(), clear, transactionOBJ);
+        Task<HashMap<String, Object>> echo = setDoc("transactions", transactionOBJ.getId(), clear, transactionOBJ);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
                 Transaction result = new Transaction(task);
@@ -770,7 +720,7 @@ public abstract class Network {
         }
     }
 
-    public static void setTransactions(@NonNull Activity cur_act, @NonNull Transaction[] transactionOBJ, boolean clear, @Nullable Callback<List<Transaction>> response) {
+    public static void setTransactions(@NonNull Transaction[] transactionOBJ, boolean clear, @Nullable Callback<List<Transaction>> response) {
         List<Transaction> responses = new ArrayList<>();
         for(int i = 0; i < transactionOBJ.length; i++) {
             if(response == null && transactionOBJ[i].getId() == null)
@@ -779,7 +729,7 @@ public abstract class Network {
                 response.onFailure(new NullPointerException("Transaction ID does not exist in transaction object " + transactionOBJ[i]));
                 continue;
             }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"transactions", transactionOBJ[i].getId(), clear, transactionOBJ[i]);
+            Task<HashMap<String, Object>> echo = setDoc("transactions", transactionOBJ[i].getId(), clear, transactionOBJ[i]);
             if(response != null) {
                 echo.addOnFailureListener(response::onFailure);
                 if(i == transactionOBJ.length - 1) {
@@ -798,8 +748,8 @@ public abstract class Network {
         }
     }
 
-    public static void getTransaction(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Transaction> response) {
-        getDoc(cur_act,"transactions", docID)
+    public static void getTransaction(@NonNull String docID, @NonNull Callback<Transaction> response) {
+        getDoc("transactions", docID)
                 .addOnSuccessListener(task -> {
                     Transaction result = new Transaction(task);
                     response.onSuccess(result);
@@ -807,12 +757,12 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@NonNull List<String> docID, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
         if(docID.size() == 0)
             response.onFailure(new NullPointerException("No documents are available"));
         for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"transactions", docID.get(i));
+            Task<HashMap<String, Object>> echo = getDoc("transactions", docID.get(i));
             echo.addOnFailureListener(response::onFailure);
             if(i == docID.size() - 1) {
                 echo.addOnSuccessListener(task -> {
@@ -829,9 +779,9 @@ public abstract class Network {
         }
     }
 
-    public static void getTransactions(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        getColl(cur_act,"transactions", filter, Math.max(pageNo, 0))
+        getColl("transactions", filter, Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -842,9 +792,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(int pageNo, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        getColl(cur_act,"transactions", null, (char) (Math.max(pageNo, 0)))
+        getColl("transactions", null, (char) (Math.max(pageNo, 0)))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -855,8 +805,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToTransaction(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Transaction> response) {
-        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "transactions", docID);
+    public static void listenToTransaction(@NonNull String docID, @NonNull Listener<Transaction> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc("transactions", docID);
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
@@ -875,8 +825,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToTransactions(@NonNull Activity cur_act, @NonNull Listener<Transaction> response) {
-        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "transactions");
+    public static void listenToTransactions(@NonNull Listener<Transaction> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl("transactions");
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {
@@ -900,14 +850,14 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void setPost(@NonNull Activity cur_act, @NonNull Post postOBJ, boolean clear, @Nullable Callback<Post> response) {
+    public static void setPost(@NonNull Post postOBJ, boolean clear, @Nullable Callback<Post> response) {
         if(response == null && postOBJ.getId() == null)
             return;
         else if(response != null && postOBJ.getId() == null) {
             response.onFailure(new NullPointerException("Post ID does not exist in post object " + postOBJ));
             return;
         }
-        Task<HashMap<String, Object>> echo = setDoc(cur_act,"posts", postOBJ.getId(), clear, postOBJ);
+        Task<HashMap<String, Object>> echo = setDoc("posts", postOBJ.getId(), clear, postOBJ);
         if(response != null) {
             echo.addOnSuccessListener(task -> {
                 Post result = new Post(task);
@@ -917,7 +867,7 @@ public abstract class Network {
         }
     }
 
-    public static void setPosts(@NonNull Activity cur_act, @NonNull Post[] postOBJ, boolean clear, @Nullable Callback<List<Post>> response) {
+    public static void setPosts(@NonNull Post[] postOBJ, boolean clear, @Nullable Callback<List<Post>> response) {
         List<Post> responses = new ArrayList<>();
         for(int i = 0; i < postOBJ.length; i++) {
             if(response == null && postOBJ[i].getId() == null)
@@ -926,7 +876,7 @@ public abstract class Network {
                 response.onFailure(new NullPointerException("Post ID does not exist in post object " + postOBJ[i]));
                 continue;
             }
-            Task<HashMap<String, Object>> echo = setDoc(cur_act,"posts", postOBJ[i].getId(), clear, postOBJ[i]);
+            Task<HashMap<String, Object>> echo = setDoc("posts", postOBJ[i].getId(), clear, postOBJ[i]);
             if(response != null) {
                 echo.addOnFailureListener(response::onFailure);
                 if(i == postOBJ.length - 1) {
@@ -945,8 +895,8 @@ public abstract class Network {
         }
     }
 
-    public static void getPost(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<Post> response) {
-        getDoc(cur_act,"posts", docID)
+    public static void getPost(@NonNull String docID, @NonNull Callback<Post> response) {
+        getDoc("posts", docID)
                 .addOnSuccessListener(task -> {
                     Post result = new Post(task);
                     response.onSuccess(result);
@@ -954,12 +904,12 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@NonNull List<String> docID, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
         if(docID.size() == 0)
             response.onFailure(new NullPointerException("No documents are available"));
         for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc(cur_act,"posts", docID.get(i));
+            Task<HashMap<String, Object>> echo = getDoc("posts", docID.get(i));
             echo.addOnFailureListener(response::onFailure);
             if(i == docID.size() - 1) {
                 echo.addOnSuccessListener(task -> {
@@ -976,9 +926,9 @@ public abstract class Network {
         }
     }
 
-    public static void getPosts(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        getColl(cur_act,"posts", filter, Math.max(pageNo, 0))
+        getColl("posts", filter, Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);
@@ -989,9 +939,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(int pageNo, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        getColl(cur_act,"posts", null, (char) (Math.max(pageNo, 0)))
+        getColl("posts", null, (char) (Math.max(pageNo, 0)))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);
@@ -1002,8 +952,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToPost(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<Post> response) {
-        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, "posts", docID);
+    public static void listenToPost(@NonNull String docID, @NonNull Listener<Post> response) {
+        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc("posts", docID);
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {
@@ -1022,8 +972,8 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void listenToPosts(@NonNull Activity cur_act, @NonNull Listener<Post> response) {
-        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, "posts");
+    public static void listenToPosts(@NonNull Listener<Post> response) {
+        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl("posts");
         pair.second
                 .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {
                     if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {

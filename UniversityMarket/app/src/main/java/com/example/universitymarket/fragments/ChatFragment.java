@@ -70,7 +70,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
 
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-        Network.getChats(requireActivity(), ActiveUser.chat_ids, new Callback<List<Chat>>() {
+        Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
             @Override
             public void onSuccess(List<Chat> result) {
                 chats = result;
@@ -84,7 +84,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
                 });
                 List<String> allUsers = participantsOrdered.stream().flatMap(List::stream).distinct().collect(Collectors.toList());
 
-                Network.getUsers(requireActivity(), allUsers, new Callback<List<User>>() {
+                Network.getUsers(allUsers, new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> result) {
                         participants = participantsOrdered.stream()
@@ -103,7 +103,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
                     }
                 });
 
-                Network.getMessages(requireActivity(), msgIds, new Callback<List<Message>>() {
+                Network.getMessages(msgIds, new Callback<List<Message>>() {
                     @Override
                     public void onSuccess(List<Message> result) {
                         previews = result;

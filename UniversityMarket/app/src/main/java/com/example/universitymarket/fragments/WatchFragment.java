@@ -60,7 +60,7 @@ public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickL
 
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-        Network.getPosts(requireActivity(), ActiveUser.watch_ids, new Callback<List<Post>>() {
+        Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 adapter = new WatchAdapter(requireContext(), result, WatchFragment.this);

@@ -237,12 +237,12 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         //created and every image was able to be uploaded
         post.setImageUrls(imageURLs);
         ActiveUser.post_ids.add(post.getId());
-        Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+        Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
             @Override
             public void onSuccess(User ignored) {
                 //setActiveUser caches ActiveUser
                 Data.setActiveUser(requireActivity(), Data.activeUserToPOJO());
-                Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+                Network.setPost(post, false, new Callback<Post>() {
                     @Override
                     public void onSuccess(Post result) {
                         Toast.makeText(
@@ -284,7 +284,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onFailure(Exception error) {
-                Network.setPost(requireActivity(), post, true, null);
+                Network.setPost(post, true, null);
                 Toast.makeText(
                         getContext(),
                         "Could not finish uploading: " + error.getMessage(),
@@ -406,7 +406,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     description.getText().toString()
             );
 
-            Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+            Network.setPost(post, false, new Callback<Post>() {
                 @Override
                 public void onSuccess(Post result) {
                     for(String s : imageURLsToBeUploaded) {

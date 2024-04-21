@@ -157,7 +157,7 @@ public class SignIn extends AppCompatActivity
 
                                 if(firebaseUser.isEmailVerified()) {
                                     //Data.setActiveUser(SignIn.this, firebaseUser);
-                                    Network.getUser(SignIn.this, ActiveUser.email, new Callback<User>() {
+                                    Network.getUser(ActiveUser.email, new Callback<User>() {
                                         @Override
                                         public void onSuccess(User result) {
                                             Data.setActiveUser(SignIn.this, result);
