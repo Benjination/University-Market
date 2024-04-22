@@ -68,23 +68,55 @@ public class viewPostFragment extends Fragment {
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
+
         if(ActiveUser.watch_ids.contains(this.postId))
         {
             addWL.setText("Remove from Watchlist");
         }
+        if(ActiveUser.post_ids.contains(this.postId))
+        {
+            addWL.setText("Delete Post");
+        }
 
         addWL.setOnClickListener(v -> {
-
-            if(ActiveUser.watch_ids.contains(this.postId))
-            {
-                watchViewModel.removeWatchPost(this.postId);
-                addWL.setText("Add to Watchlist");
-                System.out.println(ActiveUser.watch_ids);
+            if(!ActiveUser.post_ids.contains(this.postId)) {
+                if (ActiveUser.watch_ids.contains(this.postId)) {
+                    watchViewModel.removeWatchPost(this.postId);
+                    addWL.setText("Add to Watchlist");
+                    System.out.println(ActiveUser.watch_ids);
+                } else {
+                    watchViewModel.addWatchPost(this.postId);
+                    addWL.setText("Remove from Watchlist");
+                    System.out.println(ActiveUser.watch_ids);
+                }
             }
-            else {
-                watchViewModel.addWatchPost(this.postId);
-                addWL.setText("Remove from Watchlist");
-                System.out.println(ActiveUser.watch_ids);
+            else
+            {
+                //Implement code to delete post from database
+                Network.getPost(postId, new Callback<Post>() {
+                    @Override
+                    public void onSuccess(Post result) {
+                        Network.setPost(result, true, new Callback<Post>() {
+                            @Override
+                            public void onSuccess(Post result) {
+                                ActiveUser.post_ids.remove(postId);
+                                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
+                                    @Override
+                                    public void onSuccess(User result) { Toast.makeText(requireActivity(), "Deleted", Toast.LENGTH_SHORT).show(); }
+                                    @Override
+                                    public void onFailure(Exception error) { Log.e("setUser", error.getMessage()); }
+                                });
+                            }
+                            @Override
+                            public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+
+                    }
+                });
             }
         });
 
@@ -96,15 +128,21 @@ public class viewPostFragment extends Fragment {
 
     private void configureViewPostFragment(View view, String postID) {
         createConvo = view.findViewById(R.id.viewpost_create_conversation_button);
+        if(ActiveUser.post_ids.contains(this.postId))
+        {
+            createConvo.setText("Mark as Sold");
+        }
         ratingBar = view.findViewById(R.id.viewpost_rating_indicator);
 
         fetchPostAndPopulate(postID, view);
     }
 
     private void setupCreateConvoButton(Button createConvo, String authorEmail) {
-        createConvo.setEnabled(true);
+            createConvo.setEnabled(true);
+
         createConvo.setOnClickListener(l -> {
-            createConvo.setEnabled(false);
+                createConvo.setEnabled(false);
+
             chatId = Data.generateID("chat");
 
             Chat chat = new Chat(
@@ -213,6 +251,15 @@ public class viewPostFragment extends Fragment {
                             setupCreateConvoButton(createConvo, result.getAuthorEmail());
                         }
                     });
+                }
+                else
+                {
+                    if(ActiveUser.post_ids.contains(postID))
+                    {
+                        createConvo.setEnabled(true);
+                        //Create Transaction with seller but not buyer
+
+                    }
                 }
             }
 
