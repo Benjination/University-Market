@@ -203,7 +203,7 @@ public class viewPostFragment extends Fragment {
 
                 // Check if a chat has been opened
                 if(!result.getAuthorEmail().equals(ActiveUser.email)) {
-                    Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
+                    Network.getChats(ActiveUser.chat_ids, null, new Callback<List<Chat>>() {
                         @Override
                         public void onSuccess(List<Chat> ignored) {}
 

@@ -83,7 +83,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
         if(userEmail.equals(ActiveUser.email)) {
-            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
+            Network.getPosts(ActiveUser.post_ids, null, new Callback<List<Post>>() {
                 @Override
                 public void onSuccess(List<Post> result) {
                     adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, true);
@@ -108,7 +108,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
             Network.getUser(userEmail, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
-                    Network.getPosts(result.getPostIds(), new Callback<List<Post>>() {
+                    Network.getPosts(result.getPostIds(), null, new Callback<List<Post>>() {
                         @Override
                         public void onSuccess(List<Post> result) {
                             adapter = new myPostAdapter(requireContext(), result, myPostFragment.this, myPostFragment.this, false);

@@ -69,7 +69,7 @@ public class RecordsFragment extends Fragment {
 
         load = new TaskCompletionSource<>();
         loadPage(load.getTask());
-        Network.getTransactions(ActiveUser.transact_ids, new Callback<List<Transaction>>() {
+        Network.getTransactions(ActiveUser.transact_ids, null, new Callback<List<Transaction>>() {
             @Override
             public void onSuccess(List<Transaction> result) {
                 transactions = result;
@@ -79,8 +79,7 @@ public class RecordsFragment extends Fragment {
                     userIds.add(transaction.getSellerEmail());
                 });
 
-                Log.e("huh","");
-                Network.getPosts(postIds, new Callback<List<Post>>() {
+                Network.getPosts(postIds, null, new Callback<List<Post>>() {
                     @Override
                     public void onSuccess(List<Post> result) {
                         posts = result;
@@ -92,7 +91,7 @@ public class RecordsFragment extends Fragment {
                     }
                 });
 
-                Network.getUsers(userIds, new Callback<List<User>>() {
+                Network.getUsers(userIds, null, new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> result) {
                         users = result;

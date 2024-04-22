@@ -105,7 +105,7 @@ public class ChatViewModel extends ViewModel {
             retrieve.interrupt();
         isLoading.setValue(true);
 
-        Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
+        Network.getChats(ActiveUser.chat_ids, null, new Callback<List<Chat>>() {
             @Override
             public void onSuccess(List<Chat> result) {
                 chats = result;
@@ -113,7 +113,7 @@ public class ChatViewModel extends ViewModel {
                 previewIds = result.stream().map(Chat::getMessageIds).map(msgs -> msgs.isEmpty() ? null : msgs.get(msgs.size() - 1)).collect(Collectors.toList());
                 List<String> allUsers = participantsOrdered.stream().flatMap(List::stream).distinct().collect(Collectors.toList());
 
-                Network.getUsers(allUsers, new Callback<List<User>>() {
+                Network.getUsers(allUsers, null, new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> result) {
                         participants = participantsOrdered.stream()
@@ -132,7 +132,7 @@ public class ChatViewModel extends ViewModel {
                     }
                 });
 
-                Network.getMessages(previewIds.stream().filter(Objects::nonNull).collect(Collectors.toList()), new Callback<List<Message>>() {
+                Network.getMessages(previewIds.stream().filter(Objects::nonNull).collect(Collectors.toList()), null, new Callback<List<Message>>() {
                     @Override
                     public void onSuccess(List<Message> result) {
                         previews = IntStream.range(0, previewIds.size()).boxed()

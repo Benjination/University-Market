@@ -46,7 +46,7 @@ public class MessageViewModel extends ViewModel {
     }
 
     private void load(List<String> messageIds) {
-        Network.getMessages(messageIds, new Callback<List<Message>>() {
+        Network.getMessages(messageIds, null, new Callback<List<Message>>() {
             @Override
             public void onSuccess(List<Message> result) {
                 messageList.setValue(result);

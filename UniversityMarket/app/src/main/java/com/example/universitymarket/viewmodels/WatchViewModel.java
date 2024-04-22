@@ -32,7 +32,7 @@ public class WatchViewModel extends ViewModel {
     }
 
     private void loadWatchPosts() {
-        Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
+        Network.getPosts(ActiveUser.watch_ids, null, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 watchedPosts.setValue(result);
