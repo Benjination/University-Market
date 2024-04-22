@@ -512,25 +512,20 @@ String[] generate(def map, def class_name, def file) {
                     "    }\n\n" +
             \
             "    public static void get" +  class_name  + "s(@NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
-                    "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-                    "        if(docID.size() == 0)\n" +
-                    "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
-                    "        for(int i = 0; i < docID.size(); i++) {\n" +
-                    "            Task<HashMap<String, Object>> echo = getDoc(" +  coll_name  + ", docID.get(i));\n" +
-                    "            echo.addOnFailureListener(response::onFailure);\n" +
-                    "            if(i == docID.size() - 1) {\n" +
-                    "                echo.addOnSuccessListener(task -> {\n" +
-                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                    "                    list.add(result);\n" +
-                    "                    response.onSuccess(list);\n" +
-                    "                });\n" +
-                    "            } else {\n" +
-                    "                echo.addOnSuccessListener(task -> {\n" +
-                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                    "                    list.add(result);\n" +
-                    "                });\n" +
-                    "            }\n" +
+                    "        List<" + class_name + "> list = new ArrayList<>();\n" +
+                    "        if(docID.isEmpty()) {\n" +
+                    "            response.onFailure(new Exception(\"A non-empty docID list is required\"));\n" +
+                    "            return;\n" +
                     "        }\n" +
+                    "        getColl(" + coll_name + ", Filter.inArray(\"id\", docID), -1)\n" +
+                    "                .addOnSuccessListener(task -> {\n" +
+                    "                    for (HashMap<String, Object> hash : task) {\n" +
+                    "                        " + class_name + " result = new " + class_name + "(hash);\n" +
+                    "                        list.add(result);\n" +
+                    "                    }\n" +
+                    "                    response.onSuccess(list);\n" +
+                    "                })\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
             "    public static void get" +  class_name  + "s(@NonNull Filter filter, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
@@ -654,7 +649,7 @@ String[] generate(def map, def class_name, def file) {
                     "setCache(cur_act, \"Active" + class_name + "\", " + obj_name + ", false));\n"
     )
     String method = \
-            "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +
+            "\n\n    public static void setActive" + class_name + "(  Activity cur_act, " +
             class_name + " " + obj_name + ") {\n" + details + "    }" +
             "\n\n    public static " + class_name + " active" + class_name + "ToPOJO() {\n" +
             "        return new " + class_name + "(" + provOrdered + ");\n    }"

@@ -28,14 +28,10 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.squareup.picasso.Picasso;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,12 +48,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         this.messages = messages;
     }
 
-    public void removeMessage(Message message) {
-        messages.remove(message);
+    public void removeMessage(List<Message> message) {
+        messages.removeAll(message);
     }
 
-    public void addMessage(Message message) {
-        messages.add(message);
+    public void addMessages(List<Message> message) {
+        messages.addAll(message);
     }
 
     @NonNull
@@ -72,7 +68,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         Message message = messages.get(position);
         String senderEmail = message.getSenderEmail();
 
-        if(message.getOfferPostId() == null) {
+        if(message.getOfferPostId() != null) {
             if(message.getOfferTaken())
                 return;
 
@@ -193,16 +189,23 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         } else {
             if(senderEmail.equals(ActiveUser.email)) {
                 // It's our message, shift it right and recolor
-                ConstraintSet newConstraints = new ConstraintSet();
+                /*ConstraintSet newConstraints = new ConstraintSet();
                 newConstraints.clone(context, R.id.message_constraint);
                 newConstraints.connect(R.id.message_card_item, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
                 newConstraints.connect(R.id.message_timestamp, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
-                newConstraints.applyTo(holder.constraintLayout);
+                newConstraints.applyTo(holder.constraintLayout);*/
 
                 TypedValue colorSecondary = new TypedValue();
                 context.getTheme().resolveAttribute(R.attr.colorSecondary, colorSecondary, true);
                 holder.cardContainer.setCardBackgroundColor(colorSecondary.data);
             }
+
+            ViewGroup.LayoutParams params = holder.offerButton.getLayoutParams();
+            params.height = 0;
+            params.width = 0;
+            holder.offerButton.setLayoutParams(params);
+            holder.offerImage.setLayoutParams(params);
+            holder.offerTitle.setLayoutParams(params);
 
             holder.regularContent.setText(message.getContents());
         }
