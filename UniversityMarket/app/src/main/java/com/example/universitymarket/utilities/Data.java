@@ -44,6 +44,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class Data {
     public static void mergeHash(Map<String, Object> from, Map<String, Object> to) {
@@ -83,6 +85,25 @@ public abstract class Data {
         });
 
         result.dispatchUpdatesTo(adapter);
+    }
+
+    public static List<Map.Entry<String, Object>> differingValuePairs(HashMap<String, Object> firstPOJO, HashMap<String, Object> secondPOJO) {
+        Stream<Map.Entry<String, Object>> differingStream = Stream.concat(
+                firstPOJO.entrySet().stream().filter(entry -> !Objects.equals(entry.getValue(), secondPOJO.get(entry.getKey())))
+                        .flatMap(entry -> {
+                            String key = entry.getKey();
+                            Object firstVal = entry.getValue(), secondVal = secondPOJO.get(key);
+                            if(firstVal instanceof Map && secondVal instanceof Map) {
+                                return differingValuePairs((HashMap<String, Object>) firstVal, (HashMap<String, Object>) secondVal).stream();
+                            } else {
+                                return Stream.of(new AbstractMap.SimpleEntry<>(key, firstVal));
+                            }
+                        }),
+                secondPOJO.entrySet().stream().filter(entry -> !firstPOJO.containsKey(entry.getKey()))
+                        .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue()))
+        );
+
+        return differingStream.collect(Collectors.toList());
     }
 
     public static void callPicasso(@NonNull Activity cur_act, @NonNull List<Uri> uris, @NonNull List<Uri> processed, @NonNull List<Exception> exceptions, int depth, @NonNull TaskCompletionSource<List<Uri>> task) {

@@ -208,7 +208,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull String collID, @NonNull String docID) {
+    private static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull String collID, @NonNull String docID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final DocumentReference ref = db.collection(collID).document(docID);
 
@@ -217,7 +217,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull String collID) {
+    private static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull String collID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final CollectionReference ref = db.collection(collID);
 
