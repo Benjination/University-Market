@@ -15,6 +15,8 @@ import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class myPostsViewModel extends ViewModel {
     33. MyPosts does not have the ability to view each post (similar to marketplace), and only deletes
      */
     private void loadMyPosts() {
-        Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
+        Network.getPosts(ActiveUser.post_ids, null, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 myPosts.setValue(result);
@@ -66,7 +68,39 @@ public class myPostsViewModel extends ViewModel {
                     @Override
                     public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL UserPostID: "+error.getMessage()); }
                 });
+                /*
                 // add remove postID from ALL user Watchlists here
+                Network.getAllUsers(null, new Callback<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> result) {
+                        List<User> updatedUsers = new ArrayList<>();
+                        if(result != null) {
+                            for (User user : result) {
+                                List<String> user_watch_ids = user.getWatchIds();
+                                if(user_watch_ids != null) {
+                                    for (String watch_id : user_watch_ids) {
+                                        if (postID.matches(watch_id)) {
+                                            updatedUsers.add(user);
+                                        }
+                                    }
+                                }
+                            }
+                            if(updatedUsers != null) {
+                                for(User user : updatedUsers) {
+                                    List<String> user_watch_ids = user.getWatchIds();
+
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        Log.e("myPostsViewModel", "GET AllUsers: "+error.getMessage());
+                    }
+                });
+
+                 */
             }
             @Override
             public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL Post: "+error.getMessage());  }

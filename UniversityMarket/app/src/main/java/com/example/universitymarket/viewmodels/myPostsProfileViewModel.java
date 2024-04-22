@@ -25,18 +25,11 @@ public class myPostsProfileViewModel extends ViewModel {
     public myPostsProfileViewModel() {}
 
     public MutableLiveData<List<Post>> getMyPosts() {
-        loadMyPosts();
+        //loadMyPosts();
         return myPosts;
     }
 
     /*
-    43. Deleting a post in My Posts does not remove the associated pictures from storage.
-        Solution: call Network.removeImages after post removal
-    42. IMPORTANT Deleting a post in My Posts does not remove the post ID from ALL users' watchlistIDs
-    31. MyPosts does not automatically refresh with the latest database results on reload,
-        nor does it refresh after database action
-    33. MyPosts does not have the ability to view each post (similar to marketplace), and only deletes
-     */
     private void loadMyPosts() {
         Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
             @Override
@@ -113,4 +106,5 @@ public class myPostsProfileViewModel extends ViewModel {
             public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
         });
     }
+    */
 }
