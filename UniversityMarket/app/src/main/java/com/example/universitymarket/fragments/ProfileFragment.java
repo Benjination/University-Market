@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;

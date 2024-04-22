@@ -19,7 +19,7 @@ import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.WatchAdapter;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
