@@ -4,7 +4,7 @@
     "item_title": "",
     "item_description": "",
     "author_email": "",
-    "list_price": "",
+    "list_price": 0.0,
     "image_urls": [""],
     "image_contexts": [""],
     "date_created": "",

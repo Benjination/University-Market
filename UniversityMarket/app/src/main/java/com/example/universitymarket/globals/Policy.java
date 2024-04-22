@@ -31,14 +31,12 @@ public interface Policy {
             "Textbooks",
             "Technology",
             "Supplies",
-            "Miscellaneous",
-            "None"
+            "Miscellaneous"
     };
 
     String[] price_filters = {
             "Low to High",
-            "High to Low",
-            "None"
+            "High to Low"
     };
 
     String[] upload_date_filters = {
@@ -49,11 +47,9 @@ public interface Policy {
 
     String[] prices = {
             "Free",
-            "< $5.00",
             "< $10.00",
             "< $20.00",
-            "< $50.00",
-            "> $50.00"
+            "> $20.00"
     };
 
     String[] expiring = {

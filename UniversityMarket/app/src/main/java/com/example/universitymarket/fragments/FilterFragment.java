@@ -54,7 +54,6 @@ public class FilterFragment extends Fragment {
             newGenre.setText(genre);
             genre_radio_filter.addView(newGenre);
         }
-
         genre_radio_filter.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -70,7 +69,7 @@ public class FilterFragment extends Fragment {
         });
 
         price_radio_filter = root.findViewById(R.id.price_filter_group);
-        for(String priceFilter : Policy.price_filters) {
+        for(String priceFilter : Policy.prices) {
             RadioButton newPriceFilter = new RadioButton(requireContext());
             newPriceFilter.setText(priceFilter);
             price_radio_filter.addView(newPriceFilter);

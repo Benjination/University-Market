@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+//import android.widget.Filter;
 import android.widget.GridView;
 import android.widget.RadioButton;
 
@@ -24,10 +25,14 @@ import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.utilities.PostModel;
+import com.google.firebase.firestore.Filter;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MarketFragment extends Fragment {
@@ -55,47 +60,49 @@ public class MarketFragment extends Fragment {
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
         postsGV.setAdapter(adapter1);
 
-
         // Set an refresh listener
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if(FilterFragment.selected_genre_filter != null)
+                //&& FilterFragment.selected_price_filter != null
+                if(FilterFragment.selected_genre_filter != null) {
+                    // FilterFragment.selected_price_filter
                     getFilteredPosts(FilterFragment.selected_genre_filter);
+                }
                 else
                     getAllPosts();
             }
         });
 
-
-        if(FilterFragment.selected_genre_filter == null && FilterFragment.selected_price_filter == null){
-            getAllPosts();//initial fetch of posts in DB
-        }
-
-       // getAllPosts();//initial fetch of posts in DB
+        getAllPosts();//initial fetch of posts in DB
         postsGridViewlistener(postsGV);
         return view;
     }
 
     /////
-
+//, RadioButton selected_price_filter
     private void getFilteredPosts(RadioButton selected_genre_filter){
-        Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
+        Filter genreFilter = new Filter();
+        genreFilter = Filter.equalTo("about.genre", selected_genre_filter.getText().toString());
+        Filter priceFilter = new Filter();
+        priceFilter = Filter.lessThan("about.list_price", 10.0F);
+       // Filter test = Filter.lessThanOrEqualTo();
+        Filter testFilter = Filter.inArray("about.item_title", Arrays.asList(new String[]{"Terminal Output", "Car", "myPost"}.clone()));
+
+
+        Network.getPosts(requireActivity(), Filter.and(priceFilter, genreFilter), 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 postsArrayList.clear();
                 postModelArrayList.clear();
-
                 postsArrayList.addAll(result);
-                String selectedGenre = selected_genre_filter.getText().toString();
+
                 //put all post into post model form
                 for(Post p : postsArrayList){
-                    if(p.getGenre().equals(selectedGenre)) {
-                        Log.d("current post with filter:", p.getItemTitle());
+                        Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
                         List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
                         postModelArrayList.add(new PostModel("$" + p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
                         Log.d("added " + p.getItemTitle(), "success");
-                    }
                 }
                 if(postsGV != null){
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
@@ -106,10 +113,11 @@ public class MarketFragment extends Fragment {
             @Override
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
-                Log.e("Error loading posts", error.getMessage());
+                Log.e("Error loading posts with filter", error.getMessage());
             }
         });
     }
+
     private void postsGridViewlistener(GridView postsGV){
         postsGV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -150,37 +158,7 @@ public class MarketFragment extends Fragment {
             @Override
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
-                Log.e("Error loading posts", error.getMessage());
-            }
-        });
-    }
-
-    private void getFilteredPosts(){
-        Network.getPosts(requireActivity(), 1, new Callback<List<Post>>() {
-            @Override
-            public void onSuccess(List<Post> result) {
-                postsArrayList.clear();
-                postModelArrayList.clear();
-
-                postsArrayList.addAll(result);
-
-                //put all post into post model form
-                for(Post p : postsArrayList){
-                    Log.d("current post:" , p.getItemTitle());
-                    List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
-                    Log.d("added " + p.getItemTitle() , "success");
-                }
-                if(postsGV != null){
-                    PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
-                    adapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);//stop refreshing animation
-                }
-            }
-            @Override
-            public void onFailure(Exception error) {
-                swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
-                Log.e("Error loading posts", error.getMessage());
+                Log.e("Error loading posts no filter", error.getMessage());
             }
         });
     }
