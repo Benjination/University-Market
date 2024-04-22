@@ -16,12 +16,17 @@ import com.example.universitymarket.utilities.Data;
 import java.util.List;
 
 public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> {
-    private final List<Post> watched_posts;
+    public final List<Post> watched_posts;
     private OnItemClickListener itemClickListener;
 
     public WatchAdapter(Context context, List<Post> posts, OnItemClickListener itemClickListener) {
         watched_posts = posts;
         this.itemClickListener = itemClickListener;
+    }
+
+    public void update(List<Post> posts) {
+        watched_posts.clear();
+        watched_posts.addAll(posts);
     }
 
     @NonNull

@@ -12,11 +12,17 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.AdapterListUpdateCallback;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListUpdateCallback;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.tasks.Task;
@@ -32,11 +38,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +56,47 @@ public abstract class Data {
     public static void mergeHash(Map<String, Object> from, Map<String, Object> to) {
         from.forEach((key, value) -> to.merge(key, value, (oldValue, newValue) ->
                 !oldValue.equals(newValue) ? oldValue : newValue));
+    }
+
+    public static void updateAdapter(List<? extends HashMap<String, Object>> oldModelList, List<? extends HashMap<String, Object>> newModelList, RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter) {
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+            @Override
+            public int getOldListSize() {
+                return oldModelList.size();
+            }
+            @Override
+            public int getNewListSize() {
+                return newModelList.size();
+            }
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                String idOld = oldModelList.get(oldItemPosition).containsKey("id") ? String.valueOf(oldModelList.get(oldItemPosition).get("id")) : "null";
+                String idNew = newModelList.get(newItemPosition).containsKey("id") ? String.valueOf(newModelList.get(newItemPosition).get("id")) : "null";
+
+                return !(idOld.equals("null") || idNew.equals("null")) && idOld.equals(idNew);
+            }
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                return oldModelList.get(oldItemPosition).hashCode() == newModelList.get(newItemPosition).hashCode();
+            }
+        });
+
+        Class<? extends RecyclerView.Adapter> generic = adapter.getClass();
+        Field[] f = generic.getFields();
+        Field list = null;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            list = Arrays.stream(f).filter(field -> field.getGenericType() instanceof ParameterizedType &&
+                    ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName().equals("java.lang.String") &&
+                    ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[1].getTypeName().equals("java.lang.Object")).findFirst().orElse(null);
+        } else {
+            Log.e("no", "no");
+        }
+
+        try {
+            f[0].set(0, "test");
+            Log.e("testerss", (String) f[0].get(0));
+        } catch(Exception ignored) {}
+        result.dispatchUpdatesTo(adapter);
     }
 
     public static void callPicasso(@NonNull Activity cur_act, @NonNull List<Uri> uris, @NonNull List<Uri> processed, @NonNull List<Exception> exceptions, int depth, @NonNull TaskCompletionSource<List<Uri>> task) {

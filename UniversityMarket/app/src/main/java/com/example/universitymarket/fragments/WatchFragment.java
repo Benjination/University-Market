@@ -21,12 +21,14 @@ import com.example.universitymarket.adapters.WatchAdapter;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.objects.Post;
 import com.example.universitymarket.utilities.Callback;
+import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.viewmodels.WatchViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickListener {
     private View root;
@@ -62,28 +64,9 @@ public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickL
                         LinearLayoutManager.VERTICAL, false));
             } else {
                 Log.e("UPDATErecycler","test");
-                DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-                    @Override
-                    public int getOldListSize() {
-                        return watchedPosts.size();
-                    }
-                    @Override
-                    public int getNewListSize() {
-                        return updatedList.size();
-                    }
-                    @Override
-                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                        return watchedPosts.get(oldItemPosition).getId() ==
-                                updatedList.get(newItemPosition).getId();
-                    }
-                    @Override
-                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                        Post oldPost = watchedPosts.get(oldItemPosition);
-                        Post newPost = updatedList.get(newItemPosition);
-                        return oldPost.equals(newPost);
-                    }
-                });
-                result.dispatchUpdatesTo(adapter);
+                Log.e("lists", "\n" + watchedPosts.stream().map(Post::getId).collect(Collectors.toList()) + "\n" + updatedList.stream().map(Post::getId).collect(Collectors.toList()));
+                adapter.update(updatedList);
+                Data.updateAdapter(watchedPosts, updatedList, adapter);
                 watchedPosts = updatedList;
             }
             //load.setResult("getPosts");

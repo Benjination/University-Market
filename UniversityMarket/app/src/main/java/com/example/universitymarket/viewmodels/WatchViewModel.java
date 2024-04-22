@@ -18,18 +18,16 @@ import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WatchViewModel extends ViewModel {
-    private MutableLiveData<List<Post>> watchedPosts;
+    private final MutableLiveData<List<Post>> watchedPosts = new MutableLiveData<>();
 
     public WatchViewModel() {}
 
     public MutableLiveData<List<Post>> getWatchedPosts() {
-        if (watchedPosts == null) {
-            watchedPosts = new MutableLiveData<>();
-            loadWatchPosts();
-        }
+        loadWatchPosts();
         return watchedPosts;
     }
 
@@ -41,6 +39,9 @@ public class WatchViewModel extends ViewModel {
             }
             @Override
             public void onFailure(Exception error) {
+                if(error.getMessage() != null && error.getMessage().contains("No documents are available")) {
+                    watchedPosts.setValue(new ArrayList<>());
+                }
                 Log.e("getWatchPostsModel", error.getMessage());
             }
         });
