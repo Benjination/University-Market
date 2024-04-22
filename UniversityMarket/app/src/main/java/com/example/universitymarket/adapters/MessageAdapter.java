@@ -68,10 +68,28 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         Message message = messages.get(position);
         String senderEmail = message.getSenderEmail();
 
+        ViewGroup.LayoutParams params = holder.offerButton.getLayoutParams();
+        params.height = 0;
+        params.width = 0;
+
+        if(senderEmail.equals(ActiveUser.email)) {
+            // It's our message, shift it right and recolor
+                /*ConstraintSet newConstraints = new ConstraintSet();
+                newConstraints.clone(context, R.id.message_constraint);
+                newConstraints.connect(R.id.message_card_item, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
+                newConstraints.connect(R.id.message_timestamp, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
+                newConstraints.applyTo(holder.constraintLayout);*/
+
+            TypedValue colorSecondary = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.colorSecondary, colorSecondary, true);
+            holder.cardContainer.setCardBackgroundColor(colorSecondary.data);
+        }
+
         if(message.getOfferPostId() != null) {
             if(message.getOfferTaken())
                 return;
 
+            holder.regularContent.setLayoutParams(params);
             Network.getPost(message.getOfferPostId(), new Callback<Post>() {
                 @Override
                 public void onSuccess(Post post) {
@@ -187,22 +205,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.offerTitle.setVisibility(View.VISIBLE);
             holder.offerButton.setVisibility(View.VISIBLE);
         } else {
-            if(senderEmail.equals(ActiveUser.email)) {
-                // It's our message, shift it right and recolor
-                /*ConstraintSet newConstraints = new ConstraintSet();
-                newConstraints.clone(context, R.id.message_constraint);
-                newConstraints.connect(R.id.message_card_item, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
-                newConstraints.connect(R.id.message_timestamp, ConstraintSet.RIGHT, R.id.message_constraint, ConstraintSet.RIGHT, 0);
-                newConstraints.applyTo(holder.constraintLayout);*/
-
-                TypedValue colorSecondary = new TypedValue();
-                context.getTheme().resolveAttribute(R.attr.colorSecondary, colorSecondary, true);
-                holder.cardContainer.setCardBackgroundColor(colorSecondary.data);
-            }
-
-            ViewGroup.LayoutParams params = holder.offerButton.getLayoutParams();
-            params.height = 0;
-            params.width = 0;
             holder.offerButton.setLayoutParams(params);
             holder.offerImage.setLayoutParams(params);
             holder.offerTitle.setLayoutParams(params);

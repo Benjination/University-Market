@@ -12,10 +12,13 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -159,108 +162,7 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                 }
             });
         } else if(v.getId() == R.id.message_offer_button) {
-            DialogFragment postChooser = new DialogFragment(R.layout.layout_offer_dialog);
-            postChooser.onAttach(requireContext());
-            //TODO: make this its own fragment stat
-            View postChooserView = inflater.inflate(R.layout.layout_offer_dialog, container, false);
-
-            FloatingActionButton closeOffer = postChooserView.findViewById(R.id.offer_close_button);
-            RadioGroup postSelection = postChooserView.findViewById(R.id.offer_posts_radiogroup);
-            TextView noInWatchlist = postChooserView.findViewById(R.id.offer_post_in_watchlists);
-            TextView daysRemaining = postChooserView.findViewById(R.id.offer_post_days_remaining);
-            TextView listPrice = postChooserView.findViewById(R.id.offer_post_list_price);
-            Button sendOffer = postChooserView.findViewById(R.id.offer_send_button);
-
-            closeOffer.setOnClickListener(l -> postChooser.dismiss());
-
-            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
-                @Override
-                public void onSuccess(List<Post> result) {
-                    offerPosts = result;
-
-                    if(!result.isEmpty())
-                        sendOffer.setEnabled(true);
-                    for(Post post : result) {
-                        RadioButton rb = new RadioButton(requireContext());
-                        rb.setText(post.getItemTitle());
-                        postSelection.addView(rb);
-                    }
-
-                    noInWatchlist.setText("");
-                    daysRemaining.setText("");
-                    listPrice.setText("");
-
-                    postSelection.setOnCheckedChangeListener((rg, checkedId) -> {
-                        Post post = offerPosts.stream().filter(res -> res.getItemTitle().contentEquals((((RadioButton) rg.findViewById(checkedId)).getText()))).findFirst().orElse(null);
-                        if(post == null)
-                            return;
-
-                        long numDaysRemain = Duration.between((Temporal) Data.parseDate(post.getDateCreated()), LocalDateTime.now()).toDays();
-                        String daysRemText = "Expires in: " + numDaysRemain + "days";
-                        String listPriceText = "List price: $" + post.getListPrice();
-
-                        daysRemaining.setText(daysRemText);
-                        listPrice.setText(listPriceText);
-                    });
-
-                    sendOffer.setOnClickListener(l -> {
-                        Post post = offerPosts.stream().filter(res -> res.getItemTitle().contentEquals((((RadioButton) postSelection.findViewById(postSelection.getCheckedRadioButtonId())).getText()))).findFirst().orElse(null);
-                        if(post == null)
-                            return;
-
-                        String msgID = Data.generateID("msg");
-                        Message msg = new Message(
-                                false,
-                                post.getId(),
-                                null,
-                                new ArrayList<>(),
-                                ActiveUser.email,
-                                new Date().toString(),
-                                msgID
-                        );
-
-                        Network.setMessage(msg, false, new Callback<Message>() {
-                            @Override
-                            public void onSuccess(Message message) {
-                                chat.setMessageIds((ArrayList<String>) Stream.concat(chat.getMessageIds().stream(), Stream.of(message.getId())).collect(Collectors.toList()));
-
-                                Network.setChat(chat, false, new Callback<Chat>() {
-                                    @Override
-                                    public void onSuccess(Chat ignored) {
-                                        postChooser.dismiss();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Exception error) {
-                                        Log.e("setChat", error.getMessage());
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(Exception error) {
-                                Log.e("setMessage", error.getMessage());
-                                Toast.makeText(
-                                        requireContext(),
-                                        "Unable to send offer",
-                                        Toast.LENGTH_SHORT
-                                ).show();
-                            }
-                        });
-                    });
-                }
-
-                @Override
-                public void onFailure(Exception error) {
-                    Log.e("getPosts", error.getMessage());
-                    Toast.makeText(
-                            requireContext(),
-                            "Could not retrieve your posts",
-                            Toast.LENGTH_SHORT
-                    ).show();
-                }
-            });
-
+            MessageDialogFragment postChooser = new MessageDialogFragment(chat);
             postChooser.show(fm, null);
         }
     }

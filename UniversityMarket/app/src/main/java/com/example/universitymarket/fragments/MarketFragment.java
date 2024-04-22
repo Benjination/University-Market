@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 //import android.widget.Filter;
 import android.widget.GridView;
 import android.widget.RadioButton;
@@ -20,19 +19,15 @@ import android.widget.RadioButton;
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.PostGVAdapter;
 import com.example.universitymarket.globals.Policy;
-import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.utilities.PostModel;
 import com.google.firebase.firestore.Filter;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class MarketFragment extends Fragment {
@@ -90,7 +85,7 @@ public class MarketFragment extends Fragment {
         Filter testFilter = Filter.inArray("about.item_title", Arrays.asList(new String[]{"Terminal Output", "Car", "myPost"}.clone()));
 
 
-        Network.getPosts(requireActivity(), Filter.and(priceFilter, genreFilter), 1, new Callback<List<Post>>() {
+        Network.getPosts(Filter.and(priceFilter, genreFilter), null, 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 postsArrayList.clear();
@@ -134,7 +129,7 @@ public class MarketFragment extends Fragment {
     }
 
     private void getAllPosts(){
-        Network.getPosts(null, 1, new Callback<List<Post>>() {
+        Network.getPosts(null, null, 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
                 postsArrayList.clear();
