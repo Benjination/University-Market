@@ -46,6 +46,12 @@ public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> 
         void onItemClicked(Post post);
     }
 
+    public void setPosts(List<Post> posts) {
+        watched_posts.clear();
+        if(posts != null) { watched_posts.addAll(posts); }
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView title;
         private final TextView price;

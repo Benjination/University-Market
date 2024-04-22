@@ -1,12 +1,7 @@
 package com.example.universitymarket.viewmodels;
 
-import android.app.Activity;
-import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -17,7 +12,6 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class WatchViewModel extends ViewModel {
@@ -37,6 +31,13 @@ public class WatchViewModel extends ViewModel {
         Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
+                if(result == null) {
+                    Log.e("UPDATErecycler", "1.GETPOSTS SUCCESS: NULL");
+                } else {
+                    for (Post post : result) {
+                        Log.e("UPDATErecycler", "1.GETPOSTS SUCCESS: " + post);
+                    }
+                }
                 watchedPosts.setValue(result);
             }
             @Override
@@ -47,7 +48,9 @@ public class WatchViewModel extends ViewModel {
     }
 
     public void addWatchPost(String postId) {
+        Log.e("n","addWatchPost beforeActUser: "+ActiveUser.watch_ids);
         ActiveUser.watch_ids.add(String.valueOf(postId));
+        Log.e("n","addWatchPost afterActUser: "+ActiveUser.watch_ids);
         Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
             @Override
             public void onSuccess(User result) {
@@ -61,7 +64,9 @@ public class WatchViewModel extends ViewModel {
     }
 
     public void removeWatchPost(String postId) {
+        Log.e("n","removeWatchPost beforeActUser: "+ActiveUser.watch_ids);
         ActiveUser.watch_ids.remove(String.valueOf(postId));
+        Log.e("n","removeWatchPost afterActUser: "+ActiveUser.watch_ids);
         Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
             @Override
             public void onSuccess(User result) {
