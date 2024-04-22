@@ -13,11 +13,18 @@
         <entry key="app/src/main/res/layout/fragment_homepage.xml" value="0.15" />
         <entry key="app/src/main/res/layout/fragment_item.xml" value="0.165" />
         <entry key="app/src/main/res/layout/fragment_market.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_mypost.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/fragment_popup.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/fragment_post.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.14437689969604864" />
+        <entry key="app/src/main/res/layout/fragment_records.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/fragment_settings.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/fragment_tab.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/fragment_test.xml" value="0.14437689969604864" />
         <entry key="app/src/main/res/layout/fragment_view_post.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_watch.xml" value="0.14437689969604864" />
+        <entry key="app/src/main/res/layout/layout_chat_item.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/layout_mypost_item.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/test_popup.xml" value="0.13385416666666666" />
       </map>
     </option>
