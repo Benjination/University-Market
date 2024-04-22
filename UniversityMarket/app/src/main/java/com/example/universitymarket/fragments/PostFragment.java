@@ -403,7 +403,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     selected.getText().toString(),
                     ActiveUser.email,
                     imageURLs,
-                    priceText,
+                    Float.parseFloat(priceText),
                     new ArrayList<>(),
                     title.getText().toString(),
                     description.getText().toString()
