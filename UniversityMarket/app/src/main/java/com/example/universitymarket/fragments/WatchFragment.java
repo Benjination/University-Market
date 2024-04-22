@@ -2,27 +2,21 @@ package com.example.universitymarket.fragments;
 
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.WatchAdapter;
-import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.Post;
-import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
-import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.viewmodels.WatchViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;

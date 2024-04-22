@@ -144,7 +144,7 @@ public class DashboardActivity extends AppCompatActivity {
 
         // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar List<PopupFragment>
         fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Market" }, fm), false, true, new ArrayList<>())));
-        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Post", ActiveUser.email }, fm), false, true, new ArrayList<>())));
+        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Post" }, fm), false, true, new ArrayList<>())));
         fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Watch" }, fm), false, true, new ArrayList<>())));
         fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false, new ArrayList<>())));
         fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Profile", ActiveUser.email }, fm), false, false, new ArrayList<>())));
