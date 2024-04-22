@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.example.universitymarket.Login;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.firebase.auth.FirebaseAuth;

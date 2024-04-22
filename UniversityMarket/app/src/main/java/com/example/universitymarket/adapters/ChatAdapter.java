@@ -11,9 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Message;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Message;
+import com.example.universitymarket.models.User;
 
 import java.util.HashMap;
 import java.util.List;

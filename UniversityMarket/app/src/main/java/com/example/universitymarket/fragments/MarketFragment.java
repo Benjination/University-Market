@@ -18,7 +18,7 @@ import android.widget.GridView;
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.PostGVAdapter;
 import com.example.universitymarket.globals.Policy;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.utilities.PostModel;

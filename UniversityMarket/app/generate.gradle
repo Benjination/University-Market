@@ -204,7 +204,7 @@ String[] generate(def map, def class_name, def file) {
             " * </b><p>\n * File based on '" + file.name + "'" +
             " located at <a href=\"file://" + file.getPath().split(file.name)[0] + "\">" + filepath + "</a>\n" +
             "*/\n"
-    String packag = "package com.example.universitymarket.objects;\n"
+    String packag = "package com.example.universitymarket.models;\n"
     String imports = \
             "\nimport androidx.annotation.Discouraged;\n" +
             "import java.util.HashMap;\n" +
@@ -616,7 +616,7 @@ String[] generate(def map, def class_name, def file) {
     packag = "package com.example.universitymarket.globals.actives;\n"
     imports = imports.concat(
             "import android.app.Application;\n" +
-                    "import com.example.universitymarket.objects." + class_name + ";\n"
+                    "import com.example.universitymarket.models." + class_name + ";\n"
     )
     declarations = declarations.replace("private", "public static")
     body = declarations
@@ -678,10 +678,10 @@ static void update(String nString, String dString, def active_names, def obj_nam
     if(active_names.size() > 0)
         header_obj = header_obj.concat("import android.widget.Toast;\n")
     for(val in obj_names)
-        header_obj = header_obj.concat("import com.example.universitymarket.objects." + val + ";\n")
+        header_obj = header_obj.concat("import com.example.universitymarket.models." + val + ";\n")
     for(val in active_names) {
         header_obj = header_obj.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
-        header_active = header_active.concat("import com.example.universitymarket.objects." + val.split("(Active)")[1] + ";\n")
+        header_active = header_active.concat("import com.example.universitymarket.models." + val.split("(Active)")[1] + ";\n")
         header_active = header_active.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
     }
 
@@ -744,7 +744,7 @@ static void update(String nString, String dString, def active_names, def obj_nam
 task generateSupported {
     File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
     Map<String, File> skeleton_map = new HashMap<>()
-    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
+    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/models")
     object_path.mkdir()
     File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals/actives")
     global_path.mkdir()
