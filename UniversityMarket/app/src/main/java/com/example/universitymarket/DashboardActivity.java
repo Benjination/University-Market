@@ -30,7 +30,7 @@ import com.example.universitymarket.fragments.SettingsFragment;
 import com.example.universitymarket.fragments.TabFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;

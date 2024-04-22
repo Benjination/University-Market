@@ -20,9 +20,9 @@ import android.widget.ViewSwitcher;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Post;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Post;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;

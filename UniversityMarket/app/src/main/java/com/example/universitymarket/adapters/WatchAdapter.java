@@ -10,13 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.universitymarket.R;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Data;
 
 import java.util.List;
 
 public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> {
-    public final List<Post> watched_posts;
+    private final List<Post> watched_posts;
     private OnItemClickListener itemClickListener;
 
     public WatchAdapter(Context context, List<Post> posts, OnItemClickListener itemClickListener) {

@@ -1,11 +1,11 @@
 package com.example.universitymarket.utilities;
 
 import android.widget.Toast;
-import com.example.universitymarket.objects.User;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Message;
-import com.example.universitymarket.objects.Transaction;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.User;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Message;
+import com.example.universitymarket.models.Transaction;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.globals.actives.ActiveUser;
 /**
  * <b>
