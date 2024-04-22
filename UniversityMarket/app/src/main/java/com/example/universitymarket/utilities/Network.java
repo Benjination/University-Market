@@ -332,9 +332,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@NonNull Filter filter, int pageNo, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        getColl("users", filter, Math.max(pageNo, 0))
+        getColl("users", filter, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -345,9 +345,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(int pageNo, @NonNull Callback<List<User>> response) {
+    public static void getAllUsers(@NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        getColl("users", null, (char) (Math.max(pageNo, 0)))
+        getColl("users", null, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -474,9 +474,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        getColl("chats", filter, Math.max(pageNo, 0))
+        getColl("chats", filter, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -487,9 +487,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(int pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getAllChats(@NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        getColl("chats", null, (char) (Math.max(pageNo, 0)))
+        getColl("chats", null, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -616,9 +616,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        getColl("messages", filter, Math.max(pageNo, 0))
+        getColl("messages", filter, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -629,9 +629,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(int pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getAllMessages(@NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        getColl("messages", null, (char) (Math.max(pageNo, 0)))
+        getColl("messages", null, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -758,9 +758,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        getColl("transactions", filter, Math.max(pageNo, 0))
+        getColl("transactions", filter, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -771,9 +771,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(int pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getAllTransactions(@NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        getColl("transactions", null, (char) (Math.max(pageNo, 0)))
+        getColl("transactions", null, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -900,9 +900,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        getColl("posts", filter, Math.max(pageNo, 0))
+        getColl("posts", filter, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);
@@ -913,9 +913,9 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(int pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getAllPosts(@NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        getColl("posts", null, (char) (Math.max(pageNo, 0)))
+        getColl("posts", null, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);
