@@ -50,8 +50,6 @@ public class MessageDialogFragment extends DialogFragment {
 
         FloatingActionButton closeOffer = root.findViewById(R.id.offer_close_button);
         RadioGroup postSelection = root.findViewById(R.id.offer_posts_radiogroup);
-        TextView noInWatchlist = root.findViewById(R.id.offer_post_in_watchlists);
-        TextView daysRemaining = root.findViewById(R.id.offer_post_days_remaining);
         TextView listPrice = root.findViewById(R.id.offer_post_list_price);
         Button sendOffer = root.findViewById(R.id.offer_send_button);
 
@@ -70,8 +68,6 @@ public class MessageDialogFragment extends DialogFragment {
                     postSelection.addView(rb);
                 }
 
-                noInWatchlist.setText("");
-                daysRemaining.setText("");
                 listPrice.setText("");
 
                 postSelection.setOnCheckedChangeListener((rg, checkedId) -> {
@@ -83,7 +79,6 @@ public class MessageDialogFragment extends DialogFragment {
                     String daysRemText = "Expires in: " + numDaysRemain + "days";
                     String listPriceText = "List price: $" + post.getListPrice();
 
-                    daysRemaining.setText(daysRemText);
                     listPrice.setText(listPriceText);
                 });
 
