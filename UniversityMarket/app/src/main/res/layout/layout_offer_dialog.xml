@@ -65,27 +65,6 @@
         </ScrollView>
 
         <TextView
-            android:id="@+id/offer_post_in_watchlists"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
-            android:layout_marginTop="?attr/listPreferredItemPaddingStart"
-            android:text="@string/load_txt"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/offer_posts_scrollview" />
-
-        <TextView
-            android:id="@+id/offer_post_days_remaining"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="?attr/listPreferredItemPaddingLeft"
-            android:text="@string/load_txt"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/offer_post_in_watchlists" />
-
-        <TextView
             android:id="@+id/offer_post_list_price"
             android:layout_width="wrap_content"
             android:layout_height="?attr/listPreferredItemHeightLarge"
@@ -93,7 +72,8 @@
             android:text="@string/load_txt"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/offer_post_days_remaining" />
+            app:layout_constraintTop_toBottomOf="@id/offer_posts_scrollview"
+            tools:layout_editor_absoluteY="358dp" />
 
         <Button
             android:id="@+id/offer_send_button"

@@ -10,8 +10,10 @@ import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Listener;
 import com.example.universitymarket.utilities.Network;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MessageViewModel extends ViewModel {
 
@@ -25,15 +27,7 @@ public class MessageViewModel extends ViewModel {
 
             @Override
             public void onModified(Chat modified) {
-                ArrayList<String> differentMsgIds = (ArrayList<String>) Data.differingValuePairs(chat, modified).stream()
-                        .filter(pair -> pair.getKey()
-                                .equals("message_ids"))
-                        .findFirst()
-                        .map(Map.Entry::getValue)
-                        .orElse(null);
-
-                if(differentMsgIds != null)
-                    load(differentMsgIds);
+                load(new ArrayList<>(Collections.singletonList(modified.getMessageIds().get(modified.getMessageIds().size() - 1))));
             }
 
             @Override

@@ -2,6 +2,8 @@ package com.example.universitymarket.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -94,19 +96,20 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 @Override
                 public void onSuccess(Post post) {
                     holder.regularContent.setVisibility(View.INVISIBLE);
-                    Picasso
+                    new Handler(Looper.getMainLooper()).post(() -> Picasso
                             .get()
                             .load(post.getImageUrls().isEmpty() ? Policy.invalid_image.get(0) : post.getImageUrls().get(0))
                             .resize(Data.convertDpToPixel((Activity) context, 100), Data.convertDpToPixel((Activity) context, 100))
                             .into(holder.offerImage, new com.squareup.picasso.Callback() {
                                 @Override
-                                public void onSuccess() {}
+                                public void onSuccess() {
+                                }
 
                                 @Override
                                 public void onError(Exception ignored) {
                                     Picasso.get().load(Policy.invalid_image.get(0)).resize(Data.convertDpToPixel((Activity) context, 100), Data.convertDpToPixel((Activity) context, 100)).into(holder.offerImage);
                                 }
-                            });
+                            }));
                     holder.offerTitle.setText(post.getItemTitle());
                     holder.offerButton.setOnClickListener(l -> {
                         transaction = new Transaction(
