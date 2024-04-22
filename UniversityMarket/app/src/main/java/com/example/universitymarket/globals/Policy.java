@@ -1,5 +1,7 @@
 package com.example.universitymarket.globals;
 
+import android.widget.RadioButton;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -9,11 +11,12 @@ public interface Policy {
     int max_posts_per_user = 20;
     int max_docs_loaded = 30;
     int max_seconds_before_timeout = 5;
-    int max_images_per_post = 5;
+    int max_images_per_post = 1;
     int max_descriptors_per_genre = 10;
     int max_chars_per_description = 300;
     int max_stars = 5;
     int post_lifetime = 30;
+
 
     List<String> invalid_image = Collections.singletonList("https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb");
 
@@ -24,13 +27,29 @@ public interface Policy {
             "Miscellaneous"
     };
 
+    String[] genre_filters = {
+            "Textbooks",
+            "Technology",
+            "Supplies",
+            "Miscellaneous"
+    };
+
+    String[] price_filters = {
+            "Low to High",
+            "High to Low"
+    };
+
+    String[] upload_date_filters = {
+            "Newest to Oldest",
+            "Oldest to Newest",
+            "None"
+    };
+
     String[] prices = {
             "Free",
-            "< $5.00",
             "< $10.00",
             "< $20.00",
-            "< $50.00",
-            "> $50.00"
+            "> $20.00"
     };
 
     String[] expiring = {

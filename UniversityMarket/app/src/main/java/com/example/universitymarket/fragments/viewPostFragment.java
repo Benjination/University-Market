@@ -101,6 +101,7 @@ public class viewPostFragment extends Fragment {
     }
 
     private void setupCreateConvoButton(Button createConvo, String authorEmail) {
+        createConvo.setEnabled(true);
         createConvo.setOnClickListener(l -> {
             createConvo.setEnabled(false);
             chatId = Data.generateID("chat");
@@ -201,18 +202,9 @@ public class viewPostFragment extends Fragment {
 
                 // Check if a chat has been opened
                 if(!result.getAuthorEmail().equals(ActiveUser.email)) {
-                    createConvo.setEnabled(true);
-                    Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
+                    Network.getChats(ActiveUser.chat_ids, null, new Callback<List<Chat>>() {
                         @Override
-                        public void onSuccess(List<Chat> chats) {
-                            for (Chat chat : chats) {
-                                // Check to see if theres a chat with the seller and ActiveUser
-                                if (chat.getParticipantEmails().stream().filter(s -> s.equals(ActiveUser.email) || s.equals(result.getAuthorEmail())).count() == 2) {
-                                    return;
-                                }
-                                setupCreateConvoButton(createConvo, result.getAuthorEmail());
-                            }
-                        }
+                        public void onSuccess(List<Chat> ignored) {}
 
                         @Override
                         public void onFailure(Exception error) {

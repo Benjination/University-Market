@@ -27,6 +27,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.FirebaseFirestore;
 import android.util.Pair;
@@ -37,6 +38,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import org.json.JSONException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,13 +141,32 @@ public abstract class Network {
         return source.getTask();
     }
 
+    private static void getCollRecursive(@NonNull String collID, @NonNull TaskCompletionSource<List<HashMap<String, Object>>> source, @NonNull List<HashMap<String, Object>> list, @NonNull List<DocumentSnapshot> docs, int i) {
+        DocumentSnapshot thisDoc = docs.get(i);
+        Task<HashMap<String, Object>> echo = getDoc(collID, thisDoc.getId());
+        echo.addOnFailureListener(err ->
+                Log.e("getCollRecursive", thisDoc.getId() + " doc is invalid: " + err)
+        );
+        if (i == docs.size() - 1) {
+            echo.addOnSuccessListener(task -> {
+                list.add(task);
+                if (!source.getTask().isComplete())
+                    source.setResult(list);
+            });
+        } else {
+            echo.addOnSuccessListener(task -> {
+                list.add(task);
+                getCollRecursive(collID, source, list, docs, i + 1);
+            });
+        }
+    }
+
     @NonNull
-    private static Task<List<HashMap<String, Object>>> getColl(@NonNull String collID, @Nullable Filter filter, int pageNo) {
+    private static Task<List<HashMap<String, Object>>> getColl(@NonNull String collID, @Nullable Filter filter, @Nullable FieldPath sortByField, int pageNo) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<List<HashMap<String, Object>>> source = new TaskCompletionSource<>();
         String illNullData = "Collection '" + collID + "' does not exist";
         String illColl = collID + " is not among the existing collections + ( ";
-        String illPageNo = "Page number must be 1 or greater";
         String illTime = "Connection timeout";
         for(String s : Policy.collection_names)
             illColl = illColl.concat(s + " ");
@@ -158,14 +179,10 @@ public abstract class Network {
         if(Policy.collection_names.contains(collID)) {
             Query query = db.collection(collID);
             query = filter != null ? query.where(filter) : query;
+            query = sortByField != null ? query.orderBy(sortByField) : query;
             if(pageNo >= 0) {
                 query.orderBy("id").startAt(Policy.max_docs_loaded * pageNo - 1);
                 query.limit(Policy.max_docs_loaded);
-            } else {
-                if(!source.getTask().isComplete()) {
-                    source.setException(new IllegalArgumentException(illPageNo));
-                    return source.getTask();
-                }
             }
             Task<QuerySnapshot> reference = query.get();
 
@@ -178,22 +195,7 @@ public abstract class Network {
                         List<HashMap<String, Object>> list = new ArrayList<>();
                         List<DocumentSnapshot> docs = coll.getDocuments();
 
-                        for (int i = 0; i < docs.size(); i++) {
-                            DocumentSnapshot thisDoc = docs.get(i);
-                            Task<HashMap<String, Object>> echo = getDoc(collID, thisDoc.getId());
-                            echo.addOnFailureListener(err ->
-                                    Log.e("getColl", thisDoc.getId() + " doc is invalid: " + err)
-                            );
-                            if (i == docs.size() - 1) {
-                                echo.addOnSuccessListener(task -> {
-                                    list.add(task);
-                                    if (!source.getTask().isComplete())
-                                        source.setResult(list);
-                                });
-                            } else {
-                                echo.addOnSuccessListener(list::add);
-                            }
-                        }
+                        getCollRecursive(collID, source, list, docs, 0);
                     })
                     .addOnFailureListener(e -> {
                         if (!source.getTask().isComplete())
@@ -208,7 +210,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull String collID, @NonNull String docID) {
+    private static Pair<DocumentReference, Task<DocumentSnapshot>> listenToDoc(@NonNull String collID, @NonNull String docID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final DocumentReference ref = db.collection(collID).document(docID);
 
@@ -217,7 +219,7 @@ public abstract class Network {
     }
 
     @NonNull
-    public static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull String collID) {
+    private static Pair<CollectionReference, Task<QuerySnapshot>> listenToColl(@NonNull String collID) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final CollectionReference ref = db.collection(collID);
 
@@ -316,31 +318,13 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@NonNull List<String> docID, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc("users", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    User result = new User(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    User result = new User(task);
-                    list.add(result);
-                });
-            }
+        if(docID.isEmpty()) {
+            response.onFailure(new Exception("A non-empty docID list is required"));
+            return;
         }
-    }
-
-    public static void getUsers(@NonNull Filter filter, int pageNo, @NonNull Callback<List<User>> response) {
-        List<User> list = new ArrayList<>();
-        getColl("users", filter, Math.max(pageNo, 0))
+        getColl("users", Filter.inArray("id", docID), sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -351,9 +335,22 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(int pageNo, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
-        getColl("users", null, (char) (Math.max(pageNo, 0)))
+        getColl("users", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        User result = new User(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getAllUsers(@Nullable FieldPath sortByField, @NonNull Callback<List<User>> response) {
+        List<User> list = new ArrayList<>();
+        getColl("users", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         User result = new User(hash);
@@ -463,31 +460,13 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@NonNull List<String> docID, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc("chats", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    Chat result = new Chat(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    Chat result = new Chat(task);
-                    list.add(result);
-                });
-            }
+        if(docID.isEmpty()) {
+            response.onFailure(new Exception("A non-empty docID list is required"));
+            return;
         }
-    }
-
-    public static void getChats(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Chat>> response) {
-        List<Chat> list = new ArrayList<>();
-        getColl("chats", filter, Math.max(pageNo, 0))
+        getColl("chats", Filter.inArray("id", docID), sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -498,9 +477,22 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(int pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
-        getColl("chats", null, (char) (Math.max(pageNo, 0)))
+        getColl("chats", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Chat result = new Chat(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getAllChats(@Nullable FieldPath sortByField, @NonNull Callback<List<Chat>> response) {
+        List<Chat> list = new ArrayList<>();
+        getColl("chats", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Chat result = new Chat(hash);
@@ -610,31 +602,13 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@NonNull List<String> docID, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc("messages", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    Message result = new Message(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    Message result = new Message(task);
-                    list.add(result);
-                });
-            }
+        if(docID.isEmpty()) {
+            response.onFailure(new Exception("A non-empty docID list is required"));
+            return;
         }
-    }
-
-    public static void getMessages(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Message>> response) {
-        List<Message> list = new ArrayList<>();
-        getColl("messages", filter, Math.max(pageNo, 0))
+        getColl("messages", Filter.inArray("id", docID), sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -645,9 +619,22 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(int pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
-        getColl("messages", null, (char) (Math.max(pageNo, 0)))
+        getColl("messages", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Message result = new Message(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getAllMessages(@Nullable FieldPath sortByField, @NonNull Callback<List<Message>> response) {
+        List<Message> list = new ArrayList<>();
+        getColl("messages", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Message result = new Message(hash);
@@ -757,31 +744,13 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@NonNull List<String> docID, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc("transactions", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    Transaction result = new Transaction(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    Transaction result = new Transaction(task);
-                    list.add(result);
-                });
-            }
+        if(docID.isEmpty()) {
+            response.onFailure(new Exception("A non-empty docID list is required"));
+            return;
         }
-    }
-
-    public static void getTransactions(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Transaction>> response) {
-        List<Transaction> list = new ArrayList<>();
-        getColl("transactions", filter, Math.max(pageNo, 0))
+        getColl("transactions", Filter.inArray("id", docID), sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -792,9 +761,22 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(int pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
-        getColl("transactions", null, (char) (Math.max(pageNo, 0)))
+        getColl("transactions", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Transaction result = new Transaction(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getAllTransactions(@Nullable FieldPath sortByField, @NonNull Callback<List<Transaction>> response) {
+        List<Transaction> list = new ArrayList<>();
+        getColl("transactions", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Transaction result = new Transaction(hash);
@@ -904,31 +886,13 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@NonNull List<String> docID, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        if(docID.size() == 0)
-            response.onFailure(new NullPointerException("No documents are available"));
-        for(int i = 0; i < docID.size(); i++) {
-            Task<HashMap<String, Object>> echo = getDoc("posts", docID.get(i));
-            echo.addOnFailureListener(response::onFailure);
-            if(i == docID.size() - 1) {
-                echo.addOnSuccessListener(task -> {
-                    Post result = new Post(task);
-                    list.add(result);
-                    response.onSuccess(list);
-                });
-            } else {
-                echo.addOnSuccessListener(task -> {
-                    Post result = new Post(task);
-                    list.add(result);
-                });
-            }
+        if(docID.isEmpty()) {
+            response.onFailure(new Exception("A non-empty docID list is required"));
+            return;
         }
-    }
-
-    public static void getPosts(@NonNull Filter filter, int pageNo, @NonNull Callback<List<Post>> response) {
-        List<Post> list = new ArrayList<>();
-        getColl("posts", filter, Math.max(pageNo, 0))
+        getColl("posts", Filter.inArray("id", docID), sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);
@@ -939,9 +903,22 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(int pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
-        getColl("posts", null, (char) (Math.max(pageNo, 0)))
+        getColl("posts", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
+                .addOnSuccessListener(task -> {
+                    for (HashMap<String, Object> hash : task) {
+                        Post result = new Post(hash);
+                        list.add(result);
+                    }
+                    response.onSuccess(list);
+                })
+                .addOnFailureListener(response::onFailure);
+    }
+
+    public static void getAllPosts(@Nullable FieldPath sortByField, @NonNull Callback<List<Post>> response) {
+        List<Post> list = new ArrayList<>();
+        getColl("posts", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
                     for (HashMap<String, Object> hash : task) {
                         Post result = new Post(hash);

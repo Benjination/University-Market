@@ -59,7 +59,7 @@ public class DashboardActivity extends AppCompatActivity {
     private ViewGroup.LayoutParams params;
     private TaskCompletionSource<List<Uri>> urisRetrieval = new TaskCompletionSource<>();
     private TaskCompletionSource<Uri> uriRetrieval = new TaskCompletionSource<>();
-    private PickMultipleVisualMedia multipleImagePicker = new PickMultipleVisualMedia(Policy.max_images_per_post);
+    private PickMultipleVisualMedia multipleImagePicker = Policy.max_images_per_post > 1 ? new PickMultipleVisualMedia(Policy.max_images_per_post) : null;
     private final ActivityResultContracts.PickVisualMedia singleImagePicker = new ActivityResultContracts.PickVisualMedia();
     private final HashMap<String, ArrayList<Object>> fragMap = new HashMap<>();
     private final FragmentManager fm = getSupportFragmentManager();

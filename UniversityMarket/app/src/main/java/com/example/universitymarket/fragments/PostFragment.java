@@ -135,7 +135,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 if(imageupload.getVisibility() == View.VISIBLE) {
                                     imageupload.setVisibility(View.INVISIBLE);
                                     imagelabel.setVisibility(View.INVISIBLE);
-                                    addmore.setVisibility(View.VISIBLE);
+                                    //addmore.setVisibility(View.VISIBLE);
                                     removeImage.setVisibility(View.VISIBLE);
                                 }
                                 for (String uri : result.getStringArrayList("uris")) {
@@ -168,10 +168,13 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                         Toast.LENGTH_SHORT
                                 ).show();
                             } else {
+                                numIndicators += 1;
                                 String uri = result.getString("uri");
                                 imageURLsToBeUploaded.add(uri);
                                 addToCarousel(Uri.parse(uri));
                                 imagelabel.setVisibility(View.INVISIBLE);
+                                imageupload.setVisibility(View.INVISIBLE);
+                                removeImage.setVisibility(View.VISIBLE);
                             }
                             if (!load.getTask().isComplete())
                                 load.setResult("image");
@@ -347,8 +350,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 retrievePhoto();
         }
         if(ID == removeImage.getId()) {
-            carousel.removeViewAt(position);
-            imageURLsToBeUploaded.remove(position);
+            carousel.removeAllViews();
+            imageURLsToBeUploaded.remove(0);
             position -= position == numIndicators - 1 ? 1 : 0;
             indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
             if(numIndicators == 0) {
@@ -400,7 +403,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     selected.getText().toString(),
                     ActiveUser.email,
                     imageURLs,
-                    priceText,
+                    Float.parseFloat(priceText),
                     new ArrayList<>(),
                     title.getText().toString(),
                     description.getText().toString()
