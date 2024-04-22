@@ -89,6 +89,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             if(message.getOfferTaken())
                 return;
 
+            holder.regularContent.setLayoutParams(params);
             Network.getPost(message.getOfferPostId(), new Callback<Post>() {
                 @Override
                 public void onSuccess(Post post) {
