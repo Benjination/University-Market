@@ -96,6 +96,13 @@ public class ChatViewModel extends ViewModel {
     }
 
     private void refresh() {
+        participants = null;
+        participantsOrdered = null;
+        previews = null;
+        previewIds = null;
+
+        if(retrieve != null)
+            retrieve.interrupt();
         isLoading.setValue(true);
 
         Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
@@ -109,7 +116,6 @@ public class ChatViewModel extends ViewModel {
                 Network.getUsers(allUsers, new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> result) {
-                        Log.e("before", result.size() + "");
                         participants = participantsOrdered.stream()
                                 .map(list -> (list.stream()
                                         .map(s -> result.stream()
@@ -118,7 +124,6 @@ public class ChatViewModel extends ViewModel {
                                                 .orElse(null))
                                         .collect(Collectors.toList())))
                                 .collect(Collectors.toList());
-                        Log.e("after", participants.stream().mapToLong(List::size).sum() + "");
                     }
 
                     @Override
@@ -145,13 +150,9 @@ public class ChatViewModel extends ViewModel {
                 retrieve = new Thread(() -> {
                     while((participants == null || chats == null || previews == null) || participants.size() != chats.size() && previews.size() != chats.size());
 
-                    if(!(participants == null || chats == null || previews == null)) {
-                        Log.e("what on earth1", " \n" + participants.size() + ": " + participants.stream().flatMap(list -> list.stream().filter(user -> user != null && !user.getEmail().equals(ActiveUser.email))).map(User::getFirstName).collect(Collectors.toList()) + "\n" + previews.size() + "\n" + chats.size());
-                    }
-
                     List<MessagePreview> previewsInMemory = previewList.getValue() == null ? new ArrayList<>() : previewList.getValue();
+                    IntStream.range(0, chats.size()).forEach(i -> previewsInMemory.add(new MessagePreview(chats.get(i), participants.get(i), previews.get(i))));
 
-                    IntStream.range(0, chats.size() - 1).forEach(i -> previewsInMemory.add(new MessagePreview(chats.get(i), participants.get(i), previews.get(i))));
                     new Handler(Looper.getMainLooper()).post(() -> {
                         previewList.setValue(previewsInMemory);
                         isLoading.setValue(false);
@@ -161,9 +162,6 @@ public class ChatViewModel extends ViewModel {
                 retrieve.start();
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if((participants == null || chats == null || previews == null) || participants.size() != chats.size() && previews.size() != chats.size()) {
-                        if(!(participants == null || chats == null || previews == null)) {
-                            Log.e("what on earth2", " \n" + participants.size() + ": " + participants.stream().flatMap(list -> list.stream().filter(user -> !user.getEmail().equals(ActiveUser.email))).map(User::getFirstName).collect(Collectors.toList()) + "\n" + previews.size() + "\n" + chats.size());
-                        }
                         isLoading.setValue(false);
                         numUnread.setValue(null);
                         retrieve.interrupt();

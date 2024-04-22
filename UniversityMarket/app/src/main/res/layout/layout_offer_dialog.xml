@@ -5,10 +5,10 @@
     android:id="@+id/offer_card_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
+    app:cardCornerRadius="5dp"
     app:layout_constraintEnd_toEndOf="parent"
-    app:cardCornerRadius="5dp">
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -43,12 +43,11 @@
             android:id="@+id/offer_posts_scrollview"
             android:layout_width="0dp"
             android:layout_height="200dp"
-            app:layout_constraintTop_toBottomOf="@id/offer_posts_label"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginStart="?attr/listPreferredItemPaddingStart"
             android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
-            >
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/offer_posts_label">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -99,14 +98,14 @@
             android:id="@+id/offer_send_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="?attr/listPreferredItemPaddingRight"
+            android:layout_marginBottom="?attr/listPreferredItemHeight"
             android:backgroundTint="?colorSecondary"
             android:text="@string/message_offer_button_desc"
             app:icon="@drawable/send_icon"
             app:iconTint="?colorOnSecondary"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_marginBottom="?attr/listPreferredItemHeight"
-            android:layout_marginRight="?attr/listPreferredItemPaddingRight"/>
+            app:layout_constraintRight_toRightOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

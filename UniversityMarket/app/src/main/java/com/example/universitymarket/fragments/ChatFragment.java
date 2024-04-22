@@ -80,7 +80,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
                 load = new TaskCompletionSource<>();
                 loadPage(load.getTask());
             } else {
-                if(!load.getTask().isComplete())
+                if(load != null && !load.getTask().isComplete())
                     load.setResult("finish");
             }
         };
@@ -91,7 +91,7 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
                 dashMessage.putString("newSubtitle", "Unavailable");
             } else {
                 unavailable.setVisibility(View.INVISIBLE);
-                dashMessage.putString("newSubtitle", newUnread == 0 ? "You're all caught up!" : "You have" + newUnread + "unread messages");
+                dashMessage.putString("newSubtitle", newUnread == 0 ? "You're all caught up!" : "You have " + newUnread + " unread message" + (newUnread > 1 ? "s" : ""));
             }
             dashMessage.putString("callingFragment", this.getClass().getName());
             fm.setFragmentResult("updateSubtitle", dashMessage);
@@ -113,7 +113,6 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
         unavailable = v.findViewById(R.id.chat_unavailable_text);
         recycler = v.findViewById(R.id.chat_recycle_view);
         viewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
-
 
         viewModel.listenToActiveUsersChats().observe(getViewLifecycleOwner(), listenToChats);
         viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading);

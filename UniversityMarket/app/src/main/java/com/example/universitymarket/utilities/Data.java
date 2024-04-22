@@ -434,7 +434,7 @@ public abstract class Data {
 */
 
 
-    public static void setActiveUser(@NonNull Activity cur_act, User userOBJ) {
+    public static void setActiveUser(  Activity cur_act, User userOBJ) {
         ActiveUser.about = userOBJ.getAbout();
         ActiveUser.id = userOBJ.getId();
         ActiveUser.interactions = userOBJ.getInteractions();
