@@ -26,8 +26,8 @@ import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.CarouselAdapter;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Post;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.Post;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
@@ -135,7 +135,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 if(imageupload.getVisibility() == View.VISIBLE) {
                                     imageupload.setVisibility(View.INVISIBLE);
                                     imagelabel.setVisibility(View.INVISIBLE);
-                                    addmore.setVisibility(View.VISIBLE);
+                                    //addmore.setVisibility(View.VISIBLE);
                                     removeImage.setVisibility(View.VISIBLE);
                                 }
                                 for (String uri : result.getStringArrayList("uris")) {
@@ -168,10 +168,13 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                         Toast.LENGTH_SHORT
                                 ).show();
                             } else {
+                                numIndicators += 1;
                                 String uri = result.getString("uri");
                                 imageURLsToBeUploaded.add(uri);
                                 addToCarousel(Uri.parse(uri));
                                 imagelabel.setVisibility(View.INVISIBLE);
+                                imageupload.setVisibility(View.INVISIBLE);
+                                removeImage.setVisibility(View.VISIBLE);
                             }
                             if (!load.getTask().isComplete())
                                 load.setResult("image");
@@ -237,12 +240,12 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         //created and every image was able to be uploaded
         post.setImageUrls(imageURLs);
         ActiveUser.post_ids.add(post.getId());
-        Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
+        Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
             @Override
             public void onSuccess(User ignored) {
                 //setActiveUser caches ActiveUser
                 Data.setActiveUser(requireActivity(), Data.activeUserToPOJO());
-                Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+                Network.setPost(post, false, new Callback<Post>() {
                     @Override
                     public void onSuccess(Post result) {
                         Toast.makeText(
@@ -284,7 +287,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onFailure(Exception error) {
-                Network.setPost(requireActivity(), post, true, null);
+                Network.setPost(post, true, null);
                 Toast.makeText(
                         getContext(),
                         "Could not finish uploading: " + error.getMessage(),
@@ -347,8 +350,8 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                 retrievePhoto();
         }
         if(ID == removeImage.getId()) {
-            carousel.removeViewAt(position);
-            imageURLsToBeUploaded.remove(position);
+            carousel.removeAllViews();
+            imageURLsToBeUploaded.remove(0);
             position -= position == numIndicators - 1 ? 1 : 0;
             indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
             if(numIndicators == 0) {
@@ -406,7 +409,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                     description.getText().toString()
             );
 
-            Network.setPost(requireActivity(), post, false, new Callback<Post>() {
+            Network.setPost(post, false, new Callback<Post>() {
                 @Override
                 public void onSuccess(Post result) {
                     for(String s : imageURLsToBeUploaded) {

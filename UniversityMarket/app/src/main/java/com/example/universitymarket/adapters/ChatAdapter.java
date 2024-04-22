@@ -11,32 +11,38 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Message;
-import com.example.universitymarket.objects.User;
-
-import java.util.HashMap;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Message;
+import com.example.universitymarket.models.User;
+import com.example.universitymarket.utilities.Data;
+import com.example.universitymarket.viewmodels.ChatViewModel;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<Chat> chats;
     private final onClickListener clickListener;
-    private final HashMap<Chat, Pair<List<User>, Message>> previewMap = new HashMap<>();
+    private final List<ChatViewModel.MessagePreview> previewList;
 
-    public ChatAdapter(Context context, onClickListener clickListener, List<Chat> chats, List<List<User>> participants, List<Message> previews) {
+    public ChatAdapter(Context context, onClickListener clickListener, List<ChatViewModel.MessagePreview> previewList) {
         this.context = context;
+        this.previewList = previewList;
         this.clickListener = clickListener;
-        this.chats = chats;
+    }
 
-        IntStream.range(0, chats.size()).forEach(i -> previewMap.put(chats.get(i), new Pair<>(participants.get(i), previews.get(i))));
+    public void add(List<ChatViewModel.MessagePreview> previewList) {
+        previewList.addAll(previewList);
+        notifyDataSetChanged();
+    }
+
+    public void remove(List<ChatViewModel.MessagePreview> previewList) {
+        previewList.removeAll(previewList);
+        notifyDataSetChanged();
     }
 
     public interface onClickListener {
-        void onClick(Chat chat);
+        void onClick(ChatViewModel.MessagePreview preview);
     }
 
     @NonNull
@@ -48,31 +54,25 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ChatAdapter.ViewHolder holder, int position) {
-        Chat chat = chats.get(position);
-        Pair<List<User>, Message> pair = previewMap.get(chat);
-        if(pair == null)
-            return;
+        Chat chat = previewList.get(position).chat;
+        List<User> otherParticipants = previewList.get(position).participants.stream().filter(user -> !ActiveUser.email.equals(user.getEmail())).collect(Collectors.toList());
+        Message preview = previewList.get(position).preview;
 
-        holder.itemView.setOnClickListener(l -> {
-            clickListener.onClick(chat);
-        });
-
-        List<User> otherParticipants = pair.first.stream().filter(e -> !ActiveUser.email.equals(e.getId())).collect(Collectors.toList());
-        Message preview = pair.second;
+        holder.itemView.setOnClickListener(l -> clickListener.onClick(previewList.get(position)));
 
         String name = otherParticipants.size() > 1 ? otherParticipants.stream().map(User::getFirstName).collect(Collectors.joining(",")) : otherParticipants.get(0).getFirstName() + " " + otherParticipants.get(0).getLastName();
-        String message = preview.getContents() == null ? "Item offer" : preview.getContents();
-        String delivered = preview.getTimestamp() == null ? "Unknown" : preview.getTimestamp();
+        String message = preview == null ? "New conversation" : preview.getContents() == null ? "Item offer" : preview.getContents();
+        String delivered = preview == null ? Data.formatDate(Data.parseDate(chat.getDateCreated()), "MMM dd, yyyy") : preview.getTimestamp() == null ? "Unknown" : Data.formatDate(Data.parseDate(preview.getTimestamp()), "MMM dd, yyyy");
         holder.senders.setText(name);
         holder.deliverdate.setText(delivered);
         holder.preview.setText(message);
-        if(!pair.second.getReadEmails().contains(ActiveUser.email))
+        if(preview != null && !preview.getReadEmails().contains(ActiveUser.email))
             holder.unreadIndicator.setVisibility(View.VISIBLE);
     }
 
     @Override
     public int getItemCount() {
-        return chats.size();
+        return previewList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -87,7 +87,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
             deliverdate = itemView.findViewById(R.id.chat_deliverdate_text);
             preview = itemView.findViewById(R.id.chat_preview_text);
             unreadIndicator = itemView.findViewById(R.id.chat_indicator_dot);
-
         }
     }
 }

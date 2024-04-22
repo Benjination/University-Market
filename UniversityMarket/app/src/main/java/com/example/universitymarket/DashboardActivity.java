@@ -30,7 +30,7 @@ import com.example.universitymarket.fragments.SettingsFragment;
 import com.example.universitymarket.fragments.TabFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
@@ -59,7 +59,7 @@ public class DashboardActivity extends AppCompatActivity {
     private ViewGroup.LayoutParams params;
     private TaskCompletionSource<List<Uri>> urisRetrieval = new TaskCompletionSource<>();
     private TaskCompletionSource<Uri> uriRetrieval = new TaskCompletionSource<>();
-    private PickMultipleVisualMedia multipleImagePicker = new PickMultipleVisualMedia(Policy.max_images_per_post);
+    private PickMultipleVisualMedia multipleImagePicker = Policy.max_images_per_post > 1 ? new PickMultipleVisualMedia(Policy.max_images_per_post) : null;
     private final ActivityResultContracts.PickVisualMedia singleImagePicker = new ActivityResultContracts.PickVisualMedia();
     private final HashMap<String, ArrayList<Object>> fragMap = new HashMap<>();
     private final FragmentManager fm = getSupportFragmentManager();
@@ -95,7 +95,7 @@ public class DashboardActivity extends AppCompatActivity {
             );
         }
 
-        Network.getUser(this, ActiveUser.email, new Callback<User>() {
+        Network.getUser(ActiveUser.email, new Callback<User>() {
             @Override
             public void onSuccess(User result) {
                 Data.setActiveUser(DashboardActivity.this, result);

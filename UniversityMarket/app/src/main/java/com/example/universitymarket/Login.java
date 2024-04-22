@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
@@ -83,7 +83,7 @@ public class Login extends AppCompatActivity
 
             currentUser.reload();
             ActiveUser.email = currentUser.getEmail();
-            Network.getUser(Login.this, currentUser.getEmail(), new Callback<User>() {
+            Network.getUser(currentUser.getEmail(), new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
                     Data.setActiveUser(Login.this, result);
@@ -190,7 +190,7 @@ public class Login extends AppCompatActivity
                                         Date date = new Date();
                                         currUser.setAbout(date.toString(), null, last, null, first, email);
                                         Data.setActiveUser(Login.this, currUser);
-                                        Network.setUser(Login.this, currUser, false, new Callback<User>() {
+                                        Network.setUser(currUser, false, new Callback<User>() {
                                             @Override
                                             public void onSuccess(User result) {
 

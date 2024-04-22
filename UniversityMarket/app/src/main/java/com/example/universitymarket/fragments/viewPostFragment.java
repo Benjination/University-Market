@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,12 +20,13 @@ import android.widget.ViewSwitcher;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Post;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Post;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.WatchViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public class viewPostFragment extends Fragment {
 
     private final String[] args;
     private final FragmentManager fm;
+    private WatchViewModel watchViewModel;
     private final String postId;
     private String chatId;
     private View viewSinglePost;
@@ -61,6 +64,7 @@ public class viewPostFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
+        watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
@@ -73,28 +77,15 @@ public class viewPostFragment extends Fragment {
 
             if(ActiveUser.watch_ids.contains(this.postId))
             {
-                ActiveUser.watch_ids.remove(String.valueOf(this.postId));
+                watchViewModel.removeWatchPost(this.postId);
                 addWL.setText("Add to Watchlist");
                 System.out.println(ActiveUser.watch_ids);
             }
             else {
-                ActiveUser.watch_ids.add(String.valueOf(this.postId));
+                watchViewModel.addWatchPost(this.postId);
                 addWL.setText("Remove from Watchlist");
                 System.out.println(ActiveUser.watch_ids);
             }
-
-            Network.setUser(requireActivity(), Data.activeUserToPOJO(), false, new Callback<User>() {
-                @Override
-                public void onSuccess(User result) {
-                    Toast.makeText(requireActivity(), "Updated",
-                            Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onFailure(Exception error) {
-                    Log.e("setUser", error.getMessage());
-                }
-            });
         });
 
         // Configure the view post fragment
@@ -111,6 +102,7 @@ public class viewPostFragment extends Fragment {
     }
 
     private void setupCreateConvoButton(Button createConvo, String authorEmail) {
+        createConvo.setEnabled(true);
         createConvo.setOnClickListener(l -> {
             createConvo.setEnabled(false);
             chatId = Data.generateID("chat");
@@ -122,18 +114,18 @@ public class viewPostFragment extends Fragment {
                     chatId
             );
 
-            Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
+            Network.setChat(chat, false, new Callback<Chat>() {
                 @Override
                 public void onSuccess(Chat newChat) {
                     ActiveUser.chat_ids.add(chatId);
 
-                    Network.setUser(requireActivity(), ActiveUser.toPOJO(), false, null);
-                    Network.getUser(requireActivity(), authorEmail, new Callback<User>() {
+                    Network.setUser(ActiveUser.toPOJO(), false, null);
+                    Network.getUser(authorEmail, new Callback<User>() {
                         @Override
                         public void onSuccess(User author) {
                             author.setChatIds((ArrayList<String>) Stream.concat(author.getChatIds().stream(), Stream.of(chatId)).collect(Collectors.toList()));
 
-                            Network.setUser(requireActivity(), author, false, null);
+                            Network.setUser(author, false, null);
                         }
 
                         @Override
@@ -155,7 +147,7 @@ public class viewPostFragment extends Fragment {
 
     private void fetchPostAndPopulate(String postID, View view) {
         // Example fetch operation
-        Network.getPost(requireActivity(), postID, new Callback<Post>() {
+        Network.getPost(postID, new Callback<Post>() {
             @Override
             public void onSuccess(Post result) {
                 //populate views
@@ -185,7 +177,7 @@ public class viewPostFragment extends Fragment {
                 }
 
                 // Get the uploader's rating and setup author button
-                Network.getUser(requireActivity(), result.getAuthorEmail(), new Callback<User>() {
+                Network.getUser(result.getAuthorEmail(), new Callback<User>() {
                     @Override
                     public void onSuccess(User user) {
                         String firstLast = user.getFirstName() + " " + user.getLastName();
@@ -211,18 +203,9 @@ public class viewPostFragment extends Fragment {
 
                 // Check if a chat has been opened
                 if(!result.getAuthorEmail().equals(ActiveUser.email)) {
-                    createConvo.setEnabled(true);
-                    Network.getChats(requireActivity(), ActiveUser.chat_ids, new Callback<List<Chat>>() {
+                    Network.getChats(ActiveUser.chat_ids, new Callback<List<Chat>>() {
                         @Override
-                        public void onSuccess(List<Chat> chats) {
-                            for (Chat chat : chats) {
-                                // Check to see if theres a chat with the seller and ActiveUser
-                                if (chat.getParticipantEmails().stream().filter(s -> s.equals(ActiveUser.email) || s.equals(result.getAuthorEmail())).count() == 2) {
-                                    return;
-                                }
-                                setupCreateConvoButton(createConvo, result.getAuthorEmail());
-                            }
-                        }
+                        public void onSuccess(List<Chat> ignored) {}
 
                         @Override
                         public void onFailure(Exception error) {

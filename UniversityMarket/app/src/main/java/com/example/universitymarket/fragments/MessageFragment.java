@@ -2,9 +2,15 @@ package com.example.universitymarket.fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,13 +26,13 @@ import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.MessageAdapter;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.Chat;
-import com.example.universitymarket.objects.Message;
-import com.example.universitymarket.objects.Post;
+import com.example.universitymarket.models.Chat;
+import com.example.universitymarket.models.Message;
+import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
-import com.example.universitymarket.utilities.Listener;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.MessageViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -35,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class MessageFragment extends Fragment implements View.OnClickListener {
@@ -52,7 +57,10 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
     private List<Post> offerPosts;
     private List<Message> messages;
     private Chat chat;
+    private MessageViewModel viewModel;
     private final FragmentManager fm;
+
+    private Observer<List<Message>> listenToMessages;
 
     public MessageFragment(String[] args, FragmentManager fm) {
         // args[0] contains the chatID
@@ -80,83 +88,39 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
         inputBox = v.findViewById(R.id.message_input_box);
         sendButton = v.findViewById(R.id.message_send_button);
         offerButton = v.findViewById(R.id.message_offer_button);
+        viewModel = new ViewModelProvider(requireActivity()).get(MessageViewModel.class);
 
         sendButton.setEnabled(false);
         offerButton.setEnabled(false);
+        sendButton.setOnClickListener(this);
+        offerButton.setOnClickListener(this);
 
-        Network.getChat(requireActivity(), args[0], new Callback<Chat>() {
+        Network.getChat(args[0], new Callback<Chat>() {
             @Override
             public void onSuccess(Chat result) {
                 chat = result;
 
-                Network.getMessages(requireActivity(), chat.getMessageIds(), new Callback<List<Message>>() {
-                    @Override
-                    public void onSuccess(List<Message> msgs) {
-                        messages = msgs;
-                        adapter = new MessageAdapter(requireContext(), chat, messages);
+                listenToMessages = newMessages -> {
+                    if(messages == null) {
+                        messages = newMessages;
+                        adapter = new MessageAdapter(requireContext(), result, messages);
                         recycler.setAdapter(adapter);
-
-                        Network.listenToChat(requireActivity(), chat.getId(), new Listener<Chat>() {
-                            @Override
-                            public void onAdded(Chat ignored) {}
-
-                            @Override
-                            public void onModified(Chat modified) {
-                                int before = chat.getMessageIds().size(), after = modified.getMessageIds().size();
-                                Stream<Integer> indexing = IntStream.range(Math.min(before, after), Math.max(before, after) - 1).boxed();
-
-                                if(before < after) {
-                                    List<String> msgIdsChanged = indexing.map(i -> modified.getMessageIds().get(i)).collect(Collectors.toList());
-                                    chat = modified;
-                                    Network.getMessages(requireActivity(), msgIdsChanged, new Callback<List<Message>>() {
-                                        @Override
-                                        public void onSuccess(List<Message> nmsgs) {
-                                            messages = nmsgs;
-                                            for(Message m : nmsgs) {
-                                                adapter.addMessage(m);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onFailure(Exception error) {
-                                            Log.e("getMessages", error.getMessage());
-                                        }
-                                    });
-                                } else if (before > after) {
-                                    List<Message> msgsChanged = indexing.map(i -> messages.get(i)).collect(Collectors.toList());
-                                    for(Message m : msgsChanged) {
-                                        adapter.removeMessage(m);
-                                        messages.remove(m);
-                                    }
-                                    chat = modified;
-                                }
-                            }
-
-                            @Override
-                            public void onRemoved(Chat ignored) {}
-
-                            @Override
-                            public void onFailure(Exception error) {
-                                Log.e("listenToChat", error.getMessage());
-                            }
-                        });
+                        recycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+                    } else {
+                        adapter.addMessages(newMessages);
+                        Data.updateAdapter(messages, newMessages, adapter);
+                        messages = newMessages;
                     }
+                };
+                viewModel.listenToChatMessages(chat).observe(getViewLifecycleOwner(), listenToMessages);
 
-                    @Override
-                    public void onFailure(Exception error) {
-                        Log.e("getMessages", error.getMessage());
-                    }
-                });
+                sendButton.setEnabled(true);
+                offerButton.setEnabled(true);
             }
 
             @Override
             public void onFailure(Exception error) {
                 Log.e("getChat", error.getMessage());
-                Toast.makeText(
-                        requireContext(),
-                        "Could not retrieve chat, check your network connection",
-                        Toast.LENGTH_LONG
-                ).show();
             }
         });
     }
@@ -175,23 +139,13 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                     msgID
             );
 
-            Network.setMessage(requireActivity(), msg, false, new Callback<Message>() {
+            Network.setMessage(msg, false, new Callback<Message>() {
                 @Override
                 public void onSuccess(Message message) {
                     inputBox.getText().clear();
                     chat.setMessageIds((ArrayList<String>) Stream.concat(chat.getMessageIds().stream(), Stream.of(message.getId())).collect(Collectors.toList()));
 
-                    Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
-                        @Override
-                        public void onSuccess(Chat ignored) {
-                            adapter.addMessage(message);
-                        }
-
-                        @Override
-                        public void onFailure(Exception error) {
-                            Log.e("setChat", error.getMessage());
-                        }
-                    });
+                    Network.setChat(chat, false, null);
                 }
 
                 @Override
@@ -206,9 +160,9 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
             });
         } else if(v.getId() == R.id.message_offer_button) {
             DialogFragment postChooser = new DialogFragment(R.layout.layout_offer_dialog);
-            Dialog postChooserView = postChooser.getDialog();
-            if(postChooserView == null)
-                return;
+            postChooser.onAttach(requireContext());
+            //TODO: make this its own fragment stat
+            View postChooserView = inflater.inflate(R.layout.layout_offer_dialog, container, false);
 
             FloatingActionButton closeOffer = postChooserView.findViewById(R.id.offer_close_button);
             RadioGroup postSelection = postChooserView.findViewById(R.id.offer_posts_radiogroup);
@@ -219,7 +173,7 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
 
             closeOffer.setOnClickListener(l -> postChooser.dismiss());
 
-            Network.getPosts(requireActivity(), ActiveUser.post_ids, new Callback<List<Post>>() {
+            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
                 @Override
                 public void onSuccess(List<Post> result) {
                     offerPosts = result;
@@ -265,16 +219,15 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                                 msgID
                         );
 
-                        Network.setMessage(requireActivity(), msg, false, new Callback<Message>() {
+                        Network.setMessage(msg, false, new Callback<Message>() {
                             @Override
                             public void onSuccess(Message message) {
                                 chat.setMessageIds((ArrayList<String>) Stream.concat(chat.getMessageIds().stream(), Stream.of(message.getId())).collect(Collectors.toList()));
 
-                                Network.setChat(requireActivity(), chat, false, new Callback<Chat>() {
+                                Network.setChat(chat, false, new Callback<Chat>() {
                                     @Override
                                     public void onSuccess(Chat ignored) {
                                         postChooser.dismiss();
-                                        adapter.addMessage(message);
                                     }
 
                                     @Override
@@ -307,6 +260,8 @@ public class MessageFragment extends Fragment implements View.OnClickListener {
                     ).show();
                 }
             });
+
+            postChooser.show(fm, null);
         }
     }
 }

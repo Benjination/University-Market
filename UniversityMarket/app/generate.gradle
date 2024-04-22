@@ -204,7 +204,7 @@ String[] generate(def map, def class_name, def file) {
             " * </b><p>\n * File based on '" + file.name + "'" +
             " located at <a href=\"file://" + file.getPath().split(file.name)[0] + "\">" + filepath + "</a>\n" +
             "*/\n"
-    String packag = "package com.example.universitymarket.objects;\n"
+    String packag = "package com.example.universitymarket.models;\n"
     String imports = \
             "\nimport androidx.annotation.Discouraged;\n" +
             "import java.util.HashMap;\n" +
@@ -455,56 +455,15 @@ String[] generate(def map, def class_name, def file) {
     String setters = ""
     String getters = ""
     String listeners = ""
-    if(cache) {
-        setters = setters.concat(
-                "\n    public static void set" + class_name + "FromCache" +
-                        "(@NonNull Activity cur_act, @NonNull String docID, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
-                        "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", docID, clear, null);\n" +
-                        "        if(response != null) {\n" +
-                        "            echo.addOnSuccessListener(task -> {\n" +
-                        "                " + class_name + " result = new " + class_name + "(task);\n" +
-                        "                response.onSuccess(result);\n" +
-                        "            });\n" +
-                        "            echo.addOnFailureListener(response::onFailure);\n" +
-                        "        }\n" +
-                        "    }\n\n" +
-                \
-                "    public static void set" + class_name + "FromCache" +
-                        "(@NonNull Activity cur_act, boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
-                        "        Task<HashMap<String, Object>> echo = setDoc(cur_act, " + coll_name + ", Active" + class_name + "." + idName + ", clear, null);\n" +
-                        "        if(response != null) {\n" +
-                        "            echo.addOnSuccessListener(task -> {\n" +
-                        "                " + class_name + " result = new " + class_name + "(task);\n" +
-                        "                response.onSuccess(result);\n" +
-                        "            });\n" +
-                        "            echo.addOnFailureListener(response::onFailure);\n" +
-                        "        }\n" +
-                        "    }\n"
-        )
-        getters = getters.concat(
-                "\n    public static void sync" +  class_name  + "Cache(@NonNull Activity cur_act) {\n" +
-                        "        getDoc(cur_act, " + coll_name + ", Active" +  class_name  + "." + idName + ")\n" +
-                        "                .addOnSuccessListener(task -> {\n" +
-                        "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                        "                    Data.setActive" +  class_name  + "(cur_act, result);\n" +
-                        "                })\n" +
-                        "                .addOnFailureListener(e -> Toast.makeText(\n" +
-                        "                        cur_act,\n" +
-                        "                        e.getMessage(),\n" +
-                        "                        Toast.LENGTH_SHORT\n" +
-                        "                ).show());\n" +
-                        "    }\n"
-        )
-    }
     setters = setters.concat(
-            "\n    public static void set" + class_name + "(@NonNull Activity cur_act, @NonNull " + class_name + " " + obj_name + ", boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
+            "\n    public static void set" + class_name + "(@NonNull " + class_name + " " + obj_name + ", boolean clear, @Nullable Callback<" + class_name + "> response) {\n" +
                     "        if(response == null && " + obj_name + ".get" + idMethod + "() == null)\n" +
                     "            return;\n" +
                     "        else if(response != null && " + obj_name + ".get" + idMethod + "() == null) {\n" +
                     "            response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "));\n" +
                     "            return;\n" +
                     "        }\n" +
-                    "        Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + ".get" + idMethod + "(), clear, " + obj_name + ");\n" +
+                    "        Task<HashMap<String, Object>> echo = setDoc(" + coll_name + ", " + obj_name + ".get" + idMethod + "(), clear, " + obj_name + ");\n" +
                     "        if(response != null) {\n" +
                     "            echo.addOnSuccessListener(task -> {\n" +
                     "                " + class_name + " result = new " + class_name + "(task);\n" +
@@ -514,7 +473,7 @@ String[] generate(def map, def class_name, def file) {
                     "        }\n" +
                     "    }\n\n" +
             \
-            "    public static void set" + class_name + "s(@NonNull Activity cur_act, @NonNull " + class_name + "[] " + obj_name + ", boolean clear, @Nullable Callback<List<" + class_name + ">> response) {\n" +
+            "    public static void set" + class_name + "s(@NonNull " + class_name + "[] " + obj_name + ", boolean clear, @Nullable Callback<List<" + class_name + ">> response) {\n" +
                     "        List<" + class_name + "> responses = new ArrayList<>();\n" +
                     "        for(int i = 0; i < " + obj_name + ".length; i++) {\n" +
                     "            if(response == null && " + obj_name + "[i].get" + idMethod + "() == null)\n" +
@@ -523,7 +482,7 @@ String[] generate(def map, def class_name, def file) {
                     "                response.onFailure(new NullPointerException(\"" + class_name + " ID does not exist in " + class_name.toLowerCase() + " object \" + " + obj_name + "[i]));\n" +
                     "                continue;\n" +
                     "            }\n" +
-                    "            Task<HashMap<String, Object>> echo = setDoc(cur_act," + coll_name + ", " + obj_name + "[i].get" + idMethod + "(), clear, " + obj_name + "[i]);\n" +
+                    "            Task<HashMap<String, Object>> echo = setDoc(" + coll_name + ", " + obj_name + "[i].get" + idMethod + "(), clear, " + obj_name + "[i]);\n" +
                     "            if(response != null) {\n" +
                     "                echo.addOnFailureListener(response::onFailure);\n" +
                     "                if(i == " + obj_name + ".length - 1) {\n" +
@@ -543,8 +502,8 @@ String[] generate(def map, def class_name, def file) {
                     "    }\n"
     )
     getters = getters.concat(
-            "\n    public static void get" +  class_name  + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull Callback<" +  class_name  + "> response) {\n" +
-                    "        getDoc(cur_act," +  coll_name  + ", docID)\n" +
+            "\n    public static void get" +  class_name  + "(@NonNull String docID, @NonNull Callback<" +  class_name  + "> response) {\n" +
+                    "        getDoc(" +  coll_name  + ", docID)\n" +
                     "                .addOnSuccessListener(task -> {\n" +
                     "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
                     "                    response.onSuccess(result);\n" +
@@ -552,31 +511,26 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
-                    "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-                    "        if(docID.size() == 0)\n" +
-                    "            response.onFailure(new NullPointerException(\"No documents are available\"));\n" +
-                    "        for(int i = 0; i < docID.size(); i++) {\n" +
-                    "            Task<HashMap<String, Object>> echo = getDoc(cur_act," +  coll_name  + ", docID.get(i));\n" +
-                    "            echo.addOnFailureListener(response::onFailure);\n" +
-                    "            if(i == docID.size() - 1) {\n" +
-                    "                echo.addOnSuccessListener(task -> {\n" +
-                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                    "                    list.add(result);\n" +
-                    "                    response.onSuccess(list);\n" +
-                    "                });\n" +
-                    "            } else {\n" +
-                    "                echo.addOnSuccessListener(task -> {\n" +
-                    "                    " +  class_name  + " result = new " +  class_name  + "(task);\n" +
-                    "                    list.add(result);\n" +
-                    "                });\n" +
-                    "            }\n" +
+            "    public static void get" +  class_name  + "s(@NonNull List<String> docID, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+                    "        List<" + class_name + "> list = new ArrayList<>();\n" +
+                    "        if(docID.isEmpty()) {\n" +
+                    "            response.onFailure(new Exception(\"A non-empty docID list is required\"));\n" +
+                    "            return;\n" +
                     "        }\n" +
+                    "        getColl(" + coll_name + ", Filter.inArray(\"id\", docID), -1)\n" +
+                    "                .addOnSuccessListener(task -> {\n" +
+                    "                    for (HashMap<String, Object> hash : task) {\n" +
+                    "                        " + class_name + " result = new " + class_name + "(hash);\n" +
+                    "                        list.add(result);\n" +
+                    "                    }\n" +
+                    "                    response.onSuccess(list);\n" +
+                    "                })\n" +
+                    "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, @NonNull Filter filter, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@Nullable Filter filter, @Nullable Integer pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
                     "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-                    "        getColl(cur_act," +  coll_name  + ", filter, Math.max(pageNo, 0))\n" +
+                    "        getColl(" +  coll_name  + ", filter, pageNo == null ? -1 : Math.max(pageNo, 0))\n" +
                     "                .addOnSuccessListener(task -> {\n" +
                     "                    for (HashMap<String, Object> hash : task) {\n" +
                     "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
@@ -587,9 +541,9 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull Activity cur_act, int pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void getAll" +  class_name  + "s(@NonNull Callback<List<" +  class_name  + ">> response) {\n" +
                     "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
-                    "        getColl(cur_act," +  coll_name  + ", null, (char) (Math.max(pageNo, 0)))\n" +
+                    "        getColl(" +  coll_name  + ", null, -1)\n" +
                     "                .addOnSuccessListener(task -> {\n" +
                     "                    for (HashMap<String, Object> hash : task) {\n" +
                     "                        " +  class_name  + " result = new " +  class_name  + "(hash);\n" +
@@ -601,8 +555,8 @@ String[] generate(def map, def class_name, def file) {
                     "    }\n"
     )
     listeners = listeners.concat(
-            "\n    public static void listenTo" + class_name + "(@NonNull Activity cur_act, @NonNull String docID, @NonNull Listener<" + class_name + "> response) {\n" +
-                    "        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(cur_act, " + coll_name + ", docID);\n" +
+            "\n    public static void listenTo" + class_name + "(@NonNull String docID, @NonNull Listener<" + class_name + "> response) {\n" +
+                    "        Pair<DocumentReference, Task<DocumentSnapshot>> pair = listenToDoc(" + coll_name + ", docID);\n" +
                     "        pair.second\n" +
                     "                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {\n" +
                     "                    if(snapshot == null || task.getData() == null || snapshot.getData() == null || task.getData().equals(snapshot.getData())) {\n" +
@@ -621,8 +575,8 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void listenTo" + class_name + "s(@NonNull Activity cur_act, @NonNull Listener<" + class_name + "> response) {\n" +
-                    "        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(cur_act, " + coll_name + ");\n" +
+            "    public static void listenTo" + class_name + "s(@NonNull Listener<" + class_name + "> response) {\n" +
+                    "        Pair<CollectionReference, Task<QuerySnapshot>> pair = listenToColl(" + coll_name + ");\n" +
                     "        pair.second\n" +
                     "                .addOnSuccessListener(task -> pair.first.addSnapshotListener((snapshot, error) -> {\n" +
                     "                    if(snapshot == null || task.getDocumentChanges().equals(snapshot.getDocumentChanges())) {\n" +
@@ -657,7 +611,7 @@ String[] generate(def map, def class_name, def file) {
     packag = "package com.example.universitymarket.globals.actives;\n"
     imports = imports.concat(
             "import android.app.Application;\n" +
-                    "import com.example.universitymarket.objects." + class_name + ";\n"
+                    "import com.example.universitymarket.models." + class_name + ";\n"
     )
     declarations = declarations.replace("private", "public static")
     body = declarations
@@ -695,7 +649,7 @@ String[] generate(def map, def class_name, def file) {
                     "setCache(cur_act, \"Active" + class_name + "\", " + obj_name + ", false));\n"
     )
     String method = \
-            "\n\n    public static void setActive" + class_name + "(@NonNull Activity cur_act, " +
+            "\n\n    public static void setActive" + class_name + "(  Activity cur_act, " +
             class_name + " " + obj_name + ") {\n" + details + "    }" +
             "\n\n    public static " + class_name + " active" + class_name + "ToPOJO() {\n" +
             "        return new " + class_name + "(" + provOrdered + ");\n    }"
@@ -719,10 +673,10 @@ static void update(String nString, String dString, def active_names, def obj_nam
     if(active_names.size() > 0)
         header_obj = header_obj.concat("import android.widget.Toast;\n")
     for(val in obj_names)
-        header_obj = header_obj.concat("import com.example.universitymarket.objects." + val + ";\n")
+        header_obj = header_obj.concat("import com.example.universitymarket.models." + val + ";\n")
     for(val in active_names) {
         header_obj = header_obj.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
-        header_active = header_active.concat("import com.example.universitymarket.objects." + val.split("(Active)")[1] + ";\n")
+        header_active = header_active.concat("import com.example.universitymarket.models." + val.split("(Active)")[1] + ";\n")
         header_active = header_active.concat("import com.example.universitymarket.globals.actives." + val + ";\n")
     }
 
@@ -785,7 +739,7 @@ static void update(String nString, String dString, def active_names, def obj_nam
 task generateSupported {
     File[] skeletons = file("${project.projectDir}/src/main/res/raw").listFiles()
     Map<String, File> skeleton_map = new HashMap<>()
-    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/objects")
+    File object_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/models")
     object_path.mkdir()
     File global_path = file("${project.projectDir}/src/main/java/com/example/universitymarket/globals/actives")
     global_path.mkdir()

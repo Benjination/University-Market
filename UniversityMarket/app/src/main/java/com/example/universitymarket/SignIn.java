@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -157,7 +157,7 @@ public class SignIn extends AppCompatActivity
 
                                 if(firebaseUser.isEmailVerified()) {
                                     //Data.setActiveUser(SignIn.this, firebaseUser);
-                                    Network.getUser(SignIn.this, ActiveUser.email, new Callback<User>() {
+                                    Network.getUser(ActiveUser.email, new Callback<User>() {
                                         @Override
                                         public void onSuccess(User result) {
                                             Data.setActiveUser(SignIn.this, result);
@@ -204,6 +204,7 @@ public class SignIn extends AppCompatActivity
                 System.out.println("Email not accepted");
                     Toast.makeText(SignIn.this, "Invalid Email or Password",
                             Toast.LENGTH_LONG).show();
+                    resend.setVisibility(View.VISIBLE);
             }
 
         });

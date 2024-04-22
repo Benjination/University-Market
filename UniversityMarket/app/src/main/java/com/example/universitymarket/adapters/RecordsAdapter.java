@@ -9,9 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.universitymarket.R;
-import com.example.universitymarket.objects.Post;
-import com.example.universitymarket.objects.Transaction;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.Post;
+import com.example.universitymarket.models.Transaction;
+import com.example.universitymarket.models.User;
 import java.util.HashMap;
 import java.util.List;
 

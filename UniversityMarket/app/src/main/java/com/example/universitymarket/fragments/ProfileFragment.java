@@ -15,7 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
-import com.example.universitymarket.objects.User;
+import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
@@ -80,7 +80,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
             load = new TaskCompletionSource<>();
             loadPage(load.getTask());
 
-            Network.getUser(requireActivity(), userEmail, new Callback<User>() {
+            Network.getUser(userEmail, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
                     user = result;
@@ -88,7 +88,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
                     load.setResult("getUser");
 
                     ratingBar.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-                        Network.getUser(requireActivity(), userEmail, new Callback<User>() {
+                        Network.getUser(userEmail, new Callback<User>() {
                             @Override
                             public void onSuccess(User current) {
                                 current.setRatings((ArrayList<HashMap>) Stream.concat(current.getRatings().stream().filter(cur -> !cur.containsKey(ActiveUser.email)), Stream.of(new HashMap<>(Collections.singletonMap(ActiveUser.email, ratingBar.getRating())))).collect(Collectors.toList()));
@@ -135,7 +135,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener {
         if(v.getId() == R.id.profile_save_button) {
             user.setDescription(description.getText().toString());
 
-            Network.setUser(requireActivity(), user, false, new Callback<User>() {
+            Network.setUser(user, false, new Callback<User>() {
                 @Override
                 public void onSuccess(User result) {
                     Toast.makeText(
