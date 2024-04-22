@@ -26,7 +26,8 @@ public class WatchAdapter extends RecyclerView.Adapter<WatchAdapter.ViewHolder> 
 
     public void update(List<Post> posts) {
         watched_posts.clear();
-        watched_posts.addAll(posts);
+        if(posts != null) { watched_posts.addAll(posts); }
+        notifyDataSetChanged();
     }
 
     @NonNull
