@@ -204,6 +204,7 @@ public class SignIn extends AppCompatActivity
                 System.out.println("Email not accepted");
                     Toast.makeText(SignIn.this, "Invalid Email or Password",
                             Toast.LENGTH_LONG).show();
+                    resend.setVisibility(View.VISIBLE);
             }
 
         });
