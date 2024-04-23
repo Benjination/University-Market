@@ -71,5 +71,15 @@ public class PopupFragment extends Fragment {
                 .beginTransaction()
                 .replace(R.id.popup_fragment_buffer, display)
                 .commit();
+
+        childFM
+                .setFragmentResultListener(
+                        "closePopup",
+                        this,
+                        (requestKey, result) -> parentFM
+                                .beginTransaction()
+                                .remove(this)
+                                .commit()
+                );
     }
 }

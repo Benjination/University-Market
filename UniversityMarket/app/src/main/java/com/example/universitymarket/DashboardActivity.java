@@ -154,7 +154,6 @@ public class DashboardActivity extends AppCompatActivity {
                             int newMax = Policy.max_images_per_post - result.getInt("numPictures");
                             fragResponse.clear();
 
-                            Log.e("newMax", newMax + "");
                             if(newMax > 1) {
                                 urisRetrieval = new TaskCompletionSource<>();
                                 multipleImagePicker.updateMaxItems(newMax);
