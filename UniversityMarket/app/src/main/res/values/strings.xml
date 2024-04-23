@@ -40,6 +40,8 @@
 
     <string name="records_unavailable_txt">No records are available at this time</string>
 
+    <string name="watch_unavailable_txt">You are not watching any items</string>
+
     <string name="post_submit_button_txt">Post Item</string>
     <string name="post_image_submit_hint">Image upload</string>
     <string name="post_title_field_hint">Title</string>

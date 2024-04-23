@@ -28,6 +28,7 @@ import com.example.universitymarket.fragments.ChatFragment;
 import com.example.universitymarket.fragments.PopupFragment;
 import com.example.universitymarket.fragments.SettingsFragment;
 import com.example.universitymarket.fragments.TabFragment;
+import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.globals.Policy;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.User;
@@ -54,7 +55,6 @@ public class DashboardActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private Menu menu;
     private MenuItem settings;
-    private MenuItem search;
     private Drawable gear;
     private ViewGroup.LayoutParams params;
     private TaskCompletionSource<List<Uri>> urisRetrieval = new TaskCompletionSource<>();
@@ -126,10 +126,7 @@ public class DashboardActivity extends AppCompatActivity {
                         getResources().getString(R.string.dash_toolbar_create_txt),
                         getResources().getString(R.string.dash_toolbar_view_txt)
                 )),
-                new ArrayList<>(Arrays.asList(
-                        getResources().getString(R.string.dash_toolbar_watch_txt),
-                        getResources().getString(R.string.dash_toolbar_analyze_txt)
-                )),
+                getResources().getString(R.string.dash_toolbar_watch_txt),
                 getResources().getString(R.string.dash_toolbar_chat_txt),
                 ActiveUser.first_name + " " + ActiveUser.last_name
         ));
@@ -144,8 +141,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         // These are the parameters for ArrayList<Object>  // Fragment  isLoading   miniToolbar List<PopupFragment>
         fragMap.put("Market", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Market" }, fm), false, true, new ArrayList<>())));
-        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Post" }, fm), false, true, new ArrayList<>())));
-        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Watch" }, fm), false, true, new ArrayList<>())));
+        fragMap.put("Post", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Post", ActiveUser.email }, fm), false, true, new ArrayList<>())));
+        fragMap.put("Watch", new ArrayList<>(Arrays.asList(new WatchFragment(), false, true, new ArrayList<>())));
         fragMap.put("Chat", new ArrayList<>(Arrays.asList(new ChatFragment(), false, false, new ArrayList<>())));
         fragMap.put("Profile", new ArrayList<>(Arrays.asList(new TabFragment(new String[]{ "Profile", ActiveUser.email }, fm), false, false, new ArrayList<>())));
 
@@ -285,7 +282,6 @@ public class DashboardActivity extends AppCompatActivity {
             menu.findItem(R.id.dash_toolbar_settings).setIcon(gear);
         }
 
-        search = menu.findItem(R.id.dash_toolbar_search);
         settings = menu.findItem(R.id.dash_toolbar_settings);
         settings.setOnMenuItemClickListener((menuItem) -> {
             createPopup("Settings", null, SettingsFragment.class.getName(), null);
@@ -315,7 +311,6 @@ public class DashboardActivity extends AppCompatActivity {
             popups.forEach(popup -> fm.beginTransaction().show(popup).commit());
 
             settings.setVisible(name.equals("Profile"));
-            search.setVisible(name.equals("Market"));
 
             currentView = name;
 

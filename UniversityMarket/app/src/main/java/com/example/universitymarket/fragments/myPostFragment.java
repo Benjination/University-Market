@@ -39,10 +39,12 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     private TaskCompletionSource<String> load;
     private myPostAdapter adapter;
     private FragmentManager fm;
+    private final String userEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostFragment(FragmentManager fm) {
+    public myPostFragment(FragmentManager fm, String userEmail) {
         this.fm = fm;
+        this.userEmail = userEmail;
     }
 
     @Override
@@ -64,8 +66,6 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
             } else {
-                Log.e("UPDATErecycler","MyPostFragELSE");
-                Log.e("lists", "\n" + myPosts.stream().map(Post::getId).collect(Collectors.toList()) + "\n" + updatedList.stream().map(Post::getId).collect(Collectors.toList()));
                 adapter.update(updatedList);
                 Data.updateAdapter(myPosts, updatedList, adapter);
                 myPosts = updatedList;

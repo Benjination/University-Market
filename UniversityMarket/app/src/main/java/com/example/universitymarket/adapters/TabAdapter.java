@@ -12,7 +12,6 @@ import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
-import com.example.universitymarket.fragments.myPostProfileFragment;
 import com.example.universitymarket.globals.actives.ActiveUser;
 
 public class TabAdapter extends FragmentStateAdapter {
@@ -34,8 +33,6 @@ public class TabAdapter extends FragmentStateAdapter {
                 return new MarketFragment(fm);
             } else if(args[0].equals("Post")) {
                 return new PostFragment(fm);
-            } else if(args[0].equals("Watch")) {
-                return new WatchFragment(fm);
             } else {
                 return new ProfileFragment(fm, args[1]);
             }
@@ -43,11 +40,9 @@ public class TabAdapter extends FragmentStateAdapter {
             if(args[0].equals("Market")) {
                 return new FilterFragment(fm);
             } else if(args[0].equals("Post")) {
-                return new myPostFragment(fm);
-            } else if(args[0].equals("Watch")) {
-                return new AnalyticsFragment(fm);
+                return new myPostFragment(fm, args[1]);
             } else {
-                return new myPostProfileFragment(fm, args[1]);
+                return new myPostFragment(fm, args[1]);
             }
         }
     }

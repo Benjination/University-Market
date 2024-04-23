@@ -15,6 +15,7 @@ import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.example.universitymarket.R;

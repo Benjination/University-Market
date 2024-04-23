@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.WatchAdapter;
@@ -27,16 +28,13 @@ import java.util.stream.Collectors;
 public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickListener {
     private View root;
     private RecyclerView recyclerView;
+    private TextView unavailable;
     private WatchViewModel watchViewModel;
     private List<Post> watchedPosts;
     private TaskCompletionSource<String> load;
     private WatchAdapter adapter;
     private FragmentManager fm;
     private final Bundle dashMessage = new Bundle();
-
-    public WatchFragment(FragmentManager fm) {
-        this.fm = fm;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {super.onCreate(savedInstanceState);}
@@ -46,10 +44,10 @@ public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickL
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_watch, container, false);
         recyclerView = root.findViewById(R.id.watch_recyclerView);
+        unavailable = root.findViewById(R.id.watch_unavailable_text);
         watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
+        fm = getParentFragmentManager();
         final Observer<List<Post>> watchObserver = updatedList -> {
-            //load = new TaskCompletionSource<>();
-            //loadPage(load.getTask());
             if (watchedPosts == null) {
                 watchedPosts = updatedList;
                 adapter = new WatchAdapter(requireContext(), watchedPosts, WatchFragment.this);
@@ -57,13 +55,15 @@ public class WatchFragment extends Fragment implements WatchAdapter.OnItemClickL
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
             } else {
-                Log.e("UPDATErecycler","test");
-                Log.e("lists", "\n" + watchedPosts.stream().map(Post::getId).collect(Collectors.toList()) + "\n" + updatedList.stream().map(Post::getId).collect(Collectors.toList()));
                 adapter.update(updatedList);
                 Data.updateAdapter(watchedPosts, updatedList, adapter);
                 watchedPosts = updatedList;
             }
-            //load.setResult("getPosts");
+
+            if(watchedPosts == null || updatedList.size() == 0)
+                unavailable.setVisibility(View.VISIBLE);
+            else
+                unavailable.setVisibility(View.INVISIBLE);
         };
         watchViewModel.getWatchedPosts().observe(getViewLifecycleOwner(), watchObserver);
         return root;
