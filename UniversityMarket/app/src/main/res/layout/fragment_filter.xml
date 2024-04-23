@@ -51,7 +51,7 @@
         android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
-        android:text="Filter by Upload Date"
+        android:text="Sort by Upload Date"
         android:layout_marginStart="25dp"
         android:layout_marginTop="410dp"/>
 
@@ -64,18 +64,17 @@
         android:layout_marginTop="439dp">
     </RadioGroup>
 
-<!--    <Button-->
-<!--        android:id="@+id/clear_filters_button"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:backgroundTint="?colorSecondary"-->
-<!--        android:text="@string/post_submit_button_txt"-->
-<!--        android:textColor="?colorOnSecondary"-->
-<!--        app:icon="@drawable/send_icon"-->
-<!--        android:layout_marginTop="439dp"/>-->
+    <Button
+        android:id="@+id/clear_filters_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="?colorSecondary"
+        android:text="Clear Filters"
+        android:textColor="?colorOnSecondary"
+        android:layout_marginTop="529dp"
+        android:layout_gravity="center_horizontal"/>
 
 
 
 
 </FrameLayout>
-
