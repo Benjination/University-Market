@@ -16,15 +16,18 @@ import com.example.universitymarket.utilities.Data;
 
 import java.util.List;
 
-public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder> {
+public class myPostProfileAdapter extends RecyclerView.Adapter<myPostProfileAdapter.ViewHolder> {
     private final List<Post> myposts;
+    private final boolean isActiveUser;
     private OnItemClickListener itemClickListener;
     private OnItemBtnClickListener itemBtnClickListener;
 
 
-    public myPostAdapter(Context context, List<Post> posts,
-                         OnItemClickListener item, OnItemBtnClickListener itemBtn) {
+    public myPostProfileAdapter(Context context, List<Post> posts,
+                                OnItemClickListener item, OnItemBtnClickListener itemBtn,
+                                boolean isActiveUser) {
         myposts = posts;
+        this.isActiveUser = isActiveUser;
         this.itemClickListener = item;
         this.itemBtnClickListener = itemBtn;
     }
@@ -37,16 +40,16 @@ public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder
 
     @NonNull
     @Override
-    public myPostAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_mypost_item,
+    public myPostProfileAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_mypost_profile_item,
                 parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull myPostAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull myPostProfileAdapter.ViewHolder holder, int position) {
         Post post = myposts.get(position);
-        holder.bind(post, itemClickListener, itemBtnClickListener);
+        holder.bind(post, itemClickListener, itemBtnClickListener, isActiveUser);
     }
 
     @Override
@@ -71,19 +74,22 @@ public class myPostAdapter extends RecyclerView.Adapter<myPostAdapter.ViewHolder
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.mypost_title_text);
-            price = itemView.findViewById(R.id.mypost_price_text);
-            date = itemView.findViewById(R.id.mypost_date_text);
-            genre = itemView.findViewById(R.id.mypost_genre_text);
-            trash = itemView.findViewById(R.id.mypost_trash_btn);
+            title = itemView.findViewById(R.id.mypost_profile_title_text);
+            price = itemView.findViewById(R.id.mypost_profile_price_text);
+            date = itemView.findViewById(R.id.mypost_profile_date_text);
+            genre = itemView.findViewById(R.id.mypost_profile_genre_text);
+            trash = itemView.findViewById(R.id.mypost_profile_trash_btn);
         }
 
         public void bind(final Post post, final OnItemClickListener clickListener,
-                         final OnItemBtnClickListener clickBtnListener) {
+                         final OnItemBtnClickListener clickBtnListener,
+                         boolean isActiveUser) {
             title.setText(post.getItemTitle());
             price.setText("$"+post.getListPrice());
             date.setText(Data.formatDate(Data.parseDate(post.getDateCreated()), "MMM dd, yyyy"));
             genre.setText(post.getGenre());
+            if(!isActiveUser)
+                trash.setVisibility(View.INVISIBLE);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

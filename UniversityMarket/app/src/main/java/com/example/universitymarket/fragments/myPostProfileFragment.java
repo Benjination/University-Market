@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -15,15 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.universitymarket.R;
-import com.example.universitymarket.adapters.WatchAdapter;
 import com.example.universitymarket.adapters.myPostAdapter;
+import com.example.universitymarket.adapters.myPostProfileAdapter;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.Post;
-import com.example.universitymarket.models.User;
-import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
-import com.example.universitymarket.utilities.Network;
-import com.example.universitymarket.viewmodels.WatchViewModel;
+import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
 import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -31,17 +27,19 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class myPostFragment extends Fragment implements myPostAdapter.OnItemClickListener, myPostAdapter.OnItemBtnClickListener {
+public class myPostProfileFragment extends Fragment implements myPostProfileAdapter.OnItemClickListener, myPostProfileAdapter.OnItemBtnClickListener {
     private View root;
     private RecyclerView recyclerView;
-    private myPostsViewModel myViewModel;
+    private myPostsProfileViewModel myViewModel;
     private List<Post> myPosts;
     private TaskCompletionSource<String> load;
-    private myPostAdapter adapter;
+    private myPostProfileAdapter adapter;
     private FragmentManager fm;
+    private final String userEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostFragment(FragmentManager fm) {
+    public myPostProfileFragment(FragmentManager fm, String userEmail) {
+        this.userEmail = userEmail;
         this.fm = fm;
     }
 
@@ -51,20 +49,20 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_mypost, container, false);
-        recyclerView = root.findViewById(R.id.mypost_recyclerView);
-        myViewModel = new ViewModelProvider(requireActivity()).get(myPostsViewModel.class);
-        final Observer<List<Post>> myPostObserver = updatedList -> {
+        root = inflater.inflate(R.layout.fragment_mypost_profile, container, false);
+        recyclerView = root.findViewById(R.id.mypost_profile_recyclerView);
+        myViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
+        final Observer<List<Post>> myPostProfileObserver = updatedList -> {
             //load = new TaskCompletionSource<>();
             //loadPage(load.getTask());
             if (myPosts == null) {
                 myPosts = updatedList;
-                adapter = new myPostAdapter(requireContext(), myPosts, myPostFragment.this, myPostFragment.this);
+                adapter = new myPostProfileAdapter(requireContext(), myPosts, myPostProfileFragment.this, myPostProfileFragment.this, userEmail.equals(ActiveUser.email));
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
             } else {
-                Log.e("UPDATErecycler","MyPostFragELSE");
+                Log.e("UPDATErecycler","test");
                 Log.e("lists", "\n" + myPosts.stream().map(Post::getId).collect(Collectors.toList()) + "\n" + updatedList.stream().map(Post::getId).collect(Collectors.toList()));
                 adapter.update(updatedList);
                 Data.updateAdapter(myPosts, updatedList, adapter);
@@ -72,7 +70,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
             }
             //load.setResult("getPosts");
         };
-        myViewModel.getMyPosts().observe(getViewLifecycleOwner(), myPostObserver);
+        myViewModel.getMyPosts().observe(getViewLifecycleOwner(), myPostProfileObserver);
         return root;
     }
 
@@ -87,7 +85,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
 
     @Override
     public void onItemBtnClicked(Post post) {
-        myViewModel.removeMyPost(post);
+
     }
 
     private void loadPage(Task<String> task) {
