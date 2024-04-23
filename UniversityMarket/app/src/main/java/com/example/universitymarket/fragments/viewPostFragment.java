@@ -1,5 +1,6 @@
 package com.example.universitymarket.fragments;
 
+import android.nfc.Tag;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,12 +16,14 @@ import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.Chat;
 import com.example.universitymarket.models.Post;
+import com.example.universitymarket.models.Transaction;
 import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
@@ -31,6 +34,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -134,52 +138,192 @@ public class viewPostFragment extends Fragment {
         ratingBar = view.findViewById(R.id.viewpost_rating_indicator);
 
         fetchPostAndPopulate(postID, view);
+        if(ActiveUser.post_ids.contains(postID))
+        {
+            setupCreateConvoButton(createConvo, ActiveUser.email);
+        }
     }
 
     private void setupCreateConvoButton(Button createConvo, String authorEmail) {
             createConvo.setEnabled(true);
 
         createConvo.setOnClickListener(l -> {
+            if(!ActiveUser.post_ids.contains(this.postId)) {
                 createConvo.setEnabled(false);
+                chatId = Data.generateID("chat");
+                Chat chat = new Chat(
+                        new Date().toString(),
+                        new ArrayList<>(Arrays.asList(ActiveUser.email, authorEmail)),
+                        new ArrayList<>(),
+                        chatId
+                );
+                Network.setChat(chat, false, new Callback<Chat>() {
+                    @Override
+                    public void onSuccess(Chat newChat) {
+                        ActiveUser.chat_ids.add(chatId);
 
-            chatId = Data.generateID("chat");
+                        Network.setUser(ActiveUser.toPOJO(), false, null);
+                        Network.getUser(authorEmail, new Callback<User>() {
+                            @Override
+                            public void onSuccess(User author) {
+                                author.setChatIds((ArrayList<String>) Stream.concat(author.getChatIds().stream(), Stream.of(chatId)).collect(Collectors.toList()));
 
-            Chat chat = new Chat(
-                    new Date().toString(),
-                    new ArrayList<>(Arrays.asList(ActiveUser.email, authorEmail)),
-                    new ArrayList<>(),
-                    chatId
-            );
+                                Network.setUser(author, false, null);
+                            }
 
-            Network.setChat(chat, false, new Callback<Chat>() {
-                @Override
-                public void onSuccess(Chat newChat) {
-                    ActiveUser.chat_ids.add(chatId);
+                            @Override
+                            public void onFailure(Exception error) {
+                                Log.e("getUser", error.getMessage());
+                            }
+                        });
+                    }
 
-                    Network.setUser(ActiveUser.toPOJO(), false, null);
-                    Network.getUser(authorEmail, new Callback<User>() {
-                        @Override
-                        public void onSuccess(User author) {
-                            author.setChatIds((ArrayList<String>) Stream.concat(author.getChatIds().stream(), Stream.of(chatId)).collect(Collectors.toList()));
+                    @Override
+                    public void onFailure(Exception error) {
+                        createConvo.setEnabled(true);
+                        Log.e("setChat", error.getMessage());
+                    }
+                });
+                createConvo.setEnabled(true);
+            }
+            else
+            {
 
-                            Network.setUser(author, false, null);
-                        }
+                Network.getPost(postId, new Callback<Post>() {
+                    @Override
+                    public void onSuccess(Post post) {
+                                Transaction transaction = new Transaction(
+                                        post.getDescriptors(),
+                                        post.getId(),
+                                        post.getGenre(),
+                                        false,
+                                        post.getItemDescription(),
+                                        post.getId() + post.getQuantity(),
+                                        post.getImageContexts(),
+                                        post.getItemTitle(),
+                                        null,
+                                        null,
+                                        ActiveUser.email,
+                                        new Date().toString(),
+                                        ActiveUser.email,
+                                        post.getListPrice(),
+                                        "closed",
+                                        Data.generateID("tsct"));
 
-                        @Override
-                        public void onFailure(Exception error) {
-                            Log.e("getUser", error.getMessage());
-                        }
-                    });
-                }
+                                Network.setTransaction(transaction, false, new Callback<Transaction>() {
+                                    @Override
+                                    public void onSuccess(Transaction result) {
+                                        //Log.e("String", "Entered Else Statement");
+                                        ActiveUser.transact_ids.add(transaction.getId());
+                                        Toast.makeText(requireActivity(), "Transaction Updated", Toast.LENGTH_LONG).show();
+                                        Network.setPost(post, true, new Callback<Post>() {
+                                            @Override
+                                            public void onSuccess(Post result) {
+                                                Toast.makeText(requireActivity(), "Item Deleted from Market", Toast.LENGTH_LONG).show();
 
-                @Override
-                public void onFailure(Exception error) {
-                    createConvo.setEnabled(true);
-                    Log.e("setChat", error.getMessage());
-                }
-            });
-            createConvo.setEnabled(true);
+                                                //remove post from activeuser and update user in db
+                                                ActiveUser.post_ids.remove(String.valueOf(postId));
+                                                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
+                                                    @Override
+                                                    public void onSuccess(User result) {
+                                                        //loadMyPosts();
+                                                        Log.e("myPostsViewModel", "DEL UserPostID SUCCESS");
+                                                    }
+                                                    @Override
+                                                    public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL UserPostID: "+error.getMessage()); }
+                                                });
+                                                // remove post from ALL users Watchlists
+                                                // needs improvement. need to filter and possibly remove IN db
+                                                Network.getAllUsers(null, new Callback<List<User>>() {
+                                                    @Override
+                                                    public void onSuccess(List<User> result) {
+                                                        List<User> updatedUsers = new ArrayList<>();
+                                                        if(result != null) {
+                                                            for (User user : result) {
+                                                                List<String> user_watch_ids = user.getWatchIds();
+                                                                if(user_watch_ids != null) {
+                                                                    Iterator<String> iterator = user_watch_ids.iterator();
+                                                                    while (iterator.hasNext()) {
+                                                                        String watch_id = iterator.next();
+                                                                        if (postId.matches(watch_id)) {
+                                                                            iterator.remove();
+                                                                            updatedUsers.add(user);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        if(!updatedUsers.isEmpty()) {
+                                                            User[] array = new User[updatedUsers.size()];
+                                                            updatedUsers.toArray(array);
+                                                            Network.setUsers(array, false, null);
+                                                            Log.e("myPostsViewModel", "SET AllUsers SUCCESS");
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Exception error) {
+                                                        Log.e("myPostsViewModel", "GET AllUsers: "+error.getMessage());
+                                                    }
+                                                });
+                                            }
+                                            @Override
+                                            public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL Post: "+error.getMessage());  }
+                                        });
+
+
+
+                                        Network.setUser(ActiveUser.toPOJO(), false, new Callback<User>() {
+                                            @Override
+                                            public void onSuccess(User ignored) {}
+
+                                            @Override
+                                            public void onFailure(Exception error) {
+                                                Log.e("setUser", error.getMessage());
+                                            }
+
+                                        });
+                                        Network.getUser(ActiveUser.email, new Callback<User>() {
+                                            @Override
+                                            public void onSuccess(User user) {
+                                                user.setTransactIds((ArrayList<String>) Stream.concat(user.getTransactIds().stream(), Stream.of(transaction.getId())).collect(Collectors.toList()));
+
+                                                Network.setUser(user, false, new Callback<User>() {
+                                                    @Override
+                                                    public void onSuccess(User ignored) {}
+
+                                                    @Override
+                                                    public void onFailure(Exception error) {
+                                                        Log.e("setUser", error.getMessage());
+                                                    }
+                                                });
+                                            }
+                                            @Override
+                                            public void onFailure(Exception error) {
+                                                Log.e("getUser", error.getMessage());
+
+                                            }
+                                        });
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception error) {
+                                        Log.e("Fail", error.getMessage());
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure(Exception error) {
+                                Log.e("Auto-Fail", error.getMessage());
+                            }
+                       //<----------End
+                });
+            }
         });
+
+
     }
 
     private void fetchPostAndPopulate(String postID, View view) {
@@ -250,15 +394,6 @@ public class viewPostFragment extends Fragment {
                             setupCreateConvoButton(createConvo, result.getAuthorEmail());
                         }
                     });
-                }
-                else
-                {
-                    if(ActiveUser.post_ids.contains(postID))
-                    {
-                        createConvo.setEnabled(true);
-                        //Create Transaction with seller but not buyer
-
-                    }
                 }
             }
 

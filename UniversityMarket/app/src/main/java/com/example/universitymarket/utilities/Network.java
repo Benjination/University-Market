@@ -70,10 +70,10 @@ public abstract class Network {
                 pojo = obj;
                 reference.set(pojo)
                         .addOnSuccessListener(task -> {
-                            if(!source.getTask().isComplete() && Data.isAnyObjectNull(pojo.values().toArray())) {
-                                source.setException(new JSONException(illFormat));
-                                return;
-                            }
+                           // if(!source.getTask().isComplete() && Data.isAnyObjectNull(pojo.values().toArray())) {
+                             //   source.setException(new JSONException(illFormat));
+                               // return;
+                           // }
                             if(!source.getTask().isComplete())
                                 source.setResult(pojo);
                         })
