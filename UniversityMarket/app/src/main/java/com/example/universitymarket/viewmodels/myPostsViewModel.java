@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.Filter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class myPostsViewModel extends ViewModel {
@@ -31,14 +32,6 @@ public class myPostsViewModel extends ViewModel {
         return myPosts;
     }
 
-    /*
-    43. Deleting a post in My Posts does not remove the associated pictures from storage.
-        Solution: call Network.removeImages after post removal
-    42. IMPORTANT Deleting a post in My Posts does not remove the post ID from ALL users' watchlistIDs
-    31. MyPosts does not automatically refresh with the latest database results on reload,
-        nor does it refresh after database action
-    33. MyPosts does not have the ability to view each post (similar to marketplace), and only deletes
-     */
     private void loadMyPosts() {
         Network.getPosts(ActiveUser.post_ids, null, new Callback<List<Post>>() {
             @Override
@@ -47,7 +40,7 @@ public class myPostsViewModel extends ViewModel {
             }
             @Override
             public void onFailure(Exception error) {
-                if(error.getMessage() != null && error.getMessage().contains("No documents are available")) {
+                if(error.getMessage() != null && error.getMessage().contains("A non-empty docID list is required")) {
                     myPosts.setValue(new ArrayList<>());
                 }
                 Log.e("myPostsViewModel", "GET UserPosts: "+error.getMessage());
@@ -55,21 +48,30 @@ public class myPostsViewModel extends ViewModel {
         });
     }
 
+    public void addMyPost() {
+        loadMyPosts();
+    }
+
     public void removeMyPost(Post post) {
         String postID = post.getId();
         List<String> imgURLS = post.getImageUrls();
+        //remove post
         Network.setPost(post, true, new Callback<Post>() {
             @Override
             public void onSuccess(Post result) {
+                //remove post from activeuser and update user in db
                 ActiveUser.post_ids.remove(String.valueOf(postID));
                 Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
                     @Override
-                    public void onSuccess(User result) { loadMyPosts(); }
+                    public void onSuccess(User result) {
+                        loadMyPosts();
+                        Log.e("myPostsViewModel", "DEL UserPostID SUCCESS");
+                    }
                     @Override
                     public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL UserPostID: "+error.getMessage()); }
                 });
-                /*
-                // add remove postID from ALL user Watchlists here
+                // remove post from ALL users Watchlists
+                // needs improvement. need to filter and possibly remove IN db
                 Network.getAllUsers(null, new Callback<List<User>>() {
                     @Override
                     public void onSuccess(List<User> result) {
@@ -78,19 +80,22 @@ public class myPostsViewModel extends ViewModel {
                             for (User user : result) {
                                 List<String> user_watch_ids = user.getWatchIds();
                                 if(user_watch_ids != null) {
-                                    for (String watch_id : user_watch_ids) {
+                                    Iterator<String> iterator = user_watch_ids.iterator();
+                                    while (iterator.hasNext()) {
+                                        String watch_id = iterator.next();
                                         if (postID.matches(watch_id)) {
+                                            iterator.remove();
                                             updatedUsers.add(user);
                                         }
                                     }
                                 }
                             }
-                            if(updatedUsers != null) {
-                                for(User user : updatedUsers) {
-                                    List<String> user_watch_ids = user.getWatchIds();
-
-                                }
-                            }
+                        }
+                        if(!updatedUsers.isEmpty()) {
+                            User[] array = new User[updatedUsers.size()];
+                            updatedUsers.toArray(array);
+                            Network.setUsers(array, false, null);
+                            Log.e("myPostsViewModel", "SET AllUsers SUCCESS");
                         }
                     }
 
@@ -99,12 +104,11 @@ public class myPostsViewModel extends ViewModel {
                         Log.e("myPostsViewModel", "GET AllUsers: "+error.getMessage());
                     }
                 });
-
-                 */
             }
             @Override
             public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL Post: "+error.getMessage());  }
         });
+        //remove images attached to deleted post
         Network.removeImages(imgURLS, new Callback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {}

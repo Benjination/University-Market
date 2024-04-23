@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +32,7 @@ import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -48,6 +50,7 @@ import java.util.regex.Pattern;
 public class PostFragment extends Fragment implements View.OnClickListener {
 
     private View root;
+    private myPostsViewModel mypostsViewModel;
     private Button submit, addmore;
     private FloatingActionButton removeImage;
     private ImageButton imageupload;
@@ -81,6 +84,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_post, container, false);
+        mypostsViewModel = new ViewModelProvider(requireActivity()).get(myPostsViewModel.class);
         configure(root);
         return root;
     }
@@ -253,6 +257,9 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 "Posted to marketplace",
                                 Toast.LENGTH_LONG
                         ).show();
+
+                        //update LiveData for myPosts
+                        mypostsViewModel.addMyPost();
 
                         title.getText().clear();
                         price.getText().clear();

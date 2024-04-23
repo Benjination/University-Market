@@ -64,7 +64,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
             } else {
-                Log.e("UPDATErecycler","test");
+                Log.e("UPDATErecycler","MyPostFragELSE");
                 Log.e("lists", "\n" + myPosts.stream().map(Post::getId).collect(Collectors.toList()) + "\n" + updatedList.stream().map(Post::getId).collect(Collectors.toList()));
                 adapter.update(updatedList);
                 Data.updateAdapter(myPosts, updatedList, adapter);
