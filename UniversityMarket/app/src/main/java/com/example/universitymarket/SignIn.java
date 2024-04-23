@@ -127,12 +127,10 @@ public class SignIn extends AppCompatActivity
             //emailBox.setVisibility(View.INVISIBLE);
             //passwordBox.setVisibility(View.INVISIBLE);
             //login.setVisibility(View.INVISIBLE);
-            String domain1 = "mavs.uta.edu", domain2 = "uta.edu";
             email = emailBox.getText().toString();
             password = passwordBox.getText().toString();
-            String domain = email.substring(email.indexOf("@") + 1);
 
-            if ((domain.equals(domain2) || domain.equals(domain1)) && !password.equals(""))
+            if (!password.equals(""))
             {
                 // Check if the user already exists in Firebase Authentication
                 mAuth.signInWithEmailAndPassword(email, password)
@@ -201,8 +199,7 @@ public class SignIn extends AppCompatActivity
                 {
                 //invalid.setVisibility(View.VISIBLE);
                 //gotit.setVisibility(View.VISIBLE);
-                System.out.println("Email not accepted");
-                    Toast.makeText(SignIn.this, "Invalid Email or Password",
+                    Toast.makeText(SignIn.this, "Invalid Password",
                             Toast.LENGTH_LONG).show();
                     resend.setVisibility(View.VISIBLE);
             }

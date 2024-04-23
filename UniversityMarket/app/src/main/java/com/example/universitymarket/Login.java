@@ -145,7 +145,6 @@ public class Login extends AppCompatActivity
             //emailBox.setVisibility(View.INVISIBLE);
             //passwordBox.setVisibility(View.INVISIBLE);
             //login.setVisibility(View.INVISIBLE);
-            String domain1 = "mavs.uta.edu", domain2 = "uta.edu";
             String email = emailBox.getText().toString();
             String password = passwordBox.getText().toString();
             String password2 = passwordBox2.getText().toString();
@@ -153,7 +152,7 @@ public class Login extends AppCompatActivity
             String last = lname.getText().toString();
             String domain = email.substring(email.indexOf("@") + 1);
 
-            if ((domain.equals(domain2) || domain.equals(domain1)) && !password.equals(""))
+            if (!password.equals(""))
             {
                 //emailBox.setVisibility(View.INVISIBLE);
                 //passwordBox.setVisibility(View.INVISIBLE);
@@ -258,8 +257,7 @@ public class Login extends AppCompatActivity
                 //emailBox.setVisibility(View.INVISIBLE);
                 //passwordBox.setVisibility(View.INVISIBLE);
                 //login.setVisibility(View.INVISIBLE);
-                System.out.println("Email not accepted");
-                Toast.makeText(Login.this, "Invalid Email or Password",
+                Toast.makeText(Login.this, "Invalid Password",
                         Toast.LENGTH_LONG).show();
             }
         });
