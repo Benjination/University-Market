@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import android.util.Pair;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.core.OrderBy;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -162,7 +163,7 @@ public abstract class Network {
     }
 
     @NonNull
-    private static Task<List<HashMap<String, Object>>> getColl(@NonNull String collID, @Nullable Filter filter, @Nullable FieldPath sortByField, int pageNo) {
+    private static Task<List<HashMap<String, Object>>> getColl(@NonNull String collID, @Nullable Filter filter, @Nullable SortByField sortByField, int pageNo) {
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
         final TaskCompletionSource<List<HashMap<String, Object>>> source = new TaskCompletionSource<>();
         String illNullData = "Collection '" + collID + "' does not exist";
@@ -176,12 +177,23 @@ public abstract class Network {
                 source.setException(new TimeoutException(illTime));
         }, Policy.max_seconds_before_timeout * 1000);
 
+        Log.i("sortByField", sortByField == null ? "null" : sortByField.direction.toString());
+
         if(Policy.collection_names.contains(collID)) {
             Query query = db.collection(collID);
             query = filter != null ? query.where(filter) : query;
-            query = sortByField != null ? query.orderBy(sortByField) : query;
+            if(sortByField != null) {
+                sortByField.direction = sortByField.direction != null ? sortByField.direction : Query.Direction.ASCENDING;
+                Log.d("sortByField: ", sortByField.direction.toString());
+                query = query.orderBy(sortByField.fieldName, sortByField.direction);
+            }
+            else{
+                Log.d("sortByField ", "NULL");
+
+                query = query.orderBy("id");
+            }
             if(pageNo >= 0) {
-                query.orderBy("id").startAt(Policy.max_docs_loaded * pageNo - 1);
+                query.startAt(Policy.max_docs_loaded * pageNo - 1);
                 query.limit(Policy.max_docs_loaded);
             }
             Task<QuerySnapshot> reference = query.get();
@@ -318,7 +330,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
         if(docID.isEmpty()) {
             response.onFailure(new Exception("A non-empty docID list is required"));
@@ -335,7 +347,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getUsers(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<User>> response) {
+    public static void getUsers(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
         getColl("users", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
@@ -348,7 +360,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getAllUsers(@Nullable FieldPath sortByField, @NonNull Callback<List<User>> response) {
+    public static void getAllUsers(@Nullable SortByField sortByField, @NonNull Callback<List<User>> response) {
         List<User> list = new ArrayList<>();
         getColl("users", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
@@ -460,7 +472,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
         if(docID.isEmpty()) {
             response.onFailure(new Exception("A non-empty docID list is required"));
@@ -477,7 +489,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getChats(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Chat>> response) {
+    public static void getChats(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
         getColl("chats", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
@@ -490,7 +502,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getAllChats(@Nullable FieldPath sortByField, @NonNull Callback<List<Chat>> response) {
+    public static void getAllChats(@Nullable SortByField sortByField, @NonNull Callback<List<Chat>> response) {
         List<Chat> list = new ArrayList<>();
         getColl("chats", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
@@ -602,7 +614,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
         if(docID.isEmpty()) {
             response.onFailure(new Exception("A non-empty docID list is required"));
@@ -619,7 +631,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getMessages(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Message>> response) {
+    public static void getMessages(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
         getColl("messages", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
@@ -632,7 +644,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getAllMessages(@Nullable FieldPath sortByField, @NonNull Callback<List<Message>> response) {
+    public static void getAllMessages(@Nullable SortByField sortByField, @NonNull Callback<List<Message>> response) {
         List<Message> list = new ArrayList<>();
         getColl("messages", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
@@ -744,7 +756,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
         if(docID.isEmpty()) {
             response.onFailure(new Exception("A non-empty docID list is required"));
@@ -761,7 +773,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getTransactions(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Transaction>> response) {
+    public static void getTransactions(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
         getColl("transactions", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
@@ -774,7 +786,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getAllTransactions(@Nullable FieldPath sortByField, @NonNull Callback<List<Transaction>> response) {
+    public static void getAllTransactions(@Nullable SortByField sortByField, @NonNull Callback<List<Transaction>> response) {
         List<Transaction> list = new ArrayList<>();
         getColl("transactions", null, sortByField, -1)
                 .addOnSuccessListener(task -> {
@@ -886,7 +898,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
         if(docID.isEmpty()) {
             response.onFailure(new Exception("A non-empty docID list is required"));
@@ -903,7 +915,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getPosts(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Post>> response) {
+    public static void getPosts(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
         getColl("posts", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))
                 .addOnSuccessListener(task -> {
@@ -916,7 +928,7 @@ public abstract class Network {
                 .addOnFailureListener(response::onFailure);
     }
 
-    public static void getAllPosts(@Nullable FieldPath sortByField, @NonNull Callback<List<Post>> response) {
+    public static void getAllPosts(@Nullable SortByField sortByField, @NonNull Callback<List<Post>> response) {
         List<Post> list = new ArrayList<>();
         getColl("posts", null, sortByField, -1)
                 .addOnSuccessListener(task -> {

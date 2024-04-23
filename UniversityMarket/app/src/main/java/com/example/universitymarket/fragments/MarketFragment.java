@@ -23,7 +23,10 @@ import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.utilities.PostModel;
+import com.example.universitymarket.utilities.SortByField;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.Filter;
+import com.google.firebase.firestore.Query;
 
 
 import java.util.ArrayList;
@@ -45,6 +48,8 @@ public class MarketFragment extends Fragment {
     public LayoutInflater viewPostInflater;
     public ViewGroup viewSinglePostContainer;
 
+    static SortByField upload_sort_by = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
@@ -59,10 +64,22 @@ public class MarketFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                //&& FilterFragment.selected_price_filter != null
-                if(FilterFragment.selected_genre_filter != null) {
-                    // FilterFragment.selected_price_filter
-                    getFilteredPosts(FilterFragment.selected_genre_filter);
+                //assign direction from users sort choice
+                upload_sort_by = null;
+                if(FilterFragment.selected_uploadDate_filter != null){
+                    upload_sort_by = new SortByField();
+                    if(FilterFragment.selected_uploadDate_filter.getText().toString().equals("Newest to Oldest")){
+                        upload_sort_by.direction = Query.Direction.ASCENDING;
+                    }
+                    else{
+                        upload_sort_by.direction = Query.Direction.DESCENDING;
+                    }
+                    upload_sort_by.fieldName = "about.date_created";
+                }
+
+                //check if there are filters to be applied
+                if(FilterFragment.selected_genre_filter != null || FilterFragment.selected_price_filter != null || FilterFragment.selected_uploadDate_filter != null) {
+                    getFilteredPosts(FilterFragment.selected_genre_filter, FilterFragment.selected_price_filter, upload_sort_by);
                 }
                 else
                     getAllPosts();
@@ -74,18 +91,32 @@ public class MarketFragment extends Fragment {
         return view;
     }
 
-    /////
-//, RadioButton selected_price_filter
-    private void getFilteredPosts(RadioButton selected_genre_filter){
-        Filter genreFilter = new Filter();
-        genreFilter = Filter.equalTo("about.genre", selected_genre_filter.getText().toString());
+
+    private void getFilteredPosts(RadioButton selected_genre_filter, RadioButton selected_price_filter, SortByField upload_sort_by){
         Filter priceFilter = new Filter();
-        priceFilter = Filter.lessThan("about.list_price", 10.0F);
-       // Filter test = Filter.lessThanOrEqualTo();
-        Filter testFilter = Filter.inArray("about.item_title", Arrays.asList(new String[]{"Terminal Output", "Car", "myPost"}.clone()));
+        priceFilter = null;
 
+        Filter postsFilter = null;
+        if (selected_genre_filter != null) {
+            Filter genreFilter = Filter.equalTo("about.genre", selected_genre_filter.getText().toString());
+            postsFilter = postsFilter == null ? genreFilter : Filter.and(postsFilter, genreFilter);
+        }
+        if (selected_price_filter != null) {
+            String tempPriceString = selected_price_filter.getText().toString();
+            String selectedPriceFilterString = tempPriceString.substring(3);
+            if (tempPriceString.charAt(0) == '>'){
+                priceFilter = Filter.greaterThanOrEqualTo("about.list_price", Float.parseFloat(selectedPriceFilterString));
+            }
+            else {
+                priceFilter = Filter.lessThanOrEqualTo("about.list_price", Float.parseFloat(selectedPriceFilterString));
+            }
+            postsFilter = postsFilter == null ? priceFilter : Filter.and(postsFilter, priceFilter);
+        }
 
-        Network.getPosts(Filter.and(priceFilter, genreFilter), null, 1, new Callback<List<Post>>() {
+        Log.i("upload_sort_by: ", upload_sort_by == null ? "null" : upload_sort_by.direction.toString());
+
+        Network.getPosts(postsFilter, upload_sort_by, 1, new Callback<List<Post>>() {
+
             @Override
             public void onSuccess(List<Post> result) {
                 postsArrayList.clear();
@@ -94,10 +125,10 @@ public class MarketFragment extends Fragment {
 
                 //put all post into post model form
                 for(Post p : postsArrayList){
-                        Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
+                        //Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
                         List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
                         postModelArrayList.add(new PostModel("$" + p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
-                        Log.d("added " + p.getItemTitle(), "success");
+                        Log.d("added with filter" + p.getItemTitle(), "success");
                 }
                 if(postsGV != null){
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();

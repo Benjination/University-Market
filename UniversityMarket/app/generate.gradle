@@ -511,7 +511,7 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@NonNull List<String> docID, @Nullable FieldPath sortByField, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@NonNull List<String> docID, @Nullable SortByField sortByField, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
                     "        List<" + class_name + "> list = new ArrayList<>();\n" +
                     "        if(docID.isEmpty()) {\n" +
                     "            response.onFailure(new Exception(\"A non-empty docID list is required\"));\n" +
@@ -528,7 +528,7 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void get" +  class_name  + "s(@Nullable Filter filter, @Nullable FieldPath sortByField, @Nullable Integer pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void get" +  class_name  + "s(@Nullable Filter filter, @Nullable SortByField sortByField, @Nullable Integer pageNo, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
                     "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
                     "        getColl(" + coll_name + ", filter, sortByField, pageNo == null ? -1 : Math.max(pageNo, 0))\n" +
                     "                .addOnSuccessListener(task -> {\n" +
@@ -541,7 +541,7 @@ String[] generate(def map, def class_name, def file) {
                     "                .addOnFailureListener(response::onFailure);\n" +
                     "    }\n\n" +
             \
-            "    public static void getAll" +  class_name  + "s(@Nullable FieldPath sortByField, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
+            "    public static void getAll" +  class_name  + "s(@Nullable SortByField sortByField, @NonNull Callback<List<" +  class_name  + ">> response) {\n" +
                     "        List<" +  class_name  + "> list = new ArrayList<>();\n" +
                     "        getColl(" +  coll_name  + ", null, sortByField, -1)\n" +
                     "                .addOnSuccessListener(task -> {\n" +
