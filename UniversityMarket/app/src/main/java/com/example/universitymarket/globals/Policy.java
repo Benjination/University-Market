@@ -41,12 +41,11 @@ public interface Policy {
 
     String[] upload_date_filters = {
             "Newest to Oldest",
-            "Oldest to Newest",
-            "None"
+            "Oldest to Newest"
     };
 
     String[] prices = {
-            "Free",
+            "  $0.00",
             "< $10.00",
             "< $20.00",
             "> $20.00"
