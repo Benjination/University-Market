@@ -47,7 +47,7 @@ public class TabAdapter extends FragmentStateAdapter {
             } else if(args[0].equals("Watch")) {
                 return new AnalyticsFragment(fm);
             } else {
-                return new myPostProfileFragment(fm, args[1]);
+                return new myPostProfileFragment(fm);
             }
         }
     }

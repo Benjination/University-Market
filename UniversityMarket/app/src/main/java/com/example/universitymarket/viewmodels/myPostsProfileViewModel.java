@@ -28,8 +28,7 @@ public class myPostsProfileViewModel extends ViewModel {
         //loadMyPosts();
         return myPosts;
     }
-
-    /*
+/*
     private void loadMyPosts() {
         Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
             @Override
@@ -106,5 +105,6 @@ public class myPostsProfileViewModel extends ViewModel {
             public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
         });
     }
-    */
+
+ */
 }

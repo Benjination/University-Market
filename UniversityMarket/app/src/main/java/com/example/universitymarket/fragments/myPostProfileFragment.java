@@ -27,7 +27,7 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class myPostProfileFragment extends Fragment implements myPostProfileAdapter.OnItemClickListener, myPostProfileAdapter.OnItemBtnClickListener {
+public class myPostProfileFragment extends Fragment implements myPostProfileAdapter.OnItemClickListener {
     private View root;
     private RecyclerView recyclerView;
     private myPostsProfileViewModel myViewModel;
@@ -35,11 +35,9 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
     private TaskCompletionSource<String> load;
     private myPostProfileAdapter adapter;
     private FragmentManager fm;
-    private final String userEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostProfileFragment(FragmentManager fm, String userEmail) {
-        this.userEmail = userEmail;
+    public myPostProfileFragment(FragmentManager fm) {
         this.fm = fm;
     }
 
@@ -57,7 +55,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
             //loadPage(load.getTask());
             if (myPosts == null) {
                 myPosts = updatedList;
-                adapter = new myPostProfileAdapter(requireContext(), myPosts, myPostProfileFragment.this, myPostProfileFragment.this, userEmail.equals(ActiveUser.email));
+                adapter = new myPostProfileAdapter(requireContext(), myPosts, myPostProfileFragment.this);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
@@ -81,11 +79,6 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
         popupArgs.putString("popupFragment", viewPostFragment.class.getName());
         popupArgs.putStringArray("popupFragArgs", new String[]{ post.getId() });
         fm.setFragmentResult("createPopup", popupArgs);
-    }
-
-    @Override
-    public void onItemBtnClicked(Post post) {
-
     }
 
     private void loadPage(Task<String> task) {
