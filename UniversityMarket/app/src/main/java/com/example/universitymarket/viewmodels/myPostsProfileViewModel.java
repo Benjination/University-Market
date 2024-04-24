@@ -36,7 +36,7 @@ public class myPostsProfileViewModel extends ViewModel {
 
                     @Override
                     public void onFailure(Exception error) {
-                        if(error.getMessage() != null && error.getMessage().contains("No documents are available")) {
+                        if(error.getMessage() != null && error.getMessage().contains("Collection 'posts' does not exist")) {
                             myPosts.setValue(new ArrayList<>());
                         }
                         Log.e("myPostsProfileViewModel", "GET UserPosts: "+error.getMessage());
@@ -61,83 +61,4 @@ public class myPostsProfileViewModel extends ViewModel {
 
     //activeuser remove a post so update posts
     public void removeUserPost(String activeEmail) { loadUserPosts(activeEmail); }
-/*
-    private void loadMyPosts() {
-        Network.getPosts(ActiveUser.watch_ids, new Callback<List<Post>>() {
-            @Override
-            public void onSuccess(List<Post> result) {
-                myPosts.setValue(result);
-            }
-            @Override
-            public void onFailure(Exception error) {
-                if(error.getMessage() != null && error.getMessage().contains("No documents are available")) {
-                    myPosts.setValue(new ArrayList<>());
-                }
-                Log.e("getMyPostsModel", error.getMessage());
-            }
-        });
-        if(userEmail.equals(ActiveUser.email)) {
-            Network.getPosts(ActiveUser.post_ids, new Callback<List<Post>>() {
-                @Override
-                public void onSuccess(List<Post> result) {
-                }
-
-                @Override
-                public void onFailure(Exception error) {
-                    Log.e("getMyPosts", error.getMessage());
-                }
-            });
-        } else {
-            Network.getUser(userEmail, new Callback<User>() {
-                @Override
-                public void onSuccess(User result) {
-                    Network.getPosts(result.getPostIds(), new Callback<List<Post>>() {
-                        @Override
-                        public void onSuccess(List<Post> result) {
-                        }
-
-                        @Override
-                        public void onFailure(Exception error) {
-                            Log.e("getPosts", error.getMessage());
-                        }
-                    });
-                }
-
-                @Override
-                public void onFailure(Exception error) {
-                    Log.e("getUser", error.getMessage());
-                }
-            });
-        }
-    }
-
-    public void removeMyPost(String postId) {
-        ActiveUser.watch_ids.remove(String.valueOf(postId));
-        Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
-            @Override
-            public void onSuccess(User result) {
-                loadMyPosts();
-            }
-            @Override
-            public void onFailure(Exception error) {
-                Log.e("setUsermyPostsModel", error.getMessage());
-            }
-        });
-        Network.setPost(post, true, new Callback<Post>() {
-            @Override
-            public void onSuccess(Post result) {
-                ActiveUser.post_ids.remove(String.valueOf(post.getId()));
-                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
-                    @Override
-                    public void onSuccess(User result) { Toast.makeText(requireActivity(), "Deleted", Toast.LENGTH_SHORT).show(); }
-                    @Override
-                    public void onFailure(Exception error) { Log.e("setUser", error.getMessage()); }
-                });
-            }
-            @Override
-            public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
-        });
-    }
-
- */
 }
