@@ -24,6 +24,7 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.viewmodels.WatchViewModel;
+import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
 import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -35,6 +36,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     private View root;
     private RecyclerView recyclerView;
     private myPostsViewModel myViewModel;
+    private myPostsProfileViewModel mypostsProfileViewModel;
     private List<Post> myPosts;
     private TaskCompletionSource<String> load;
     private myPostAdapter adapter;
@@ -54,6 +56,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
         root = inflater.inflate(R.layout.fragment_mypost, container, false);
         recyclerView = root.findViewById(R.id.mypost_recyclerView);
         myViewModel = new ViewModelProvider(requireActivity()).get(myPostsViewModel.class);
+        mypostsProfileViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
         final Observer<List<Post>> myPostObserver = updatedList -> {
             //load = new TaskCompletionSource<>();
             //loadPage(load.getTask());
@@ -88,6 +91,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     @Override
     public void onItemBtnClicked(Post post) {
         myViewModel.removeMyPost(post);
+        mypostsProfileViewModel.removeUserPost(ActiveUser.email);
     }
 
     private void loadPage(Task<String> task) {

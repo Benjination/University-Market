@@ -14,13 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.universitymarket.R;
-import com.example.universitymarket.adapters.myPostAdapter;
 import com.example.universitymarket.adapters.myPostProfileAdapter;
-import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
-import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
@@ -35,10 +32,12 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
     private TaskCompletionSource<String> load;
     private myPostProfileAdapter adapter;
     private FragmentManager fm;
+    private String userClickedEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostProfileFragment(FragmentManager fm) {
+    public myPostProfileFragment(FragmentManager fm, String userClickedEmail) {
         this.fm = fm;
+        this.userClickedEmail = userClickedEmail;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
             }
             //load.setResult("getPosts");
         };
-        myViewModel.getMyPosts().observe(getViewLifecycleOwner(), myPostProfileObserver);
+        myViewModel.getUserPosts(userClickedEmail).observe(getViewLifecycleOwner(), myPostProfileObserver);
         return root;
     }
 
