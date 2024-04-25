@@ -32,6 +32,7 @@ import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
 import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -51,6 +52,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
     private View root;
     private myPostsViewModel mypostsViewModel;
+    private myPostsProfileViewModel mypostsProfileViewModel;
     private Button submit, addmore;
     private FloatingActionButton removeImage;
     private ImageButton imageupload;
@@ -85,6 +87,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_post, container, false);
         mypostsViewModel = new ViewModelProvider(requireActivity()).get(myPostsViewModel.class);
+        mypostsProfileViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
         configure(root);
         return root;
     }
@@ -260,6 +263,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
 
                         //update LiveData for myPosts
                         mypostsViewModel.addMyPost();
+                        mypostsProfileViewModel.addUserPost(ActiveUser.email);
 
                         title.getText().clear();
                         price.getText().clear();

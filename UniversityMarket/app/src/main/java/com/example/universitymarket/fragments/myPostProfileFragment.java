@@ -14,20 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.universitymarket.R;
-import com.example.universitymarket.adapters.myPostAdapter;
 import com.example.universitymarket.adapters.myPostProfileAdapter;
-import com.example.universitymarket.globals.actives.ActiveUser;
 import com.example.universitymarket.models.Post;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
-import com.example.universitymarket.viewmodels.myPostsViewModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class myPostProfileFragment extends Fragment implements myPostProfileAdapter.OnItemClickListener, myPostProfileAdapter.OnItemBtnClickListener {
+public class myPostProfileFragment extends Fragment implements myPostProfileAdapter.OnItemClickListener {
     private View root;
     private RecyclerView recyclerView;
     private myPostsProfileViewModel myViewModel;
@@ -35,12 +32,12 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
     private TaskCompletionSource<String> load;
     private myPostProfileAdapter adapter;
     private FragmentManager fm;
-    private final String userEmail;
+    private String userClickedEmail;
     private final Bundle dashMessage = new Bundle();
 
-    public myPostProfileFragment(FragmentManager fm, String userEmail) {
-        this.userEmail = userEmail;
+    public myPostProfileFragment(FragmentManager fm, String userClickedEmail) {
         this.fm = fm;
+        this.userClickedEmail = userClickedEmail;
     }
 
     @Override
@@ -57,7 +54,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
             //loadPage(load.getTask());
             if (myPosts == null) {
                 myPosts = updatedList;
-                adapter = new myPostProfileAdapter(requireContext(), myPosts, myPostProfileFragment.this, myPostProfileFragment.this, userEmail.equals(ActiveUser.email));
+                adapter = new myPostProfileAdapter(requireContext(), myPosts, myPostProfileFragment.this);
                 recyclerView.setAdapter(adapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(),
                         LinearLayoutManager.VERTICAL, false));
@@ -70,7 +67,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
             }
             //load.setResult("getPosts");
         };
-        myViewModel.getMyPosts().observe(getViewLifecycleOwner(), myPostProfileObserver);
+        myViewModel.getUserPosts(userClickedEmail).observe(getViewLifecycleOwner(), myPostProfileObserver);
         return root;
     }
 
@@ -81,11 +78,6 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
         popupArgs.putString("popupFragment", viewPostFragment.class.getName());
         popupArgs.putStringArray("popupFragArgs", new String[]{ post.getId() });
         fm.setFragmentResult("createPopup", popupArgs);
-    }
-
-    @Override
-    public void onItemBtnClicked(Post post) {
-
     }
 
     private void loadPage(Task<String> task) {

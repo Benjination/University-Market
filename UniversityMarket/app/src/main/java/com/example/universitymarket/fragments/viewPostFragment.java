@@ -29,6 +29,7 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.viewmodels.WatchViewModel;
+import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class viewPostFragment extends Fragment {
     private final String[] args;
     private final FragmentManager fm;
     private WatchViewModel watchViewModel;
+    private myPostsProfileViewModel postProfileViewModel;
     private final String postId;
     private String chatId;
     private View viewSinglePost;
@@ -68,6 +70,7 @@ public class viewPostFragment extends Fragment {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
+        postProfileViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
@@ -371,6 +374,7 @@ public class viewPostFragment extends Fragment {
                             dashMessage.putString("popupSubtitle", user.getEmail());
                             dashMessage.putString("popupFragment", TabFragment.class.getName());
                             dashMessage.putStringArray("popupFragArgs", new String[]{ "Profile", user.getEmail() });
+                            postProfileViewModel.viewUserPosts(user.getEmail());
 
                             fm.setFragmentResult("createPopup", dashMessage);
                         });
