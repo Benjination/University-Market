@@ -29,6 +29,7 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.Query;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,9 +126,15 @@ public class MarketFragment extends Fragment {
 
                 //put all post into post model form
                 for (Post p : postsArrayList) {
-                    //Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
+                    // Create a DecimalFormat object with pattern for two decimal places
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                    // Format the list price to two decimal places
+                    String formattedPrice = decimalFormat.format(p.getListPrice());
+                    // Create the title string with the formatted price
+                    String title = "$" + formattedPrice + " - " + p.getItemTitle();
+                    // Add the formatted title to the postModelArrayList
                     List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
-                    postModelArrayList.add(new PostModel("$" + p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
+                    postModelArrayList.add(new PostModel(title, imageUrls.get(0)));
                     Log.d("added with filter" + p.getItemTitle(), "success");
                 }
 
@@ -174,10 +181,15 @@ public class MarketFragment extends Fragment {
 
                 //put all post into post model form
                 for(Post p : postsArrayList){
-                    Log.d("current post:" , p.getItemTitle());
+                    // Create a DecimalFormat object with pattern for two decimal places
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                    // Format the list price to two decimal places
+                    String formattedPrice = decimalFormat.format(p.getListPrice());
+                    // Create the title string with the formatted price
+                    String title = "$" + formattedPrice + " - " + p.getItemTitle();
+                    // Add the formatted title to the postModelArrayList
                     List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
-                    Log.d("added " + p.getItemTitle() , "success");
+                    postModelArrayList.add(new PostModel(title, imageUrls.get(0)));
                 }
                 if(postsGV != null){
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
