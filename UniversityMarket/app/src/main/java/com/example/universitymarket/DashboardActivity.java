@@ -127,7 +127,7 @@ public class DashboardActivity extends AppCompatActivity {
                 )),
                 new ArrayList<>(Arrays.asList(
                         getResources().getString(R.string.dash_toolbar_watch_txt),
-                        getResources().getString(R.string.dash_toolbar_analyze_txt)
+                        getResources().getString(R.string.dash_toolbar_bookkeep_txt)
                 )),
                 getResources().getString(R.string.dash_toolbar_chat_txt),
                 ActiveUser.first_name + " " + ActiveUser.last_name
