@@ -13,8 +13,10 @@
         <entry key="app/src/main/res/layout/fragment_filter.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_homepage.xml" value="0.15" />
         <entry key="app/src/main/res/layout/fragment_item.xml" value="0.165" />
-        <entry key="app/src/main/res/layout/fragment_market.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_market.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_message.xml" value="0.20052083333333334" />
         <entry key="app/src/main/res/layout/fragment_mypost.xml" value="0.16770833333333332" />
+        <entry key="app/src/main/res/layout/fragment_mypost_profile.xml" value="0.20052083333333334" />
         <entry key="app/src/main/res/layout/fragment_popup.xml" value="0.16770833333333332" />
         <entry key="app/src/main/res/layout/fragment_post.xml" value="0.335" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.14437689969604864" />

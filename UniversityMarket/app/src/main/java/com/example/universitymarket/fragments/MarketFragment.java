@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 //import android.widget.Filter;
 import android.widget.GridView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.PostGVAdapter;
@@ -41,6 +42,8 @@ public class MarketFragment extends Fragment {
     public ArrayList<Post> postsArrayList = new ArrayList<>();
     public ArrayList <PostModel> postModelArrayList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
+    public TextView refine_filter_message;
+
 
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
@@ -56,6 +59,7 @@ public class MarketFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
         postsGV = view.findViewById(R.id.idGVposts); // Find the GridView in your layout
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        refine_filter_message = view.findViewById(R.id.refine_filters);
 
         // Create the adapter and set it to the GridView with current posts
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
@@ -123,6 +127,7 @@ public class MarketFragment extends Fragment {
                 postModelArrayList.clear();
                 postsArrayList.addAll(result);
                 postsGV.setVisibility(View.VISIBLE);
+                refine_filter_message.setVisibility(View.INVISIBLE);
 
                 //put all post into post model form
                 for (Post p : postsArrayList) {
@@ -149,7 +154,7 @@ public class MarketFragment extends Fragment {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
                 Log.e("Error loading posts with filter", error.getMessage());
                 postsGV.setVisibility(View.INVISIBLE);
-
+                refine_filter_message.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -174,6 +179,7 @@ public class MarketFragment extends Fragment {
             @Override
             public void onSuccess(List<Post> result) {
                 postsGV.setVisibility(View.VISIBLE);
+                refine_filter_message.setVisibility(View.INVISIBLE);
                 postsArrayList.clear();
                 postModelArrayList.clear();
 
@@ -200,6 +206,7 @@ public class MarketFragment extends Fragment {
             @Override
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
+                refine_filter_message.setVisibility(View.INVISIBLE);
                 Log.e("Error loading posts no filter", error.getMessage());
             }
         });

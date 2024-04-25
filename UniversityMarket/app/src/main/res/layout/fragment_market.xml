@@ -4,6 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.MarketFragment">
+    <TextView
+        android:id="@+id/refine_filters"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:text="No posts under these filters:("
+        android:gravity="center"
+        android:visibility="invisible" />
+
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
