@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -28,6 +29,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
     private View root;
     private RecyclerView recyclerView;
     private myPostsProfileViewModel myViewModel;
+    private TextView unavailable;
     private List<Post> myPosts;
     private TaskCompletionSource<String> load;
     private myPostProfileAdapter adapter;
@@ -48,6 +50,7 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_mypost_profile, container, false);
         recyclerView = root.findViewById(R.id.mypost_profile_recyclerView);
+        unavailable = root.findViewById(R.id.mypostprofile_unavailable_text);
         myViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
         final Observer<List<Post>> myPostProfileObserver = updatedList -> {
             //load = new TaskCompletionSource<>();
@@ -66,6 +69,11 @@ public class myPostProfileFragment extends Fragment implements myPostProfileAdap
                 myPosts = updatedList;
             }
             //load.setResult("getPosts");
+
+            if(myPosts == null || updatedList.size() == 0)
+                unavailable.setVisibility(View.VISIBLE);
+            else
+                unavailable.setVisibility(View.INVISIBLE);
         };
         myViewModel.getUserPosts(userClickedEmail).observe(getViewLifecycleOwner(), myPostProfileObserver);
         return root;

@@ -63,17 +63,7 @@ public class ChatViewModel extends ViewModel {
 
             @Override
             public void onModified(User modified) {
-                ArrayList<String> differentChatIds = (ArrayList<String>) Data.differingValuePairs(ActiveUser.toPOJO(), modified).stream()
-                        .filter(pair -> pair.getKey()
-                                .equals("chat_ids"))
-                        .findFirst()
-                        .map(Map.Entry::getValue)
-                        .orElse(null);
-
-                if(differentChatIds != null) {
-                    ActiveUser.chat_ids = differentChatIds;
-                    refresh();
-                }
+                refresh();
             }
 
             @Override

@@ -54,7 +54,6 @@ public class DashboardActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private Menu menu;
     private MenuItem settings;
-    private MenuItem search;
     private Drawable gear;
     private ViewGroup.LayoutParams params;
     private TaskCompletionSource<List<Uri>> urisRetrieval = new TaskCompletionSource<>();
@@ -157,7 +156,6 @@ public class DashboardActivity extends AppCompatActivity {
                             int newMax = Policy.max_images_per_post - result.getInt("numPictures");
                             fragResponse.clear();
 
-                            Log.e("newMax", newMax + "");
                             if(newMax > 1) {
                                 urisRetrieval = new TaskCompletionSource<>();
                                 multipleImagePicker.updateMaxItems(newMax);
@@ -285,7 +283,6 @@ public class DashboardActivity extends AppCompatActivity {
             menu.findItem(R.id.dash_toolbar_settings).setIcon(gear);
         }
 
-        search = menu.findItem(R.id.dash_toolbar_search);
         settings = menu.findItem(R.id.dash_toolbar_settings);
         settings.setOnMenuItemClickListener((menuItem) -> {
             createPopup("Settings", null, SettingsFragment.class.getName(), null);
@@ -315,7 +312,6 @@ public class DashboardActivity extends AppCompatActivity {
             popups.forEach(popup -> fm.beginTransaction().show(popup).commit());
 
             settings.setVisible(name.equals("Profile"));
-            search.setVisible(name.equals("Market"));
 
             currentView = name;
 

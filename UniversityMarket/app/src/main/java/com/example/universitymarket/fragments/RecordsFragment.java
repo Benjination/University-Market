@@ -41,11 +41,9 @@ public class RecordsFragment extends Fragment {
     private Thread retrieve;
     private TextView unavailable;
     private final Bundle dashMessage = new Bundle();
-    private final String[] args;
     private final FragmentManager fm;
 
-    public RecordsFragment(String[] args, FragmentManager fm) {
-        this.args = args;
+    public RecordsFragment(FragmentManager fm) {
         this.fm = fm;
     }
 

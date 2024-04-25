@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -37,6 +38,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
     private RecyclerView recyclerView;
     private myPostsViewModel myViewModel;
     private myPostsProfileViewModel mypostsProfileViewModel;
+    private TextView unavailable;
     private List<Post> myPosts;
     private TaskCompletionSource<String> load;
     private myPostAdapter adapter;
@@ -55,6 +57,7 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
                              Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_mypost, container, false);
         recyclerView = root.findViewById(R.id.mypost_recyclerView);
+        unavailable = root.findViewById(R.id.mypost_unavailable_text);
         myViewModel = new ViewModelProvider(requireActivity()).get(myPostsViewModel.class);
         mypostsProfileViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
         final Observer<List<Post>> myPostObserver = updatedList -> {
@@ -74,6 +77,11 @@ public class myPostFragment extends Fragment implements myPostAdapter.OnItemClic
                 myPosts = updatedList;
             }
             //load.setResult("getPosts");
+
+            if(myPosts == null || updatedList.size() == 0)
+                unavailable.setVisibility(View.VISIBLE);
+            else
+                unavailable.setVisibility(View.INVISIBLE);
         };
         myViewModel.getMyPosts().observe(getViewLifecycleOwner(), myPostObserver);
         return root;

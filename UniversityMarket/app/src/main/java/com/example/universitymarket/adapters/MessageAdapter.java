@@ -60,13 +60,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @NonNull
     @Override
-    public MessageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int type) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_message_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MessageAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Message message = messages.get(position);
         String senderEmail = message.getSenderEmail();
 
@@ -91,10 +91,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             if(message.getOfferTaken())
                 return;
 
-            holder.regularContent.setLayoutParams(params);
             Network.getPost(message.getOfferPostId(), new Callback<Post>() {
                 @Override
                 public void onSuccess(Post post) {
+                    holder.offerImage.setVisibility(View.VISIBLE);
+                    holder.offerTitle.setVisibility(View.VISIBLE);
+                    holder.offerButton.setVisibility(View.VISIBLE);
+
+                    holder.regularContent.setLayoutParams(params);
                     holder.regularContent.setVisibility(View.INVISIBLE);
                     new Handler(Looper.getMainLooper()).post(() -> Picasso
                             .get()
@@ -197,16 +201,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 @Override
                 public void onFailure(Exception error) {
                     Log.e("getPost", error.getMessage());
-                    Toast.makeText(
-                            context,
-                            "Please check your network connection",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                    holder.offerButton.setLayoutParams(params);
+                    holder.offerImage.setLayoutParams(params);
+                    holder.offerTitle.setLayoutParams(params);
+
+                    holder.regularContent.setVisibility(View.VISIBLE);
+                    holder.regularContent.setText(R.string.message_post_unavailable);
                 }
             });
-            holder.offerImage.setVisibility(View.VISIBLE);
-            holder.offerTitle.setVisibility(View.VISIBLE);
-            holder.offerButton.setVisibility(View.VISIBLE);
         } else {
             holder.offerButton.setLayoutParams(params);
             holder.offerImage.setLayoutParams(params);

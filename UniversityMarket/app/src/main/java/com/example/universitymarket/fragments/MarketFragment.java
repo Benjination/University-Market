@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 //import android.widget.Filter;
 import android.widget.GridView;
 import android.widget.RadioButton;
+import android.widget.TextView;
 
 import com.example.universitymarket.R;
 import com.example.universitymarket.adapters.PostGVAdapter;
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.Filter;
 import com.google.firebase.firestore.Query;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +42,7 @@ public class MarketFragment extends Fragment {
     public ArrayList<Post> postsArrayList = new ArrayList<>();
     public ArrayList <PostModel> postModelArrayList = new ArrayList<>();
     private SwipeRefreshLayout swipeRefreshLayout;
+    public TextView refine_filter_message;
 
     public MarketFragment(FragmentManager fm) {
         this.fm = fm;
@@ -55,6 +58,7 @@ public class MarketFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_market, container, false);
         postsGV = view.findViewById(R.id.idGVposts); // Find the GridView in your layout
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout);
+        refine_filter_message = view.findViewById(R.id.refine_filters);
 
         // Create the adapter and set it to the GridView with current posts
         PostGVAdapter adapter1 = new PostGVAdapter(getActivity(), postModelArrayList);
@@ -69,10 +73,10 @@ public class MarketFragment extends Fragment {
                 if(FilterFragment.selected_uploadDate_filter != null){
                     upload_sort_by = new SortByField();
                     if(FilterFragment.selected_uploadDate_filter.getText().toString().equals("Newest to Oldest")){
-                        upload_sort_by.direction = Query.Direction.ASCENDING;
+                        upload_sort_by.direction = Query.Direction.DESCENDING;
                     }
                     else{
-                        upload_sort_by.direction = Query.Direction.DESCENDING;
+                        upload_sort_by.direction = Query.Direction.ASCENDING;
                     }
                     upload_sort_by.fieldName = "about.date_created";
                 }
@@ -122,12 +126,20 @@ public class MarketFragment extends Fragment {
                 postsArrayList.clear();
                 postModelArrayList.clear();
                 postsArrayList.addAll(result);
+                postsGV.setVisibility(View.VISIBLE);
+                refine_filter_message.setVisibility(View.INVISIBLE);
 
                 //put all post into post model form
                 for(Post p : postsArrayList){
-                    //Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
+                    // Create a DecimalFormat object with pattern for two decimal places
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                    // Format the list price to two decimal places
+                    String formattedPrice = decimalFormat.format(p.getListPrice());
+                    // Create the title string with the formatted price
+                    String title = "$" + formattedPrice + " - " + p.getItemTitle();
+                    // Add the formatted title to the postModelArrayList
                     List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
-                    postModelArrayList.add(new PostModel("$" + p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
+                    postModelArrayList.add(new PostModel(title, imageUrls.get(0)));
                     Log.d("added with filter" + p.getItemTitle(), "success");
                 }
                 if(postsGV != null){
@@ -140,6 +152,8 @@ public class MarketFragment extends Fragment {
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
                 Log.e("Error loading posts with filter", error.getMessage());
+                postsGV.setVisibility(View.INVISIBLE);
+                refine_filter_message.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -163,6 +177,8 @@ public class MarketFragment extends Fragment {
         Network.getPosts(null, null, 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
+                postsGV.setVisibility(View.VISIBLE);
+                refine_filter_message.setVisibility(View.INVISIBLE);
                 postsArrayList.clear();
                 postModelArrayList.clear();
 
@@ -170,10 +186,15 @@ public class MarketFragment extends Fragment {
 
                 //put all post into post model form
                 for(Post p : postsArrayList){
-                    Log.d("current post:" , p.getItemTitle());
+                    // Create a DecimalFormat object with pattern for two decimal places
+                    DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+                    // Format the list price to two decimal places
+                    String formattedPrice = decimalFormat.format(p.getListPrice());
+                    // Create the title string with the formatted price
+                    String title = "$" + formattedPrice + " - " + p.getItemTitle();
+                    // Add the formatted title to the postModelArrayList
                     List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
-                    postModelArrayList.add(new PostModel("$"+ p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
-                    Log.d("added " + p.getItemTitle() , "success");
+                    postModelArrayList.add(new PostModel(title, imageUrls.get(0)));
                 }
                 if(postsGV != null){
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
@@ -184,6 +205,7 @@ public class MarketFragment extends Fragment {
             @Override
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
+                refine_filter_message.setVisibility(View.VISIBLE);
                 Log.e("Error loading posts no filter", error.getMessage());
             }
         });

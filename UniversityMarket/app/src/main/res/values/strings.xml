@@ -7,7 +7,7 @@
     <string name="tab_create_txt">Create</string>
     <string name="tab_view_txt">Posts</string>
     <string name="tab_watch_txt">Watch</string>
-    <string name="tab_analyze_txt">Analyze</string>
+    <string name="tab_bookkeep_txt">Bookkeep</string>
     <string name="tab_portfolio_txt">Portfolio</string>
 
     <string name="chat_unavailable_txt">You have not yet started a conversation</string>
@@ -15,6 +15,7 @@
     <string name="message_input_box_hint">Type a message</string>
     <string name="message_send_button_desc">Send</string>
     <string name="message_offer_button_desc">Send offer</string>
+    <string name="message_post_unavailable"><i><b>Post unavailable</b></i></string>
 
     <string name="offer_posts_label_txt">Select a post</string>
     <string name="offer_close_button_txt">Close</string>
@@ -40,6 +41,8 @@
 
     <string name="records_unavailable_txt">No records are available at this time</string>
 
+    <string name="watch_unavailable_txt">You are not watching any items</string>
+
     <string name="post_submit_button_txt">Post Item</string>
     <string name="post_image_submit_hint">Image upload</string>
     <string name="post_title_field_hint">Title</string>
@@ -48,6 +51,12 @@
     <string name="post_price_field_hint">Price</string>
     <string name="post_image_required_txt">at least one image is required</string>
     <string name="post_image_addmore_button_txt">Add more images</string>
+
+    <string name="mypost_posts_unavailable_txt">You haven\'t uploaded any posts yet</string>
+
+    <string name="mypostprofile_posts_unavailable_txt">User has not posted anything</string>
+
+    <string name="market_posts_unavailable_txt">No posts under these filters</string>
 
     <string name="viewpost_watchlist_add_button_txt">Add to watchlist</string>
     <string name="viewpost_create_conversation_button_txt">Contact seller</string>

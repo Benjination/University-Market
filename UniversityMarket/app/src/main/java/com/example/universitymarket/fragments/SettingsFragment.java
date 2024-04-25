@@ -55,22 +55,14 @@ public class SettingsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void configureButtons(View view) {
-        Button recordsButton = view.findViewById(R.id.settings_records_button);
         Button signoutButton = view.findViewById(R.id.settings_signout_button);
-        recordsButton.setOnClickListener(this);
         signoutButton.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         Intent btn_i;
-        if(v.getId() == R.id.settings_records_button) {
-            Bundle popupArgs = new Bundle();
-            popupArgs.putString("popupTitle", "Records");
-            popupArgs.putString("popupFragment", RecordsFragment.class.getName());
-            popupArgs.putStringArray("popupFragArgs", null);
-            fm.setFragmentResult("createPopup", popupArgs);
-        } else if(v.getId() == R.id.settings_signout_button) {
+        if(v.getId() == R.id.settings_signout_button) {
             FirebaseAuth mAuth = FirebaseAuth.getInstance();
             mAuth.signOut();
             btn_i = new Intent(getContext(), Login.class);

@@ -7,6 +7,17 @@
     android:orientation="vertical"
     tools:context=".fragments.myPostFragment">
 
+    <TextView
+        android:id="@+id/mypost_unavailable_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="?listPreferredItemPaddingStart"
+        android:layout_marginTop="?listPreferredItemPaddingStart"
+        android:text="@string/mypost_posts_unavailable_txt"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mypost_recyclerView"
         android:layout_width="0dp"

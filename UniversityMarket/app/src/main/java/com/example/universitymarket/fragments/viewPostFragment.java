@@ -1,6 +1,5 @@
 package com.example.universitymarket.fragments;
 
-import android.nfc.Tag;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -29,7 +28,6 @@ import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
 import com.example.universitymarket.viewmodels.WatchViewModel;
-import com.example.universitymarket.viewmodels.myPostsProfileViewModel;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -45,7 +43,6 @@ public class viewPostFragment extends Fragment {
     private final String[] args;
     private final FragmentManager fm;
     private WatchViewModel watchViewModel;
-    private myPostsProfileViewModel postProfileViewModel;
     private final String postId;
     private String chatId;
     private View viewSinglePost;
@@ -70,7 +67,6 @@ public class viewPostFragment extends Fragment {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
-        postProfileViewModel = new ViewModelProvider(requireActivity()).get(myPostsProfileViewModel.class);
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
@@ -102,25 +98,12 @@ public class viewPostFragment extends Fragment {
                 Network.getPost(postId, new Callback<Post>() {
                     @Override
                     public void onSuccess(Post result) {
-                        Network.setPost(result, true, new Callback<Post>() {
-                            @Override
-                            public void onSuccess(Post result) {
-                                ActiveUser.post_ids.remove(postId);
-                                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
-                                    @Override
-                                    public void onSuccess(User result) { Toast.makeText(requireActivity(), "Deleted", Toast.LENGTH_SHORT).show(); }
-                                    @Override
-                                    public void onFailure(Exception error) { Log.e("setUser", error.getMessage()); }
-                                });
-                            }
-                            @Override
-                            public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
-                        });
+                        deletePost(result);
                     }
 
                     @Override
                     public void onFailure(Exception error) {
-
+                        Log.e("getPost", error.getMessage());
                     }
                 });
             }
@@ -147,8 +130,64 @@ public class viewPostFragment extends Fragment {
         }
     }
 
+    private void deletePost(Post post) {
+        Network.setPost(post, true, new Callback<Post>() {
+            @Override
+            public void onSuccess(Post result) {
+                ActiveUser.post_ids.remove(postId);
+                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
+                    @Override
+                    public void onSuccess(User result) {
+                        //Toast.makeText(requireActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+                    }
+                    @Override
+                    public void onFailure(Exception error) { Log.e("setUser", error.getMessage()); }
+                });
+                // remove post from ALL users Watchlists
+                // needs improvement. need to filter and possibly remove IN db
+                Network.getAllUsers(null, new Callback<List<User>>() {
+                    @Override
+                    public void onSuccess(List<User> result) {
+                        List<User> updatedUsers = new ArrayList<>();
+                        if(result != null) {
+                            for (User user : result) {
+                                List<String> user_watch_ids = user.getWatchIds();
+                                if(user_watch_ids != null) {
+                                    Iterator<String> iterator = user_watch_ids.iterator();
+                                    while (iterator.hasNext()) {
+                                        String watch_id = iterator.next();
+                                        if (postId.matches(watch_id)) {
+                                            iterator.remove();
+                                            updatedUsers.add(user);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if(!updatedUsers.isEmpty()) {
+                            User[] array = new User[updatedUsers.size()];
+                            updatedUsers.toArray(array);
+                            Network.setUsers(array, false, null);
+                            Log.e("myPostsViewModel", "SET AllUsers SUCCESS");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        Log.e("myPostsViewModel", "GET AllUsers: "+error.getMessage());
+                    }
+                });
+
+                // Get fragment manager of the popup
+                getParentFragmentManager().setFragmentResult("closePopup", new Bundle());
+            }
+            @Override
+            public void onFailure(Exception error) { Toast.makeText(requireActivity(), "Try Again Later", Toast.LENGTH_SHORT).show(); }
+        });
+    }
+
     private void setupCreateConvoButton(Button createConvo, String authorEmail) {
-            createConvo.setEnabled(true);
+        createConvo.setEnabled(true);
 
         createConvo.setOnClickListener(l -> {
             if(!ActiveUser.post_ids.contains(this.postId)) {
@@ -187,7 +226,6 @@ public class viewPostFragment extends Fragment {
                         Log.e("setChat", error.getMessage());
                     }
                 });
-                createConvo.setEnabled(true);
             }
             else
             {
@@ -195,138 +233,47 @@ public class viewPostFragment extends Fragment {
                 Network.getPost(postId, new Callback<Post>() {
                     @Override
                     public void onSuccess(Post post) {
-                                Transaction transaction = new Transaction(
-                                        post.getDescriptors(),
-                                        post.getId(),
-                                        post.getGenre(),
-                                        false,
-                                        post.getItemDescription(),
-                                        post.getId() + post.getQuantity(),
-                                        post.getImageContexts(),
-                                        post.getItemTitle(),
-                                        null,
-                                        null,
-                                        ActiveUser.email,
-                                        new Date().toString(),
-                                        ActiveUser.email,
-                                        post.getListPrice(),
-                                        "closed",
-                                        Data.generateID("tsct"));
+                        Transaction transaction = new Transaction(
+                                post.getDescriptors(),
+                                post.getId(),
+                                post.getGenre(),
+                                false,
+                                post.getItemDescription(),
+                                post.getId() + post.getQuantity(),
+                                post.getImageContexts(),
+                                post.getItemTitle(),
+                                null,
+                                null,
+                                ActiveUser.email,
+                                new Date().toString(),
+                                ActiveUser.email,
+                                post.getListPrice(),
+                                "closed",
+                                Data.generateID("tsct"));
 
-                                Network.setTransaction(transaction, false, new Callback<Transaction>() {
-                                    @Override
-                                    public void onSuccess(Transaction result) {
-                                        //Log.e("String", "Entered Else Statement");
-                                        ActiveUser.transact_ids.add(transaction.getId());
-                                        Toast.makeText(requireActivity(), "Transaction Updated", Toast.LENGTH_LONG).show();
-                                        Network.setPost(post, true, new Callback<Post>() {
-                                            @Override
-                                            public void onSuccess(Post result) {
-                                                Toast.makeText(requireActivity(), "Item Deleted from Market", Toast.LENGTH_LONG).show();
-
-                                                //remove post from activeuser and update user in db
-                                                ActiveUser.post_ids.remove(String.valueOf(postId));
-                                                Network.setUser(Data.activeUserToPOJO(), false, new Callback<User>() {
-                                                    @Override
-                                                    public void onSuccess(User result) {
-                                                        //loadMyPosts();
-                                                        Log.e("myPostsViewModel", "DEL UserPostID SUCCESS");
-                                                    }
-                                                    @Override
-                                                    public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL UserPostID: "+error.getMessage()); }
-                                                });
-                                                // remove post from ALL users Watchlists
-                                                // needs improvement. need to filter and possibly remove IN db
-                                                Network.getAllUsers(null, new Callback<List<User>>() {
-                                                    @Override
-                                                    public void onSuccess(List<User> result) {
-                                                        List<User> updatedUsers = new ArrayList<>();
-                                                        if(result != null) {
-                                                            for (User user : result) {
-                                                                List<String> user_watch_ids = user.getWatchIds();
-                                                                if(user_watch_ids != null) {
-                                                                    Iterator<String> iterator = user_watch_ids.iterator();
-                                                                    while (iterator.hasNext()) {
-                                                                        String watch_id = iterator.next();
-                                                                        if (postId.matches(watch_id)) {
-                                                                            iterator.remove();
-                                                                            updatedUsers.add(user);
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        if(!updatedUsers.isEmpty()) {
-                                                            User[] array = new User[updatedUsers.size()];
-                                                            updatedUsers.toArray(array);
-                                                            Network.setUsers(array, false, null);
-                                                            Log.e("myPostsViewModel", "SET AllUsers SUCCESS");
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onFailure(Exception error) {
-                                                        Log.e("myPostsViewModel", "GET AllUsers: "+error.getMessage());
-                                                    }
-                                                });
-                                            }
-                                            @Override
-                                            public void onFailure(Exception error) { Log.e("myPostsViewModel", "DEL Post: "+error.getMessage());  }
-                                        });
-
-
-
-                                        Network.setUser(ActiveUser.toPOJO(), false, new Callback<User>() {
-                                            @Override
-                                            public void onSuccess(User ignored) {}
-
-                                            @Override
-                                            public void onFailure(Exception error) {
-                                                Log.e("setUser", error.getMessage());
-                                            }
-
-                                        });
-                                        Network.getUser(ActiveUser.email, new Callback<User>() {
-                                            @Override
-                                            public void onSuccess(User user) {
-                                                user.setTransactIds((ArrayList<String>) Stream.concat(user.getTransactIds().stream(), Stream.of(transaction.getId())).collect(Collectors.toList()));
-
-                                                Network.setUser(user, false, new Callback<User>() {
-                                                    @Override
-                                                    public void onSuccess(User ignored) {}
-
-                                                    @Override
-                                                    public void onFailure(Exception error) {
-                                                        Log.e("setUser", error.getMessage());
-                                                    }
-                                                });
-                                            }
-                                            @Override
-                                            public void onFailure(Exception error) {
-                                                Log.e("getUser", error.getMessage());
-
-                                            }
-                                        });
-
-                                    }
-
-                                    @Override
-                                    public void onFailure(Exception error) {
-                                        Log.e("Fail", error.getMessage());
-                                    }
-                                });
+                        Network.setTransaction(transaction, false, new Callback<Transaction>() {
+                            @Override
+                            public void onSuccess(Transaction result) {
+                                //Log.e("String", "Entered Else Statement");
+                                ActiveUser.transact_ids.add(transaction.getId());
+                                Toast.makeText(requireActivity(), "Transaction Updated", Toast.LENGTH_LONG).show();
+                                deletePost(post);
                             }
 
                             @Override
                             public void onFailure(Exception error) {
-                                Log.e("Auto-Fail", error.getMessage());
+                                Log.e("Fail", error.getMessage());
                             }
-                       //<----------End
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        Log.e("Auto-Fail", error.getMessage());
+                    }
                 });
             }
         });
-
-
     }
 
     private void fetchPostAndPopulate(String postID, View view) {
@@ -353,12 +300,27 @@ public class viewPostFragment extends Fragment {
                     }
                 });
 
+                postImageSwitcher.setInAnimation(getContext(), android.R.anim.slide_in_left);
+                postImageSwitcher.setInAnimation(getContext(), android.R.anim.slide_out_right);
+
                 // Load the image
                 if (!result.getImageUrls().isEmpty()) {
                     Picasso.get().load(result.getImageUrls().get(0)).into((ImageView) postImageSwitcher.getCurrentView());
                 } else {
                     Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/university-market-e4aa7.appspot.com/o/invalid.png?alt=media&token=4034f579-5c6f-4ac9-a38b-29e3a2b005bb").into((ImageView) postImageSwitcher.getCurrentView());
                 }
+
+                // Set up click listener for image switcher to switch to next image
+                postImageSwitcher.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        currentIndex++;
+                        if (currentIndex >= result.getImageUrls().size()) {
+                            currentIndex = 0; // Wrap around to the first image
+                        }
+                        Picasso.get().load(result.getImageUrls().get(currentIndex)).into((ImageView) postImageSwitcher.getCurrentView());
+                    }
+                });
 
                 // Get the uploader's rating and setup author button
                 Network.getUser(result.getAuthorEmail(), new Callback<User>() {
@@ -374,10 +336,16 @@ public class viewPostFragment extends Fragment {
                             dashMessage.putString("popupSubtitle", user.getEmail());
                             dashMessage.putString("popupFragment", TabFragment.class.getName());
                             dashMessage.putStringArray("popupFragArgs", new String[]{ "Profile", user.getEmail() });
-                            postProfileViewModel.viewUserPosts(user.getEmail());
 
                             fm.setFragmentResult("createPopup", dashMessage);
                         });
+
+                        for(String s : user.getChatIds()) {
+                            if(ActiveUser.chat_ids.contains(s)) {
+                                return;
+                            }
+                        }
+                        setupCreateConvoButton(createConvo, result.getAuthorEmail());
                     }
 
                     @Override
@@ -385,20 +353,6 @@ public class viewPostFragment extends Fragment {
                         Log.e("getUser", error.getMessage());
                     }
                 });
-
-                // Check if a chat has been opened
-                if(!result.getAuthorEmail().equals(ActiveUser.email)) {
-                    Network.getChats(ActiveUser.chat_ids, null, new Callback<List<Chat>>() {
-                        @Override
-                        public void onSuccess(List<Chat> ignored) {}
-
-                        @Override
-                        public void onFailure(Exception error) {
-                            Log.e("getChats", error.getMessage());
-                            setupCreateConvoButton(createConvo, result.getAuthorEmail());
-                        }
-                    });
-                }
             }
 
             @Override

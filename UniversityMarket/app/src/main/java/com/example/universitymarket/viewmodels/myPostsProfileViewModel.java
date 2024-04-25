@@ -36,7 +36,9 @@ public class myPostsProfileViewModel extends ViewModel {
 
                     @Override
                     public void onFailure(Exception error) {
-                        if(error.getMessage() != null && error.getMessage().contains("Collection 'posts' does not exist")) {
+                        if(error.getMessage() != null &&
+                                (error.getMessage().contains("Collection 'posts' does not exist") ||
+                                (error.getMessage().contains("No documents are available")))) {
                             myPosts.setValue(new ArrayList<>());
                         }
                         Log.e("myPostsProfileViewModel", "GET UserPosts: "+error.getMessage());

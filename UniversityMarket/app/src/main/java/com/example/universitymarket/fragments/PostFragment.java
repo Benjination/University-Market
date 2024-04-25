@@ -142,7 +142,7 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 if(imageupload.getVisibility() == View.VISIBLE) {
                                     imageupload.setVisibility(View.INVISIBLE);
                                     imagelabel.setVisibility(View.INVISIBLE);
-                                    //addmore.setVisibility(View.VISIBLE);
+                                    addmore.setVisibility(View.VISIBLE);
                                     removeImage.setVisibility(View.VISIBLE);
                                 }
                                 for (String uri : result.getStringArrayList("uris")) {
@@ -157,6 +157,9 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                     imageURLsToBeUploaded.add(uri);
                                     addToCarousel(Uri.parse(uri));
                                 }
+                            }
+                            if(Policy.max_images_per_post == imageURLsToBeUploaded.size()) {
+                                addmore.setVisibility(View.INVISIBLE);
                             }
                             if (!load.getTask().isComplete())
                                 load.setResult("image");
@@ -182,6 +185,9 @@ public class PostFragment extends Fragment implements View.OnClickListener {
                                 imagelabel.setVisibility(View.INVISIBLE);
                                 imageupload.setVisibility(View.INVISIBLE);
                                 removeImage.setVisibility(View.VISIBLE);
+                            }
+                            if(Policy.max_images_per_post == imageURLsToBeUploaded.size()) {
+                                addmore.setVisibility(View.INVISIBLE);
                             }
                             if (!load.getTask().isComplete())
                                 load.setResult("image");
@@ -362,15 +368,14 @@ public class PostFragment extends Fragment implements View.OnClickListener {
         }
         if(ID == removeImage.getId()) {
             carousel.removeAllViews();
-            imageURLsToBeUploaded.remove(0);
-            position -= position == numIndicators - 1 ? 1 : 0;
-            indicatorContainer.removeView(indicatorContainer.getChildAt(--numIndicators));
-            if(numIndicators == 0) {
-                addmore.setVisibility(View.INVISIBLE);
-                removeImage.setVisibility(View.INVISIBLE);
-                imageupload.setVisibility(View.VISIBLE);
-                imagelabel.setVisibility(View.VISIBLE);
-            }
+            imageURLsToBeUploaded.clear();
+            position = 0;
+            numIndicators = 0;
+            indicatorContainer.removeAllViews();
+            addmore.setVisibility(View.INVISIBLE);
+            removeImage.setVisibility(View.INVISIBLE);
+            imageupload.setVisibility(View.VISIBLE);
+            imagelabel.setVisibility(View.VISIBLE);
         }
         if(ID == addmore.getId()) {
             if(imageURLsToBeUploaded.size() < Policy.max_images_per_post)

@@ -11,7 +11,7 @@ public interface Policy {
     int max_posts_per_user = 20;
     int max_docs_loaded = 30;
     int max_seconds_before_timeout = 5;
-    int max_images_per_post = 1;
+    int max_images_per_post = 5;
     int max_descriptors_per_genre = 10;
     int max_chars_per_description = 300;
     int max_stars = 5;
