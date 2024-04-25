@@ -71,8 +71,8 @@ public class TabFragment extends Fragment {
         } else if(args[0].equals("Watch")) {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.clock_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_watch_txt);
-            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.chart_icon);
-            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_analyze_txt);
+            ((ImageView) right.findViewById(R.id.tab_icon)).setImageResource(R.drawable.receipt_icon);
+            ((TextView) right.findViewById(R.id.tab_text)).setText(R.string.tab_bookkeep_txt);
         } else {
             ((ImageView) left.findViewById(R.id.tab_icon)).setImageResource(R.drawable.profile_icon);
             ((TextView) left.findViewById(R.id.tab_text)).setText(R.string.tab_portfolio_txt);

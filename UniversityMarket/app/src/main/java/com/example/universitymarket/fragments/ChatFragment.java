@@ -50,30 +50,10 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
 
     private Observer<Boolean> isLoading;
     private Observer<Integer> numUnread;
-    private Observer<List<ChatViewModel.MessagePreview>> listenToChats;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-         listenToChats = newPreviews -> {
-            if(previews == null) {
-                previews = newPreviews;
-                adapter = new ChatAdapter(requireContext(), ChatFragment.this, previews);
-                recycler.setAdapter(adapter);
-                recycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
-            } else {
-                for(ChatViewModel.MessagePreview messagePreview : newPreviews) {
-                    if(messagePreview.add)
-                        adapter.add(newPreviews);
-                    else
-                        adapter.remove(newPreviews);
-                }
-                Data.updateAdapter(previews.stream().map(prev -> prev.chat).collect(Collectors.toList()),
-                        newPreviews.stream().map(prev -> prev.chat).collect(Collectors.toList()), adapter);
-                previews = newPreviews;
-            }
-        };
 
         isLoading = currentlyLoading -> {
             if(currentlyLoading) {
@@ -112,8 +92,30 @@ public class ChatFragment extends Fragment implements ChatAdapter.onClickListene
     private void configure(View v) {
         unavailable = v.findViewById(R.id.chat_unavailable_text);
         recycler = v.findViewById(R.id.chat_recycle_view);
-        viewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
 
+        viewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
+        final Observer<List<ChatViewModel.MessagePreview>> listenToChats = newPreviews -> {
+            if(previews == null) {
+                previews = newPreviews;
+                adapter = new ChatAdapter(requireContext(), ChatFragment.this, previews);
+                recycler.setAdapter(adapter);
+                recycler.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false));
+            } else {
+                try {
+                    for (ChatViewModel.MessagePreview messagePreview : newPreviews) {
+                        if (messagePreview.add)
+                            adapter.add(newPreviews);
+                        else
+                            adapter.remove(newPreviews);
+                    }
+                } catch(Exception e) {
+                    return;
+                }
+                Data.updateAdapter(previews.stream().map(prev -> prev.chat).collect(Collectors.toList()),
+                        newPreviews.stream().map(prev -> prev.chat).collect(Collectors.toList()), adapter);
+                previews = newPreviews;
+            }
+        };
         viewModel.listenToActiveUsersChats().observe(getViewLifecycleOwner(), listenToChats);
         viewModel.getLoading().observe(getViewLifecycleOwner(), isLoading);
         viewModel.getUnread().observe(getViewLifecycleOwner(), numUnread);

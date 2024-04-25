@@ -5,15 +5,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-import com.example.universitymarket.fragments.AnalyticsFragment;
 import com.example.universitymarket.fragments.FilterFragment;
 import com.example.universitymarket.fragments.MarketFragment;
 import com.example.universitymarket.fragments.PostFragment;
 import com.example.universitymarket.fragments.ProfileFragment;
+import com.example.universitymarket.fragments.RecordsFragment;
 import com.example.universitymarket.fragments.WatchFragment;
 import com.example.universitymarket.fragments.myPostFragment;
 import com.example.universitymarket.fragments.myPostProfileFragment;
-import com.example.universitymarket.globals.actives.ActiveUser;
 
 public class TabAdapter extends FragmentStateAdapter {
 
@@ -45,7 +44,7 @@ public class TabAdapter extends FragmentStateAdapter {
             } else if(args[0].equals("Post")) {
                 return new myPostFragment(fm);
             } else if(args[0].equals("Watch")) {
-                return new AnalyticsFragment(fm);
+                return new RecordsFragment(fm);
             } else {
                 return new myPostProfileFragment(fm, args[1]);
             }

@@ -5,6 +5,16 @@
     android:layout_height="match_parent"
     tools:context=".fragments.MarketFragment">
 
+    <TextView
+        android:id="@+id/refine_filters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="?listPreferredItemPaddingStart"
+        android:layout_marginTop="?listPreferredItemPaddingStart"
+        android:text="@string/market_posts_unavailable_txt"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:visibility="invisible" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"

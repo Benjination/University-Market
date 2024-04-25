@@ -8,28 +8,16 @@
 
 
     <Button
-        android:id="@+id/settings_records_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="?attr/listPreferredItemPaddingStart"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
-        android:text="@string/settings_records_button_txt"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <Button
         android:id="@+id/settings_signout_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="?attr/listPreferredItemPaddingStart"
         android:layout_marginEnd="?attr/listPreferredItemPaddingEnd"
+        android:layout_marginTop="?attr/actionBarSize"
         android:text="@string/settings_signout_button_txt"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_records_button" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
 
     <TextView

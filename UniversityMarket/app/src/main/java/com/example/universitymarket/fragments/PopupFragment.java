@@ -4,10 +4,13 @@ import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.example.universitymarket.R;
+import com.example.universitymarket.utilities.Data;
 
 public class PopupFragment extends Fragment {
 
@@ -48,8 +51,15 @@ public class PopupFragment extends Fragment {
     private void configure(View v) {
         toolbar = v.findViewById(R.id.popup_toolbar);
         toolbar.setTitle(title);
-        if(subtitle != null)
+        if(subtitle != null) {
+            TypedValue actionBarTV = new TypedValue();
+            requireActivity().getTheme().resolveAttribute(R.attr.actionBarSize, actionBarTV, true);
+            ViewGroup.LayoutParams params = toolbar.getLayoutParams();
+            params.height = Data.convertComplexToPixel(requireActivity(), actionBarTV.data) * 2;
+
+            toolbar.setLayoutParams(params);
             toolbar.setSubtitle(subtitle);
+        }
 
         toolbar.setNavigationOnClickListener((view) -> parentFM
                 .beginTransaction()
