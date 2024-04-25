@@ -69,14 +69,13 @@ public class MarketFragment extends Fragment {
                 if(FilterFragment.selected_uploadDate_filter != null){
                     upload_sort_by = new SortByField();
                     if(FilterFragment.selected_uploadDate_filter.getText().toString().equals("Newest to Oldest")){
-                        upload_sort_by.direction = Query.Direction.ASCENDING;
-                    }
-                    else{
                         upload_sort_by.direction = Query.Direction.DESCENDING;
                     }
-                    upload_sort_by.fieldName = "about.date_created";
+                    else{
+                        upload_sort_by.direction = Query.Direction.ASCENDING;
+                    }
+                    upload_sort_by.fieldName = "id";
                 }
-
                 //check if there are filters to be applied
                 if(FilterFragment.selected_genre_filter != null || FilterFragment.selected_price_filter != null || FilterFragment.selected_uploadDate_filter != null) {
                     getFilteredPosts(FilterFragment.selected_genre_filter, FilterFragment.selected_price_filter, upload_sort_by);
@@ -122,15 +121,17 @@ public class MarketFragment extends Fragment {
                 postsArrayList.clear();
                 postModelArrayList.clear();
                 postsArrayList.addAll(result);
+                postsGV.setVisibility(View.VISIBLE);
 
                 //put all post into post model form
-                for(Post p : postsArrayList){
+                for (Post p : postsArrayList) {
                     //Log.d("current post with filter " + selected_genre_filter.getText().toString(), p.getItemTitle());
                     List<String> imageUrls = p.getImageUrls().isEmpty() ? Policy.invalid_image : p.getImageUrls();
                     postModelArrayList.add(new PostModel("$" + p.getListPrice() + " - " + p.getItemTitle(), imageUrls.get(0)));
                     Log.d("added with filter" + p.getItemTitle(), "success");
                 }
-                if(postsGV != null){
+
+                if (postsGV != null) {
                     PostGVAdapter adapter = (PostGVAdapter) postsGV.getAdapter();
                     adapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);//stop refreshing animation
@@ -140,6 +141,8 @@ public class MarketFragment extends Fragment {
             public void onFailure(Exception error) {
                 swipeRefreshLayout.setRefreshing(false);// Stop the refreshing animation
                 Log.e("Error loading posts with filter", error.getMessage());
+                postsGV.setVisibility(View.INVISIBLE);
+
             }
         });
     }
@@ -163,6 +166,7 @@ public class MarketFragment extends Fragment {
         Network.getPosts(null, null, 1, new Callback<List<Post>>() {
             @Override
             public void onSuccess(List<Post> result) {
+                postsGV.setVisibility(View.VISIBLE);
                 postsArrayList.clear();
                 postModelArrayList.clear();
 
@@ -189,3 +193,4 @@ public class MarketFragment extends Fragment {
         });
     }
 }
+
