@@ -27,6 +27,7 @@ import com.example.universitymarket.models.User;
 import com.example.universitymarket.utilities.Callback;
 import com.example.universitymarket.utilities.Data;
 import com.example.universitymarket.utilities.Network;
+import com.example.universitymarket.viewmodels.RecordsViewModel;
 import com.example.universitymarket.viewmodels.WatchViewModel;
 import com.squareup.picasso.Picasso;
 
@@ -43,6 +44,7 @@ public class viewPostFragment extends Fragment {
     private final String[] args;
     private final FragmentManager fm;
     private WatchViewModel watchViewModel;
+    private RecordsViewModel recordsViewModel;
     private final String postId;
     private String chatId;
     private View viewSinglePost;
@@ -67,6 +69,7 @@ public class viewPostFragment extends Fragment {
         // Inflate the layout for the fragment
         View view = inflater.inflate(R.layout.fragment_view_post, container, false);
         watchViewModel = new ViewModelProvider(requireActivity()).get(WatchViewModel.class);
+        recordsViewModel = new ViewModelProvider(requireActivity()).get(RecordsViewModel.class);
 
         // Find the button and set the click listener
         Button addWL = view.findViewById(R.id.addwl);
@@ -258,6 +261,7 @@ public class viewPostFragment extends Fragment {
                                 ActiveUser.transact_ids.add(transaction.getId());
                                 Toast.makeText(requireActivity(), "Transaction Updated", Toast.LENGTH_LONG).show();
                                 deletePost(post);
+                                recordsViewModel.addTransaction(result.getId());
                             }
 
                             @Override

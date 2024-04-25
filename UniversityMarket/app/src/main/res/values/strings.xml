@@ -32,7 +32,7 @@
     <string name="dash_toolbar_create_txt">Create a Post</string>
     <string name="dash_toolbar_view_txt">My Posts</string>
     <string name="dash_toolbar_watch_txt">My Watchlist</string>
-    <string name="dash_toolbar_analyze_txt">My Analytics</string>
+    <string name="dash_toolbar_bookkeep_txt">My Receipts</string>
     <string name="dash_toolbar_chat_txt">My Conversations</string>
 
     <string name="test_upload_button_txt">Upload Test</string>
